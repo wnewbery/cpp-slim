@@ -20,6 +20,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\slim\Error.hpp" />
+    <ClInclude Include="include\slim\expression\ArithmeticOp.hpp" />
+    <ClInclude Include="include\slim\expression\Ast.hpp" />
+    <ClInclude Include="include\slim\expression\AstOp.hpp" />
+    <ClInclude Include="include\slim\expression\CmpOp.hpp" />
+    <ClInclude Include="include\slim\expression\LogicalOp.hpp" />
+    <ClInclude Include="include\slim\expression\Expression.hpp" />
+    <ClInclude Include="include\slim\expression\ExpressionLexer.hpp" />
+    <ClInclude Include="include\slim\expression\ExpressionParser.hpp" />
+    <ClInclude Include="include\slim\expression\Scope.hpp" />
+    <ClInclude Include="include\slim\Function.hpp" />
     <ClInclude Include="include\slim\Operators.hpp" />
     <ClInclude Include="include\slim\types\Boolean.hpp" />
     <ClInclude Include="include\slim\types\Null.hpp" />
@@ -30,6 +40,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Error.cpp" />
+    <ClCompile Include="source\expression\ArithmeticOp.cpp" />
+    <ClCompile Include="source\expression\AstOp.cpp" />
+    <ClCompile Include="source\expression\CmpOp.cpp" />
+    <ClCompile Include="source\expression\Expression.cpp" />
+    <ClCompile Include="source\expression\ExpressionLexer.cpp" />
+    <ClCompile Include="source\expression\ExpressionParser.cpp" />
+    <ClCompile Include="source\expression\LogicalOp.cpp" />
     <ClCompile Include="source\Operators.cpp" />
     <ClCompile Include="source\types\Object.cpp" />
   </ItemGroup>

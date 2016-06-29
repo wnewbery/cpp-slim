@@ -16,6 +16,9 @@
     <Filter Include="source\types">
       <UniqueIdentifier>{e35ca5a9-f8d9-45ef-a83e-4182551e9933}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\expression">
+      <UniqueIdentifier>{458d2f3e-acdc-4bd9-aee9-79004f0105c9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\slim\types\Null.hpp">
@@ -42,6 +45,36 @@
     <ClInclude Include="include\slim\Error.hpp">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\slim\expression\Expression.hpp">
+      <Filter>include\expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\slim\expression\ExpressionLexer.hpp">
+      <Filter>include\expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\slim\expression\ExpressionParser.hpp">
+      <Filter>include\expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\slim\expression\Scope.hpp">
+      <Filter>include\expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\slim\expression\Ast.hpp">
+      <Filter>include\expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\slim\expression\LogicalOp.hpp">
+      <Filter>include\expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\slim\expression\CmpOp.hpp">
+      <Filter>include\expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\slim\expression\AstOp.hpp">
+      <Filter>include\expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\slim\Function.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\slim\expression\ArithmeticOp.hpp">
+      <Filter>include\expression</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\types\Object.cpp">
@@ -52,6 +85,27 @@
     </ClCompile>
     <ClCompile Include="source\Error.cpp">
       <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\expression\Expression.cpp">
+      <Filter>source\expression</Filter>
+    </ClCompile>
+    <ClCompile Include="source\expression\ExpressionParser.cpp">
+      <Filter>source\expression</Filter>
+    </ClCompile>
+    <ClCompile Include="source\expression\ExpressionLexer.cpp">
+      <Filter>source\expression</Filter>
+    </ClCompile>
+    <ClCompile Include="source\expression\AstOp.cpp">
+      <Filter>source\expression</Filter>
+    </ClCompile>
+    <ClCompile Include="source\expression\ArithmeticOp.cpp">
+      <Filter>source\expression</Filter>
+    </ClCompile>
+    <ClCompile Include="source\expression\CmpOp.cpp">
+      <Filter>source\expression</Filter>
+    </ClCompile>
+    <ClCompile Include="source\expression\LogicalOp.cpp">
+      <Filter>source\expression</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
