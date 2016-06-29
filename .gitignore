@@ -1,0 +1,10 @@
+/third_party/boost
+/Intermediate
+/Win32-Debug
+/Win32-Release
+/x64-Debug
+/x64-Release
+/.vs
+/*.user
+/cpp-slim.VC.VC.opendb
+/cpp-slim.VC.db
