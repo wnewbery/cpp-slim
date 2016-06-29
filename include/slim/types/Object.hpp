@@ -6,9 +6,19 @@ namespace slim
     class Object;
     typedef std::shared_ptr<Object> ObjectPtr;
     typedef std::shared_ptr<const Object> CObjectPtr;
+    /**Base abstract object for the expression interpreter.*/
     class Object
     {
     public:
+        /**Create an instance of this object.
+         * 
+         * Used by slim::create_object<T> via T::create.
+         * 
+         * The default implementation simply uses std::make_shared and forwards to the constructor,
+         * but types may provide an alternative implementation. For example Null and Boolean are
+         * immutable types, and always return a reference to singleton null, true and false
+         * instances.
+         */
         template<class T, class... Args>
         static std::shared_ptr<T> create(Args && ... args)
         {
@@ -16,9 +26,14 @@ namespace slim
         }
 
         virtual ~Object() {}
-
+        /**Returns the type name of this object.
+         * Should vary by class only, not instances such that a comparison of type_name strings
+         * is equivalent to comparing the typeid of the instances.
+         */
         virtual const std::string& type_name()const = 0;
+        /**Convert this instance to a displayable string.*/
         virtual std::string to_string()const = 0;
+        /**Returns if this object instance should be considered true in a boolean context.*/
         virtual bool is_true()const { return true; }
         /**Compare with another object of the same type.
          * Default is identity equality.
@@ -30,6 +45,12 @@ namespace slim
         virtual int cmp(const Object *rhs)const;
     };
 
+    /**Create an instance of an object of type T.
+     * 
+     * T should derive from Object.
+     * 
+     * See Object::create for details on providing custom implementations.
+     */
     template<class T, class... Args>
     std::shared_ptr<T> create_object(Args && ... args)
     {

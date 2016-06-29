@@ -10,11 +10,18 @@ namespace slim
         using std::runtime_error::runtime_error;
     };
 
+    /**Base type for all errors thrown by the script interpreter.*/
     class ScriptError : public Error
     {
     public:
         using Error::Error;
         virtual ~ScriptError() {}
+    };
+    /**Errors from the lexer or parser.*/
+    class SyntaxError : public ScriptError
+    {
+    public:
+        using ScriptError::ScriptError;
     };
     class TypeError : public ScriptError
     {

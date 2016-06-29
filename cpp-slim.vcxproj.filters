@@ -48,12 +48,6 @@
     <ClInclude Include="include\slim\expression\Expression.hpp">
       <Filter>include\expression</Filter>
     </ClInclude>
-    <ClInclude Include="include\slim\expression\ExpressionLexer.hpp">
-      <Filter>include\expression</Filter>
-    </ClInclude>
-    <ClInclude Include="include\slim\expression\ExpressionParser.hpp">
-      <Filter>include\expression</Filter>
-    </ClInclude>
     <ClInclude Include="include\slim\expression\Scope.hpp">
       <Filter>include\expression</Filter>
     </ClInclude>
@@ -75,6 +69,15 @@
     <ClInclude Include="include\slim\expression\ArithmeticOp.hpp">
       <Filter>include\expression</Filter>
     </ClInclude>
+    <ClInclude Include="include\slim\expression\Parser.hpp">
+      <Filter>include\expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\slim\expression\Lexer.hpp">
+      <Filter>include\expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\slim\expression\Token.hpp">
+      <Filter>include\expression</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\types\Object.cpp">
@@ -89,12 +92,6 @@
     <ClCompile Include="source\expression\Expression.cpp">
       <Filter>source\expression</Filter>
     </ClCompile>
-    <ClCompile Include="source\expression\ExpressionParser.cpp">
-      <Filter>source\expression</Filter>
-    </ClCompile>
-    <ClCompile Include="source\expression\ExpressionLexer.cpp">
-      <Filter>source\expression</Filter>
-    </ClCompile>
     <ClCompile Include="source\expression\AstOp.cpp">
       <Filter>source\expression</Filter>
     </ClCompile>
@@ -105,6 +102,12 @@
       <Filter>source\expression</Filter>
     </ClCompile>
     <ClCompile Include="source\expression\LogicalOp.cpp">
+      <Filter>source\expression</Filter>
+    </ClCompile>
+    <ClCompile Include="source\expression\Lexer.cpp">
+      <Filter>source\expression</Filter>
+    </ClCompile>
+    <ClCompile Include="source\expression\Parser.cpp">
       <Filter>source\expression</Filter>
     </ClCompile>
   </ItemGroup>

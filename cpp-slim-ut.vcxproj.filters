@@ -7,6 +7,9 @@
     <Filter Include="tests\types">
       <UniqueIdentifier>{e0e32ade-bcaf-4b90-83ad-15618f46a414}</UniqueIdentifier>
     </Filter>
+    <Filter Include="tests\expression">
+      <UniqueIdentifier>{dcb13253-1b3f-4447-b353-d4d4b71bba85}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tests\Main.cpp">
@@ -17,6 +20,9 @@
     </ClCompile>
     <ClCompile Include="tests\Operators.cpp">
       <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\expression\Lexer.cpp">
+      <Filter>tests\expression</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
