@@ -36,10 +36,22 @@
     <ClInclude Include="include\slim\types\Object.hpp">
       <Filter>include\types</Filter>
     </ClInclude>
+    <ClInclude Include="include\slim\Operators.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\slim\Error.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\types\Object.cpp">
       <Filter>source\types</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Operators.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Error.cpp">
+      <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

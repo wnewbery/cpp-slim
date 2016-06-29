@@ -15,5 +15,8 @@
     <ClCompile Include="tests\types\BasicTypes.cpp">
       <Filter>tests\types</Filter>
     </ClCompile>
+    <ClCompile Include="tests\Operators.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

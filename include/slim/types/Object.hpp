@@ -5,6 +5,7 @@ namespace slim
 {
     class Object;
     typedef std::shared_ptr<Object> ObjectPtr;
+    typedef std::shared_ptr<const Object> CObjectPtr;
     class Object
     {
     public:
@@ -20,9 +21,13 @@ namespace slim
         virtual std::string to_string()const = 0;
         virtual bool is_true()const { return true; }
         /**Compare with another object of the same type.
-         * 
+         * Default is identity equality.
          */
-        virtual int cmp(const Object *rhs)const = 0;
+        virtual bool eq(const Object *rhs)const;
+        /**Compare with another object of the same type.
+         * Default throws UnorderableTypeError.
+         */
+        virtual int cmp(const Object *rhs)const;
     };
 
     template<class T, class... Args>

@@ -21,9 +21,13 @@ namespace slim
         virtual const std::string& type_name()const override { return TYPE_NAME; }
         virtual std::string to_string()const override { return b ? "true" : "false"; }
         virtual bool is_true()const override { return b; }
+        virtual bool eq(const Object *rhs)const override
+        {
+            return b == ((const Boolean*)rhs)->b;
+        }
         virtual int cmp(const Object *rhs)const override
         {
-            return (((const Boolean*)rhs)->b ? 1 : 0) - (b ? 1 : 0);
+            return (b ? 1 : 0) - (((const Boolean*)rhs)->b ? 1 : 0);
         }
     private:
         bool b;

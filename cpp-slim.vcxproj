@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\slim\Error.hpp" />
+    <ClInclude Include="include\slim\Operators.hpp" />
     <ClInclude Include="include\slim\types\Boolean.hpp" />
     <ClInclude Include="include\slim\types\Null.hpp" />
     <ClInclude Include="include\slim\types\Number.hpp" />
@@ -27,6 +29,8 @@
     <ClInclude Include="include\slim\Value.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\Error.cpp" />
+    <ClCompile Include="source\Operators.cpp" />
     <ClCompile Include="source\types\Object.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
