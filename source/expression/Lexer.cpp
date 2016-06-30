@@ -58,7 +58,6 @@ namespace slim
             case '*': ++p; return Token::MUL;
             case '/': ++p; return Token::DIV;
             case '%': ++p; return Token::MOD;
-            case '!': ++p; return Token::LOGICAL_NOT;
             case '\'':
             case '\"':
                 return quoted_string();
@@ -72,6 +71,26 @@ namespace slim
                 if (p[1] != '|') error("Expected ||");
                 p += 2;
                 return Token::LOGICAL_OR;
+            case '!':
+                ++p;
+                if (p >= end) error("Unexpected end");
+                if (p[0] == '=') { ++p; return Token::CMP_NE; }
+                else return Token::LOGICAL_NOT;
+            case '=':
+                if (p + 1 >= end) error("Unexpected end");
+                if (p[1] != '=') error("Expected ==");
+                p += 2;
+                return Token::CMP_EQ;
+            case '<':
+                ++p;
+                if (p >= end) error("Unexpected end");
+                if (p[0] == '=') { ++p; return Token::CMP_LE; }
+                else return Token::CMP_LT;
+            case '>':
+                ++p;
+                if (p >= end) error("Unexpected end");
+                if (p[0] == '=') { ++p; return Token::CMP_GE; }
+                else return Token::CMP_GT;
             default:
                 if (is_symbol_start_chr(peek)) return symbol();
                 else if (is_digit(peek)) return number();

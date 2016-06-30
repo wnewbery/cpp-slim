@@ -27,9 +27,15 @@ BOOST_AUTO_TEST_CASE(single_tokens)
     BOOST_CHECK_EQUAL(Token::MUL, single_token("*").type);
     BOOST_CHECK_EQUAL(Token::DIV, single_token("/").type);
     BOOST_CHECK_EQUAL(Token::MOD, single_token("%").type);
-    BOOST_CHECK_EQUAL(Token::LOGICAL_NOT, single_token("!").type);
+    BOOST_CHECK_EQUAL(Token::LOGICAL_NOT, single_token("! ").type);
     BOOST_CHECK_EQUAL(Token::LOGICAL_AND, single_token("&&").type);
     BOOST_CHECK_EQUAL(Token::LOGICAL_OR, single_token("||").type);
+    BOOST_CHECK_EQUAL(Token::CMP_EQ, single_token("==").type);
+    BOOST_CHECK_EQUAL(Token::CMP_NE, single_token("!=").type);
+    BOOST_CHECK_EQUAL(Token::CMP_LT, single_token("< ").type);
+    BOOST_CHECK_EQUAL(Token::CMP_LE, single_token("<=").type);
+    BOOST_CHECK_EQUAL(Token::CMP_GT, single_token("> ").type);
+    BOOST_CHECK_EQUAL(Token::CMP_GE, single_token(">=").type);
 
     auto tok_str = single_token("'string \\\\ \\' \\\" \\t \\n \\r end'");
     BOOST_CHECK_EQUAL(Token::STRING, tok_str.type);

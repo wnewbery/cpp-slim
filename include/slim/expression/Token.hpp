@@ -25,6 +25,13 @@ namespace slim
                 DIV,
                 MOD,
 
+                CMP_EQ,
+                CMP_NE,
+                CMP_LT,
+                CMP_LE,
+                CMP_GT,
+                CMP_GE,
+
                 LOGICAL_NOT,
                 LOGICAL_AND,
                 LOGICAL_OR
