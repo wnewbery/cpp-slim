@@ -9,6 +9,7 @@ namespace slim
         class Literal : public ExpressionNode
         {
         public:
+            Literal(ObjectPtr value) : value(value) {}
             virtual std::string to_string()const override;
             virtual ObjectPtr eval(Scope &scope)const override;
             ObjectPtr value;
@@ -16,6 +17,7 @@ namespace slim
         class Variable : public ExpressionNode
         {
         public:
+            Variable(const std::string &name) : name(name) {}
             virtual std::string to_string()const override { return name; }
             virtual ObjectPtr eval(Scope &scope)const override;
             std::string name;

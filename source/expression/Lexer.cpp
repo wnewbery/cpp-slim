@@ -110,7 +110,11 @@ namespace slim
             while (true)
             {
                 if (p >= end) error("Unexpected end in string");
-                else if (*p == delim) break;
+                else if (*p == delim)
+                {
+                    ++p;
+                    break;
+                }
                 else if (*p == '\\')
                 {
                     if (p + 1 >= end) error("Unexpected end in string");

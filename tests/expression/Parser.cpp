@@ -1,0 +1,129 @@
+#include <boost/test/unit_test.hpp>
+#include "expression/Parser.hpp"
+#include "expression/Ast.hpp"
+#include "expression/AstOp.hpp"
+#include "expression/Lexer.hpp"
+#include "Error.hpp"
+
+using namespace slim;
+using namespace slim::expr;
+BOOST_AUTO_TEST_SUITE(TestExprParser)
+
+ExpressionNodePtr parse(const std::string &str)
+{
+    Lexer lexer(str);
+    Parser parser(lexer);
+    return parser.parse_expression();
+}
+
+template<class T> bool is_node_type(ExpressionNodePtr ptr)
+{
+    return dynamic_cast<T*>(ptr.get()) != nullptr;
+}
+
+BOOST_AUTO_TEST_CASE(single_values)
+{
+    BOOST_CHECK(is_node_type<Literal>(parse("true")));
+    BOOST_CHECK_EQUAL("true", parse("true")->to_string());
+
+    BOOST_CHECK(is_node_type<Literal>(parse("false")));
+    BOOST_CHECK_EQUAL("false", parse("false")->to_string());
+
+    BOOST_CHECK(is_node_type<Literal>(parse("null")));
+    BOOST_CHECK_EQUAL("null", parse("null")->to_string());
+
+    BOOST_CHECK(is_node_type<Literal>(parse("55")));
+    BOOST_CHECK_EQUAL("55", parse("55")->to_string());
+
+    BOOST_CHECK(is_node_type<Literal>(parse("55.5")));
+    BOOST_CHECK_EQUAL("55.5", parse("55.5")->to_string());
+
+    BOOST_CHECK(is_node_type<Literal>(parse("'true'")));
+    BOOST_CHECK_EQUAL("\"true\"", parse("'true'")->to_string());
+
+    BOOST_CHECK_THROW(parse("55.5.5"), SyntaxError);
+
+
+    BOOST_CHECK(is_node_type<Variable>(parse("myvar")));
+    BOOST_CHECK_EQUAL("myvar", parse("myvar")->to_string());
+}
+
+
+BOOST_AUTO_TEST_CASE(single_ops)
+{
+    BOOST_CHECK_EQUAL("(5 && 10)", parse("5 && 10")->to_string());
+    BOOST_CHECK_EQUAL("(5 || 10)", parse("5 || 10")->to_string());
+
+    BOOST_CHECK_EQUAL("(5 == 10)", parse("5 == 10")->to_string());
+    BOOST_CHECK_EQUAL("(5 != 10)", parse("5 != 10")->to_string());
+    BOOST_CHECK_EQUAL("(5 < 10)", parse("5 < 10")->to_string());
+    BOOST_CHECK_EQUAL("(5 <= 10)", parse("5 <= 10")->to_string());
+    BOOST_CHECK_EQUAL("(5 > 10)", parse("5 > 10")->to_string());
+    BOOST_CHECK_EQUAL("(5 >= 10)", parse("5 >= 10")->to_string());
+
+    BOOST_CHECK_EQUAL("(5 + 10)", parse("5 + 10")->to_string());
+    BOOST_CHECK_EQUAL("(5 - 10)", parse("5 - 10")->to_string());
+
+    BOOST_CHECK_EQUAL("(5 * 10)", parse("5 * 10")->to_string());
+    BOOST_CHECK_EQUAL("(5 / 10)", parse("5 / 10")->to_string());
+    BOOST_CHECK_EQUAL("(5 % 10)", parse("5 % 10")->to_string());
+
+    BOOST_CHECK_EQUAL("(!10)", parse("! 10")->to_string());
+    BOOST_CHECK_EQUAL("(-10)", parse("-10")->to_string());
+    BOOST_CHECK_EQUAL("10", parse("+10")->to_string());
+}
+
+BOOST_AUTO_TEST_CASE(associativity_single)
+{
+    // binary, left to right
+    BOOST_CHECK_EQUAL("(((5 && 10) || 5) && true)", parse("5 && 10 || 5 && true")->to_string());
+
+    // unary, right to left
+    BOOST_CHECK_EQUAL("(-(!(-5)))", parse("-!-+5")->to_string());
+}
+
+BOOST_AUTO_TEST_CASE(grouping)
+{
+    BOOST_CHECK_EQUAL("(5 - 5)", parse("(5 - 5)")->to_string());
+    BOOST_CHECK_EQUAL("(5 - 5)", parse("(((5) - 5))")->to_string()); //because groups dont exist in the AST
+    BOOST_CHECK_EQUAL("((5 - 5) * 6)", parse("(5 - 5) * 6")->to_string());
+    BOOST_CHECK_EQUAL("(-((5 - 5) * 6))", parse("-((5 - 5) * 6)")->to_string());
+}
+
+BOOST_AUTO_TEST_CASE(precedence)
+{
+    BOOST_CHECK_EQUAL("((5 - 5) && 10)", parse("5 - 5 && 10")->to_string());
+    BOOST_CHECK_EQUAL("(((5 - 5) == 0) && (10 != null))", parse("5 - 5 == 0 && 10 != null")->to_string());
+    BOOST_CHECK_EQUAL("((5 < 10) == (15 >= 10))", parse("5 < 10 == 15 >= 10")->to_string());
+    BOOST_CHECK_EQUAL("((5 - (-5)) == 0)", parse("5 - - 5 == 0")->to_string());
+    BOOST_CHECK_EQUAL("(c + (m * x))", parse("c + m * x")->to_string());
+    BOOST_CHECK_EQUAL("((m * x) + c)", parse("m * x + c")->to_string());
+    BOOST_CHECK_EQUAL("((-(5 - 5)) * 6)", parse("-(5 - 5) * 6")->to_string());
+}
+
+BOOST_AUTO_TEST_CASE(basic_syntax_errors)
+{
+    //empty expr
+    BOOST_CHECK_THROW(parse(""), SyntaxError);
+    BOOST_CHECK_THROW(parse("5 + ()"), SyntaxError);
+    //adjacent values
+    BOOST_CHECK_THROW(parse("5 true"), SyntaxError);
+    BOOST_CHECK_THROW(parse("(10 + 4) x"), SyntaxError);
+    BOOST_CHECK_THROW(parse("(10 + 4) (54 / 5)"), SyntaxError);
+    //unary operators, missing value
+    BOOST_CHECK_THROW(parse("-"), SyntaxError);
+    BOOST_CHECK_THROW(parse("- == 5"), SyntaxError);
+    BOOST_CHECK_THROW(parse("5 == -"), SyntaxError);
+    //binary operators, missing value
+    BOOST_CHECK_THROW(parse("=="), SyntaxError);
+    BOOST_CHECK_THROW(parse("5 =="), SyntaxError);
+    BOOST_CHECK_THROW(parse("== 5"), SyntaxError);
+    BOOST_CHECK_THROW(parse("5 == < 5"), SyntaxError);
+    //unmatched group parenthesis
+    BOOST_CHECK_THROW(parse("(5 + 5"), SyntaxError);
+    BOOST_CHECK_THROW(parse("5 + 5)"), SyntaxError);
+    BOOST_CHECK_THROW(parse("((5 + 5) * 8"), SyntaxError);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+

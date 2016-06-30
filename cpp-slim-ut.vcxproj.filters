@@ -24,5 +24,11 @@
     <ClCompile Include="tests\expression\Lexer.cpp">
       <Filter>tests\expression</Filter>
     </ClCompile>
+    <ClCompile Include="tests\expression\Parser.cpp">
+      <Filter>tests\expression</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\expression\Expression.cpp">
+      <Filter>tests\expression</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

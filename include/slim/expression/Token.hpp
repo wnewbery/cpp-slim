@@ -4,14 +4,21 @@ namespace slim
 {
     namespace expr
     {
+        /**@brief Token read by Lexer.
+         * Each token has a type, and possibly an associated source string (e.g. number).
+         */
         struct Token
         {
             enum Type
             {
                 END = 0,
-
+                /**A string literal. Value stored in str.*/
                 STRING,
+                /**A number literal. Unparsed value stored in str.*/
                 NUMBER,
+                /**A symbol.
+                 * May be a value such as 'true', a variable name, function name, etc.
+                 */
                 SYMBOL,
 
                 LPAREN,

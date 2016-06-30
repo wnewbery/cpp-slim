@@ -5,6 +5,7 @@ namespace slim
     namespace expr
     {
         struct Token;
+        /**@brief Reads tokens from source code for use by the Parser.*/
         class Lexer
         {
         public:
