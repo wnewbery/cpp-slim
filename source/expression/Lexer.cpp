@@ -16,10 +16,6 @@ namespace slim
             {
                 return c >= '0' && c <= '9';
             }
-            bool is_number_chr(char c)
-            {
-                return is_digit(c) || c == '.';
-            }
             bool is_symbol_start_chr(char c)
             {
                 return c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
@@ -147,9 +143,16 @@ namespace slim
         }
         Token Lexer::number()
         {
-            assert(is_number_chr(*p));
+            assert(is_digit(*p));
             auto start = p;
-            while (p < end && is_number_chr(*p)) ++p;
+            while (p < end && is_digit(*p)) ++p;
+
+            if (p + 1 < end && p[0] == '.' && is_digit(p[1])) //decimal
+            {
+                p += 2;
+                while (p < end && is_digit(*p)) ++p;
+            }
+
             return{ Token::NUMBER, std::string(start, p - start) };
         }
     }

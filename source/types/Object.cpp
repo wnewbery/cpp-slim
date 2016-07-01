@@ -25,6 +25,11 @@ namespace slim
     {
         throw UnorderableTypeError(this, "cmp", rhs);
     }
+    ObjectPtr Object::call_method(const std::string &name, const FunctionArgs &args)
+    {
+        if (name == "to_s") return make_value(to_string());
+        throw NoSuchMethod(this, name);
+    }
 
     std::string Number::to_string()const
     {

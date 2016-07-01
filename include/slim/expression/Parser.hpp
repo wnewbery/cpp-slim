@@ -1,6 +1,7 @@
 #pragma once
 #include "Token.hpp"
 #include <memory>
+#include <vector>
 namespace slim
 {
     namespace expr
@@ -30,6 +31,8 @@ namespace slim
             ExpressionNodePtr sub_expression();
             /** A literal value, variable, or global function call. */
             ExpressionNodePtr value();
+            /** '(' expression , expression ')' */
+            std::vector<ExpressionNodePtr> func_args();
 
             /**Helper that constructs a binary operator node of type T.
              * 
@@ -44,17 +47,19 @@ namespace slim
             void next_binary_op(ExpressionNodePtr &lhs, U get_rhs);
 
             /** && || */
-            ExpressionNodePtr op1();
+            ExpressionNodePtr logical_op();
             /** == != */
-            ExpressionNodePtr op2();
+            ExpressionNodePtr equality_op();
             /** < <= > >= */
-            ExpressionNodePtr op3();
+            ExpressionNodePtr cmp_op();
             /** + -*/
-            ExpressionNodePtr op4();
+            ExpressionNodePtr add_op();
             /** * / % */
-            ExpressionNodePtr op5();
+            ExpressionNodePtr mul_op();
             /** ! + - */
-            ExpressionNodePtr op6();
+            ExpressionNodePtr unary_op();
+            /** .func(args) */
+            ExpressionNodePtr member_func();
 
         };
     }

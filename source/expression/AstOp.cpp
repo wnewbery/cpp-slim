@@ -54,14 +54,13 @@ namespace slim
 
         std::string MemberFuncCall::to_string() const
         {
-            return "." + name + FuncCall::to_string();
+            return lhs->to_string() + "." + name + FuncCall::to_string();
         }
         ObjectPtr MemberFuncCall::eval(Scope & scope) const
         {
             auto self = lhs->eval(scope);
             auto args = eval_args(scope);
-            //TODO: Implement member methods
-            return NULL_VALUE;
+            return self->call_method(name, args);
         }
     }
 }

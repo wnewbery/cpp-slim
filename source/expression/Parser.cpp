@@ -15,6 +15,8 @@
 
 #include "Error.hpp"
 
+#include <cassert>
+
 namespace slim
 {
     namespace expr
@@ -54,7 +56,7 @@ namespace slim
         }
         ExpressionNodePtr Parser::expression()
         {
-            return op1();
+            return logical_op();
         }
         ExpressionNodePtr Parser::sub_expression()
         {
@@ -88,6 +90,26 @@ namespace slim
             }
         }
 
+        std::vector<ExpressionNodePtr> Parser::func_args()
+        {
+            assert(current_token.type == Token::LPAREN);
+            std::vector<ExpressionNodePtr> args;
+            next();
+            if (current_token.type != Token::RPAREN)
+            {
+                while (true)
+                {
+                    args.push_back(expression());
+                    if (current_token.type == Token::COMMA) next();
+                    else break;
+                }
+
+                if (current_token.type != Token::RPAREN) throw SyntaxError("Expected ')'");
+            }
+            next();
+            return args;
+        }
+
         template<class T> ExpressionNodePtr Parser::binary_op(ExpressionNodePtr &&lhs)
         {
             next();
@@ -103,80 +125,80 @@ namespace slim
             lhs = std::make_unique<T>(std::move(lhs), std::move(rhs));
         }
 
-        ExpressionNodePtr Parser::op1()
+        ExpressionNodePtr Parser::logical_op()
         {
-            auto lhs = op2();
+            auto lhs = equality_op();
             while (true)
             {
                 switch(current_token.type)
                 {
-                case Token::LOGICAL_AND: next_binary_op<LogicalAnd>(lhs, &Parser::op2); break;
-                case Token::LOGICAL_OR: next_binary_op<LogicalOr>(lhs, &Parser::op2); break;
+                case Token::LOGICAL_AND: next_binary_op<LogicalAnd>(lhs, &Parser::equality_op); break;
+                case Token::LOGICAL_OR: next_binary_op<LogicalOr>(lhs, &Parser::equality_op); break;
                 default: return lhs;
                 }
             }
         }
 
-        ExpressionNodePtr Parser::op2()
+        ExpressionNodePtr Parser::equality_op()
         {
-            auto lhs = op3();
+            auto lhs = cmp_op();
             while (true)
             {
                 switch (current_token.type)
                 {
-                case Token::CMP_EQ: next_binary_op<Eq>(lhs, &Parser::op3); break;
-                case Token::CMP_NE: next_binary_op<Ne>(lhs, &Parser::op3); break;
+                case Token::CMP_EQ: next_binary_op<Eq>(lhs, &Parser::cmp_op); break;
+                case Token::CMP_NE: next_binary_op<Ne>(lhs, &Parser::cmp_op); break;
                 default: return lhs;
                 }
             }
         }
 
-        ExpressionNodePtr Parser::op3()
+        ExpressionNodePtr Parser::cmp_op()
         {
-            auto lhs = op4();
+            auto lhs = add_op();
             while (true)
             {
                 switch (current_token.type)
                 {
-                case Token::CMP_LT: next_binary_op<Lt>(lhs, &Parser::op4); break;
-                case Token::CMP_LE: next_binary_op<Le>(lhs, &Parser::op4); break;
-                case Token::CMP_GT: next_binary_op<Gt>(lhs, &Parser::op4); break;
-                case Token::CMP_GE: next_binary_op<Ge>(lhs, &Parser::op4); break;
+                case Token::CMP_LT: next_binary_op<Lt>(lhs, &Parser::add_op); break;
+                case Token::CMP_LE: next_binary_op<Le>(lhs, &Parser::add_op); break;
+                case Token::CMP_GT: next_binary_op<Gt>(lhs, &Parser::add_op); break;
+                case Token::CMP_GE: next_binary_op<Ge>(lhs, &Parser::add_op); break;
                 default: return lhs;
                 }
             }
         }
 
-        ExpressionNodePtr Parser::op4()
+        ExpressionNodePtr Parser::add_op()
         {
-            auto lhs = op5();
+            auto lhs = mul_op();
             while (true)
             {
                 switch (current_token.type)
                 {
-                case Token::PLUS: next_binary_op<Add>(lhs, &Parser::op5); break;
-                case Token::MINUS: next_binary_op<Sub>(lhs, &Parser::op5); break;
+                case Token::PLUS: next_binary_op<Add>(lhs, &Parser::mul_op); break;
+                case Token::MINUS: next_binary_op<Sub>(lhs, &Parser::mul_op); break;
                 default: return lhs;
                 }
             }
         }
 
-        ExpressionNodePtr Parser::op5()
+        ExpressionNodePtr Parser::mul_op()
         {
-            auto lhs = op6();
+            auto lhs = unary_op();
             while (true)
             {
                 switch (current_token.type)
                 {
-                case Token::MUL: next_binary_op<Mul>(lhs, &Parser::op6); break;
-                case Token::DIV: next_binary_op<Div>(lhs, &Parser::op6); break;
-                case Token::MOD: next_binary_op<Mod>(lhs, &Parser::op6); break;
+                case Token::MUL: next_binary_op<Mul>(lhs, &Parser::unary_op); break;
+                case Token::DIV: next_binary_op<Div>(lhs, &Parser::unary_op); break;
+                case Token::MOD: next_binary_op<Mod>(lhs, &Parser::unary_op); break;
                 default: return lhs;
                 }
             }
         }
 
-        ExpressionNodePtr Parser::op6()
+        ExpressionNodePtr Parser::unary_op()
         {
             ExpressionNodePtr rhs;
             while (true)
@@ -185,18 +207,35 @@ namespace slim
                 {
                 case Token::PLUS:
                     next();
-                    return op6();
+                    return unary_op();
                 case Token::MINUS:
                     next();
-                    rhs = op6();
+                    rhs = unary_op();
                     return std::make_unique<Negative>(std::move(rhs));
                 case Token::LOGICAL_NOT:
                     next();
-                    rhs = op6();
+                    rhs = unary_op();
                     return std::make_unique<LogicalNot>(std::move(rhs));
-                default: return value();
+                default: return member_func();
                 }
             }
+        }
+
+        ExpressionNodePtr Parser::member_func()
+        {
+            auto lhs = value();
+            while (current_token.type == Token::DOT)
+            {
+                next();
+                if (current_token.type != Token::SYMBOL) throw SyntaxError("Expected symbol");
+                auto name = current_token.str;
+
+                next();
+                FuncCall::Args args;
+                if (current_token.type == Token::LPAREN) args = func_args();
+                lhs = std::make_unique<MemberFuncCall>(std::move(lhs), std::move(name), std::move(args));
+            }
+            return lhs;
         }
     }
 }

@@ -14,4 +14,8 @@ namespace slim
         : TypeError("unsupported operand types: " + std::string(op) + " " + rhs->type_name())
     {
     }
+    NoSuchMethod::NoSuchMethod(const Object * obj, const std::string & method_name)
+        : ScriptError(obj->type_name() + " has no method " + method_name)
+    {
+    }
 }

@@ -39,4 +39,9 @@ namespace slim
         UnsupportedOperandTypeError(const Object *lhs, const char *op, const Object *rhs);
         UnsupportedOperandTypeError(const char *op, const Object *rhs);
     };
+    class NoSuchMethod : public ScriptError
+    {
+    public:
+        NoSuchMethod(const Object *obj, const std::string &method_name);
+    };
 }

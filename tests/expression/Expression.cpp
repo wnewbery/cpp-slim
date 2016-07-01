@@ -96,6 +96,13 @@ BOOST_AUTO_TEST_CASE(precedence)
     BOOST_CHECK_EQUAL("false", eval("20 == (100 == false)"));
 }
 
+BOOST_AUTO_TEST_CASE(member_func)
+{
+    BOOST_CHECK_EQUAL("200", eval("20.to_s + '0'"));
+    BOOST_CHECK_EQUAL("200", eval("20.to_s() + '0'"));
+    BOOST_CHECK_EQUAL("300", eval("(20 + 10).to_s() + '0'"));
+}
+
 BOOST_AUTO_TEST_CASE(runtime_error)
 {
     BOOST_CHECK_THROW(eval("5 < true"), UnorderableTypeError);

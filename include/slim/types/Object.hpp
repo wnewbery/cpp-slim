@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <string>
+#include "Function.hpp"
 namespace slim
 {
     class Object;
@@ -43,6 +44,8 @@ namespace slim
          * Default throws UnorderableTypeError.
          */
         virtual int cmp(const Object *rhs)const;
+
+        virtual ObjectPtr call_method(const std::string &name, const FunctionArgs &args);
     };
 
     /**Create an instance of an object of type T.

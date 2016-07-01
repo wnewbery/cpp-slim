@@ -1,9 +1,10 @@
 #pragma once
-#include "types/Object.hpp"
 #include <functional>
 #include <vector>
 namespace slim
 {
+    class Object;
+    typedef std::shared_ptr<Object> ObjectPtr;
     typedef std::vector<ObjectPtr> FunctionArgs;
     typedef std::function<ObjectPtr(const FunctionArgs&)> Function2;
     struct Function

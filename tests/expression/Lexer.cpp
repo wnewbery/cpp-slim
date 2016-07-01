@@ -37,17 +37,25 @@ BOOST_AUTO_TEST_CASE(single_tokens)
     BOOST_CHECK_EQUAL(Token::CMP_GT, single_token("> ").type);
     BOOST_CHECK_EQUAL(Token::CMP_GE, single_token(">=").type);
 
-    auto tok_str = single_token("'string \\\\ \\' \\\" \\t \\n \\r end'");
-    BOOST_CHECK_EQUAL(Token::STRING, tok_str.type);
-    BOOST_CHECK_EQUAL("string \\ \' \" \t \n \r end", tok_str.str);
+    auto tok = single_token("'string \\\\ \\' \\\" \\t \\n \\r end'");
+    BOOST_CHECK_EQUAL(Token::STRING, tok.type);
+    BOOST_CHECK_EQUAL("string \\ \' \" \t \n \r end", tok.str);
 
-    auto tok_number = single_token("054335.2250");
-    BOOST_CHECK_EQUAL(Token::NUMBER, tok_number.type);
-    BOOST_CHECK_EQUAL("054335.2250", tok_number.str);
+    tok = single_token("054335.2250");
+    BOOST_CHECK_EQUAL(Token::NUMBER, tok.type);
+    BOOST_CHECK_EQUAL("054335.2250", tok.str);
 
-    auto tok_symbol = single_token("test_func55");
-    BOOST_CHECK_EQUAL(Token::SYMBOL, tok_symbol.type);
-    BOOST_CHECK_EQUAL("test_func55", tok_symbol.str);
+    tok = single_token("054335.0");
+    BOOST_CHECK_EQUAL(Token::NUMBER, tok.type);
+    BOOST_CHECK_EQUAL("054335.0", tok.str);
+
+    tok = single_token("054335.");
+    BOOST_CHECK_EQUAL(Token::NUMBER, tok.type);
+    BOOST_CHECK_EQUAL("054335", tok.str);
+
+    tok = single_token("test_func55");
+    BOOST_CHECK_EQUAL(Token::SYMBOL, tok.type);
+    BOOST_CHECK_EQUAL("test_func55", tok.str);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
