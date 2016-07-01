@@ -32,6 +32,7 @@ namespace slim
                 DIV,
                 MOD,
 
+                CMP,
                 CMP_EQ,
                 CMP_NE,
                 CMP_LT,

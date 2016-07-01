@@ -18,6 +18,13 @@ namespace slim
             virtual const char *symbol()const override { return "!="; }
             virtual ObjectPtr eval(Scope &scope)const override;
         };
+        class Cmp : public BinaryOp
+        {
+        public:
+            using BinaryOp::BinaryOp;
+            virtual const char *symbol()const override { return "<=>"; }
+            virtual ObjectPtr eval(Scope &scope)const override;
+        };
         class Lt : public BinaryOp
         {
         public:

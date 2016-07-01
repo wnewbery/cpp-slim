@@ -6,6 +6,14 @@
 using namespace slim;
 BOOST_AUTO_TEST_SUITE(TestOperators)
 
+double to_d(ObjectPtr val)
+{
+    auto n = dynamic_cast<const Number*>(val.get());
+    if (n) return n->get_value();
+    BOOST_FAIL("Not a number");
+    return 0;
+}
+
 BOOST_AUTO_TEST_CASE(equals)
 {
     auto a = make_value(55.0);
@@ -58,6 +66,10 @@ BOOST_AUTO_TEST_CASE(rel_cmp)
     auto f = make_value("56");
 
     //Number
+    BOOST_CHECK_EQUAL(0, to_d(op_cmp(a.get(), a.get())));
+    BOOST_CHECK_EQUAL(-1, to_d(op_cmp(a.get(), b.get())));
+    BOOST_CHECK_EQUAL(1, to_d(op_cmp(b.get(), a.get())));
+
     BOOST_CHECK(!op_lt(a.get(), a.get())->is_true());
     BOOST_CHECK(op_le(a.get(), a.get())->is_true());
     BOOST_CHECK(!op_gt(a.get(), a.get())->is_true());
@@ -96,13 +108,6 @@ BOOST_AUTO_TEST_CASE(rel_cmp)
     BOOST_CHECK(op_le(d.get(), e.get())->is_true());
 }
 
-double to_d(ObjectPtr val)
-{
-    auto n = dynamic_cast<const Number*>(val.get());
-    if (n) return n->get_value();
-    BOOST_FAIL("Not a number");
-    return 0;
-}
 BOOST_AUTO_TEST_CASE(binary)
 {
     auto a = make_value(2.0);

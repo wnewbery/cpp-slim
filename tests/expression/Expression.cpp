@@ -66,6 +66,10 @@ BOOST_AUTO_TEST_CASE(operators)
     BOOST_CHECK_EQUAL("true", eval("55 != 10"));
     BOOST_CHECK_EQUAL("false", eval("10 != 10"));
 
+    BOOST_CHECK_EQUAL("1", eval("55 <=> 10"));
+    BOOST_CHECK_EQUAL("0", eval("10 <=> 10"));
+    BOOST_CHECK_EQUAL("-1", eval("5 <=> 10"));
+
     BOOST_CHECK_EQUAL("false", eval("55 < 10"));
     BOOST_CHECK_EQUAL("false", eval("10 < 10"));
     BOOST_CHECK_EQUAL("true", eval("5 < 10"));

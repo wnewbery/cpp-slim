@@ -158,6 +158,7 @@ namespace slim
             {
                 switch (current_token.type)
                 {
+                case Token::CMP: next_binary_op<Cmp>(lhs, &Parser::cmp_op); break;
                 case Token::CMP_EQ: next_binary_op<Eq>(lhs, &Parser::cmp_op); break;
                 case Token::CMP_NE: next_binary_op<Ne>(lhs, &Parser::cmp_op); break;
                 default: return lhs;

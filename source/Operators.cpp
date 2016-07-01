@@ -29,7 +29,12 @@ namespace slim
     {
         return make_value(!imp_eq(lhs, rhs));
     }
-    ObjectPtr op_lt(const Object *lhs, const Object *rhs)
+    ObjectPtr op_cmp(const Object *lhs, const Object *rhs)
+    {
+        int rel = imp_cmp(lhs, "<=>", rhs);
+        return make_value(rel < 0 ? -1.0 : (rel > 0 ? 1.0 : 0.0));
+    }
+     ObjectPtr op_lt(const Object *lhs, const Object *rhs)
     {
         return make_value(imp_cmp(lhs, "<", rhs) < 0);
     }

@@ -18,6 +18,12 @@ namespace slim
             auto rhs_v = rhs->eval(scope);
             return op_ne(lhs_v.get(), rhs_v.get());
         }
+        ObjectPtr Cmp::eval(Scope & scope) const
+        {
+            auto lhs_v = lhs->eval(scope);
+            auto rhs_v = rhs->eval(scope);
+            return op_cmp(lhs_v.get(), rhs_v.get());
+        }
         ObjectPtr Lt::eval(Scope & scope) const
         {
             auto lhs_v = lhs->eval(scope);

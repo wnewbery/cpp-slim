@@ -80,7 +80,17 @@ namespace slim
             case '<':
                 ++p;
                 if (p >= end) error("Unexpected end");
-                if (p[0] == '=') { ++p; return Token::CMP_LE; }
+                if (p[0] == '=')
+                {
+                    ++p;
+                    if (p >= end) error("Unexpected end");
+                    if (p[0] == '>')
+                    {
+                        ++p;
+                        return Token::CMP;
+                    }
+                    else return Token::CMP_LE;
+                }
                 else return Token::CMP_LT;
             case '>':
                 ++p;
