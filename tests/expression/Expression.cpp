@@ -94,6 +94,8 @@ BOOST_AUTO_TEST_CASE(precedence)
     BOOST_CHECK_EQUAL("true", eval("20 == 100 == false"));
     BOOST_CHECK_EQUAL("true", eval("(20 == 100) == false"));
     BOOST_CHECK_EQUAL("false", eval("20 == (100 == false)"));
+    BOOST_CHECK_EQUAL("1", eval("5 && 1 || 0 && 7"));
+    BOOST_CHECK_EQUAL("7", eval("((5 && 1) || 0) && 7"));
 }
 
 BOOST_AUTO_TEST_CASE(member_func)

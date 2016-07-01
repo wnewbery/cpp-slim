@@ -56,7 +56,7 @@ namespace slim
         }
         ExpressionNodePtr Parser::expression()
         {
-            return logical_op();
+            return logical_or_op();
         }
         ExpressionNodePtr Parser::sub_expression()
         {
@@ -125,15 +125,27 @@ namespace slim
             lhs = std::make_unique<T>(std::move(lhs), std::move(rhs));
         }
 
-        ExpressionNodePtr Parser::logical_op()
+        ExpressionNodePtr Parser::logical_or_op()
+        {
+            auto lhs = logical_and_op();
+            while (true)
+            {
+                switch (current_token.type)
+                {
+                case Token::LOGICAL_OR: next_binary_op<LogicalOr>(lhs, &Parser::logical_and_op); break;
+                default: return lhs;
+                }
+            }
+        }
+
+        ExpressionNodePtr Parser::logical_and_op()
         {
             auto lhs = equality_op();
             while (true)
             {
-                switch(current_token.type)
+                switch (current_token.type)
                 {
                 case Token::LOGICAL_AND: next_binary_op<LogicalAnd>(lhs, &Parser::equality_op); break;
-                case Token::LOGICAL_OR: next_binary_op<LogicalOr>(lhs, &Parser::equality_op); break;
                 default: return lhs;
                 }
             }

@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(single_ops)
 BOOST_AUTO_TEST_CASE(associativity_single)
 {
     // binary, left to right
-    BOOST_CHECK_EQUAL("(((5 && 10) || 5) && true)", parse("5 && 10 || 5 && true")->to_string());
+    BOOST_CHECK_EQUAL("(((5 && 10) && 5) && true)", parse("5 && 10 && 5 && true")->to_string());
 
     // unary, right to left
     BOOST_CHECK_EQUAL("(-(!(-5)))", parse("-!-+5")->to_string());
@@ -109,6 +109,7 @@ BOOST_AUTO_TEST_CASE(precedence)
     BOOST_CHECK_EQUAL("(c + (m * x))", parse("c + m * x")->to_string());
     BOOST_CHECK_EQUAL("((m * x) + c)", parse("m * x + c")->to_string());
     BOOST_CHECK_EQUAL("((-(5 - 5)) * 6)", parse("-(5 - 5) * 6")->to_string());
+    BOOST_CHECK_EQUAL("((5 && 1) || (0 && 7))", parse("5 && 1 || 0 && 7")->to_string());
 }
 
 BOOST_AUTO_TEST_CASE(basic_syntax_errors)
