@@ -128,6 +128,11 @@ BOOST_AUTO_TEST_CASE(member_func)
     BOOST_CHECK_EQUAL("200", eval("20.to_s + '0'"));
     BOOST_CHECK_EQUAL("200", eval("20.to_s() + '0'"));
     BOOST_CHECK_EQUAL("300", eval("(20 + 10).to_s() + '0'"));
+
+    BOOST_CHECK_EQUAL("200", eval("'20.5'.to_i * 10"));
+    BOOST_CHECK_EQUAL("205", eval("'20.5'.to_f * 10"));
+
+    BOOST_CHECK_THROW(eval("'x'.invalid"), NoSuchMethod);
 }
 
 BOOST_AUTO_TEST_CASE(runtime_error)

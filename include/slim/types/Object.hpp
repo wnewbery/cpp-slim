@@ -5,10 +5,12 @@
 namespace slim
 {
     class Object;
+    class Boolean;
+    class Number;
     typedef std::shared_ptr<Object> ObjectPtr;
     typedef std::shared_ptr<const Object> CObjectPtr;
     /**Base abstract object for the expression interpreter.*/
-    class Object
+    class Object : public std::enable_shared_from_this<Object>
     {
     public:
         /**Create an instance of this object.
@@ -34,6 +36,8 @@ namespace slim
         virtual const std::string& type_name()const = 0;
         /**Convert this instance to a displayable string.*/
         virtual std::string to_string()const = 0;
+        /**Convert this instance to a displayable string object. The default uses to_string. */
+        virtual ObjectPtr to_string_obj()const;
         /**Returns if this object instance should be considered true in a boolean context.*/
         virtual bool is_true()const { return true; }
         /**Compare with another object of the same type.
@@ -44,8 +48,10 @@ namespace slim
          * Default throws UnorderableTypeError.
          */
         virtual int cmp(const Object *rhs)const;
-
         virtual ObjectPtr call_method(const std::string &name, const FunctionArgs &args);
+    protected:
+        /**Get a function table for the default implementation of call_method.*/
+        virtual const MethodTable &method_table()const;
     };
 
     /**Create an instance of an object of type T.

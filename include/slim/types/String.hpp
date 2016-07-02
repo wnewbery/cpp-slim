@@ -20,6 +20,10 @@ namespace slim
             return v.compare(((const String*)rhs)->v);
         }
         const std::string& get_value()const { return v; }
+        std::shared_ptr<Number> to_f();
+        std::shared_ptr<Number> to_i();
+    protected:
+        virtual const MethodTable &method_table()const;
     private:
         std::string v;
     };

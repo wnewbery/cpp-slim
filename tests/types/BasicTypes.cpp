@@ -64,4 +64,26 @@ BOOST_AUTO_TEST_CASE(string)
     BOOST_CHECK_EQUAL(true, c->is_true());
 }
 
+BOOST_AUTO_TEST_CASE(to_f)
+{
+    BOOST_CHECK_EQUAL(5.5, make_value(5.5)->to_f()->get_value());
+    BOOST_CHECK_EQUAL(5.5, make_value("5.5")->to_f()->get_value());
+    BOOST_CHECK_EQUAL(5.5, make_value("5.5x")->to_f()->get_value());
+    BOOST_CHECK_EQUAL(0.0, make_value("x")->to_f()->get_value());
+    BOOST_CHECK_EQUAL(1.0, make_value(true)->to_f()->get_value());
+    BOOST_CHECK_EQUAL(0.0, make_value(false)->to_f()->get_value());
+    BOOST_CHECK_EQUAL(0.0, NULL_VALUE->to_f()->get_value());
+}
+
+BOOST_AUTO_TEST_CASE(to_i)
+{
+    BOOST_CHECK_EQUAL(5.0, make_value(5.5)->to_i()->get_value());
+    BOOST_CHECK_EQUAL(5.0, make_value("5.5")->to_i()->get_value());
+    BOOST_CHECK_EQUAL(5.0, make_value("5.5x")->to_i()->get_value());
+    BOOST_CHECK_EQUAL(0.0, make_value("x")->to_i()->get_value());
+    BOOST_CHECK_EQUAL(1.0, make_value(true)->to_i()->get_value());
+    BOOST_CHECK_EQUAL(0.0, make_value(false)->to_i()->get_value());
+    BOOST_CHECK_EQUAL(0.0, NULL_VALUE->to_i()->get_value());
+}
+
 BOOST_AUTO_TEST_SUITE_END()

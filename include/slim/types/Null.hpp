@@ -20,5 +20,9 @@ namespace slim
         virtual const std::string& type_name()const override { return TYPE_NAME; }
         virtual std::string to_string()const override { return "null"; }
         virtual bool is_true()const override { return false; }
+        std::shared_ptr<Number> to_f();
+        std::shared_ptr<Number> to_i();
+    protected:
+        virtual const MethodTable &method_table()const;
     };
 }

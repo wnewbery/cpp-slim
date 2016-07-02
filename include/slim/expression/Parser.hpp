@@ -1,10 +1,10 @@
 #pragma once
 #include "Token.hpp"
+#include "Function.hpp"
 #include <memory>
 #include <vector>
 namespace slim
 {
-    class FunctionTable;
     namespace expr
     {
         class Lexer;

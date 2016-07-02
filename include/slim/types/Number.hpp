@@ -23,6 +23,10 @@ namespace slim
             else return 0;
         }
         double get_value()const { return v; }
+        std::shared_ptr<Number> to_f();
+        std::shared_ptr<Number> to_i();
+    protected:
+        virtual const MethodTable &method_table()const;
     private:
         double v;
     };

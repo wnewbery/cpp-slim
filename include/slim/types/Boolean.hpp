@@ -29,6 +29,10 @@ namespace slim
         {
             return (b ? 1 : 0) - (((const Boolean*)rhs)->b ? 1 : 0);
         }
+        std::shared_ptr<Number> to_f();
+        std::shared_ptr<Number> to_i();
+    protected:
+        virtual const MethodTable &method_table()const;
     private:
         bool b;
     };
