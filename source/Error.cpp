@@ -2,6 +2,10 @@
 #include "types/Object.hpp"
 namespace slim
 {
+    TypeError::TypeError(const Object *type, const std::string &type_name)
+        : ScriptError(type->type_name() + " can not be converted to " + type_name)
+    {
+    }
     UnorderableTypeError::UnorderableTypeError(const Object *lhs, const char *op, const Object *rhs)
         : TypeError("unorderable types: " + lhs->type_name() + " " + op + " " + rhs->type_name())
     {

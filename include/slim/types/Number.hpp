@@ -23,6 +23,15 @@ namespace slim
             else return 0;
         }
         double get_value()const { return v; }
+
+        //operators
+        virtual ObjectPtr mul(Object *rhs);
+        virtual ObjectPtr div(Object *rhs);
+        virtual ObjectPtr mod(Object *rhs);
+        virtual ObjectPtr add(Object *rhs);
+        virtual ObjectPtr sub(Object *rhs);
+        virtual ObjectPtr negate();
+
         std::shared_ptr<Number> to_f();
         std::shared_ptr<Number> to_i();
         std::shared_ptr<Number> abs();

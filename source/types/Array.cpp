@@ -37,6 +37,27 @@ namespace slim
         else if (arr.size() > rhs.size()) return 1;
         else return 0;
     }
+    ObjectPtr Array::add(Object *rhs)
+    {
+        auto rhs_arr = coerce<Array>(rhs);
+        std::vector<ObjectPtr> out;
+        out.reserve(arr.size() + rhs_arr->arr.size());
+        out = arr;
+        out.insert(out.end(), rhs_arr->arr.begin(), rhs_arr->arr.end());
+        return make_value(std::move(out));
+    }
+    ObjectPtr Array::sub(Object *rhs)
+    {
+        auto rhs_arr = coerce<Array>(rhs);
+        std::vector<ObjectPtr> out; 
+        for (auto &i : arr)
+        {
+            if (!rhs_arr->include_q_imp(i.get()))
+                out.push_back(i);
+        }
+        return make_value(std::move(out));
+    }
+
     std::shared_ptr<Object> Array::assoc(const Object * a)
     {
         for (auto &i : arr)
@@ -131,13 +152,17 @@ namespace slim
     {
         return TRUE_VALUE;
     }
-    std::shared_ptr<Boolean> Array::include_q(const Object * obj)
+    bool Array::include_q_imp(const Object *obj)
     {
         for (size_t i = 0; i < arr.size(); ++i)
         {
-            if (slim::eq(obj, arr[i].get())) return TRUE_VALUE;
+            if (slim::eq(obj, arr[i].get())) return true;
         }
-        return FALSE_VALUE;
+        return false;
+    }
+    std::shared_ptr<Boolean> Array::include_q(const Object * obj)
+    {
+        return make_value(include_q_imp(obj));
     }
     std::shared_ptr<Object> Array::index(const Object *obj)
     {

@@ -20,6 +20,7 @@ namespace slim
             return v.compare(((const String*)rhs)->v);
         }
         const std::string& get_value()const { return v; }
+        virtual ObjectPtr add(Object *rhs);
         std::shared_ptr<Number> to_f();
         std::shared_ptr<Number> to_i();
     protected:

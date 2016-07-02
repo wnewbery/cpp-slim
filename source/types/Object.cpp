@@ -23,6 +23,32 @@ namespace slim
     {
         throw UnorderableTypeError(this, "cmp", rhs);
     }
+
+    ObjectPtr Object::mul(Object * rhs)
+    {
+        throw NoSuchMethod(this, "*");
+    }
+    ObjectPtr Object::div(Object * rhs)
+    {
+        throw NoSuchMethod(this, "/");
+    }
+    ObjectPtr Object::mod(Object * rhs)
+    {
+        throw NoSuchMethod(this, "%");
+    }
+    ObjectPtr Object::add(Object * rhs)
+    {
+        throw NoSuchMethod(this, "+");
+    }
+    ObjectPtr Object::sub(Object * rhs)
+    {
+        throw NoSuchMethod(this, "-");
+    }
+    ObjectPtr Object::negate()
+    {
+        throw NoSuchMethod(this, "-negate");
+    }
+
     ObjectPtr Object::call_method(const std::string &name, const FunctionArgs &args)
     {
         auto &method = method_table().get(this, name);
@@ -80,6 +106,10 @@ namespace slim
         return table;
     }
 
+    ObjectPtr String::add(Object *rhs)
+    {
+        return make_value(v + coerce<String>(rhs)->get_value());
+    }
 
     //to_f
     std::shared_ptr<Number> Null::to_f()

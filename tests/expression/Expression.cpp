@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(global_func)
     auto func = [](const FunctionArgs &args) -> ObjectPtr
     {
         if (args.size() != 2) throw InvalidArgument("test");
-        return op_add(args[0].get(), args[1].get());
+        return args[0]->add(args[1].get());
     };
     FunctionTable functions = {{func, "func"}};
 
@@ -141,14 +141,14 @@ BOOST_AUTO_TEST_CASE(runtime_error)
     BOOST_CHECK_THROW(eval("5 < '5'"), UnorderableTypeError);
     BOOST_CHECK_THROW(eval("null < null"), UnorderableTypeError);
 
-    BOOST_CHECK_THROW(eval("null + null"), UnsupportedOperandTypeError);
-    BOOST_CHECK_THROW(eval("null - null"), UnsupportedOperandTypeError);
-    BOOST_CHECK_THROW(eval("- null"), UnsupportedOperandTypeError);
+    BOOST_CHECK_THROW(eval("null + null"), NoSuchMethod);
+    BOOST_CHECK_THROW(eval("null - null"), NoSuchMethod);
+    BOOST_CHECK_THROW(eval("- null"), NoSuchMethod);
 
-    BOOST_CHECK_THROW(eval("5 + null"), UnsupportedOperandTypeError);
-    BOOST_CHECK_THROW(eval("5 + true"), UnsupportedOperandTypeError);
-    BOOST_CHECK_THROW(eval("5 + 'str'"), UnsupportedOperandTypeError);
-    BOOST_CHECK_THROW(eval("'str' + 5"), UnsupportedOperandTypeError);
+    BOOST_CHECK_THROW(eval("5 + null"), TypeError);
+    BOOST_CHECK_THROW(eval("5 + true"), TypeError);
+    BOOST_CHECK_THROW(eval("5 + 'str'"), TypeError);
+    BOOST_CHECK_THROW(eval("'str' + 5"), TypeError);
 }
 
 BOOST_AUTO_TEST_CASE(short_circuit)

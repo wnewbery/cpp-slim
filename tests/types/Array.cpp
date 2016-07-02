@@ -84,6 +84,29 @@ BOOST_AUTO_TEST_CASE(basic_methods)
     BOOST_CHECK_EQUAL("2", eval("c.count(5)", scope));
     BOOST_CHECK_EQUAL("0", eval("c.count(7)", scope));
 }
+BOOST_AUTO_TEST_CASE(add)
+{
+    Scope scope;
+    scope.set("a", make_array({}));
+    scope.set("b", make_array2({ 5.0, 10.0 }));
+    scope.set("c", make_array2({ 5.0, 10.0, 5.0 }));
+
+    BOOST_CHECK_EQUAL("[5, 10]", eval("a + b", scope));
+    BOOST_CHECK_EQUAL("[5, 10, 5, 10, 5]", eval("b + c", scope));
+    BOOST_CHECK_EQUAL("[5, 10, 5, 5, 10]", eval("c + b", scope));
+}
+BOOST_AUTO_TEST_CASE(sub)
+{
+    Scope scope;
+    scope.set("a", make_array({}));
+    scope.set("b", make_array2({ 5.0, 10.0 }));
+    scope.set("c", make_array2({ 5.0, 10.0, 5.0, 7.0 }));
+
+    BOOST_CHECK_EQUAL("[]", eval("a - b", scope));
+    BOOST_CHECK_EQUAL("[5, 10]", eval("b - a", scope));
+    BOOST_CHECK_EQUAL("[7]", eval("c - b", scope));
+    BOOST_CHECK_EQUAL("[]", eval("b - c", scope));
+}
 
 BOOST_AUTO_TEST_CASE(basic_access)
 {

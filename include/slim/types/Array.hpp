@@ -18,6 +18,8 @@ namespace slim
         virtual std::string to_string()const override;
         virtual bool eq(const Object *rhs)const override { return cmp(rhs) == 0; }
         virtual int cmp(const Object *rhs)const override;
+        virtual ObjectPtr add(Object *rhs)override;
+        virtual ObjectPtr sub(Object *rhs)override;
         const std::vector<ObjectPtr>& get_value()const { return arr; }
 
         //+, [], -, *, <<, &, |
@@ -41,6 +43,7 @@ namespace slim
         void flatten_imp(std::vector<ObjectPtr> &out, int level);
         std::shared_ptr<Boolean> frozen_q();
         //hash
+        bool include_q_imp(const Object *obj);
         std::shared_ptr<Boolean> include_q(const Object *obj);
         /** also find_index */
         std::shared_ptr<Object> index(const Object *obj);

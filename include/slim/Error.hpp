@@ -26,7 +26,8 @@ namespace slim
     class TypeError : public ScriptError
     {
     public:
-        using ScriptError::ScriptError;
+        TypeError(const std::string &msg) : ScriptError(msg) {}
+        TypeError(const Object *type, const std::string &type_name);
     };
     class IndexError : public ScriptError
     {

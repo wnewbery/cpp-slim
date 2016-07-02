@@ -2,6 +2,7 @@
 #include <memory>
 #include <string>
 #include "Function.hpp"
+#include "Error.hpp"
 namespace slim
 {
     class Object;
@@ -48,6 +49,15 @@ namespace slim
          * Default throws UnorderableTypeError.
          */
         virtual int cmp(const Object *rhs)const;
+
+        //operators
+        virtual ObjectPtr mul(Object *rhs);
+        virtual ObjectPtr div(Object *rhs);
+        virtual ObjectPtr mod(Object *rhs);
+        virtual ObjectPtr add(Object *rhs);
+        virtual ObjectPtr sub(Object *rhs);
+        virtual ObjectPtr negate();
+
         virtual ObjectPtr call_method(const std::string &name, const FunctionArgs &args);
     protected:
         /**Get a function table for the default implementation of call_method.*/
@@ -70,5 +80,31 @@ namespace slim
     inline double as_number(const ObjectPtr &obj)
     {
         return as_number(obj.get());
+    }
+
+
+    template<class T> T *coerce(Object *obj)
+    {
+        auto obj2 = dynamic_cast<T*>(obj);
+        if (obj2) return obj2;
+        else throw TypeError(obj, T::TYPE_NAME);
+    }
+    template<class T> const T *coerce(const Object *obj)
+    {
+        auto obj2 = dynamic_cast<const T*>(obj);
+        if (obj2) return obj2;
+        else throw TypeError(obj, T::TYPE_NAME);
+    }
+    template<class T> std::shared_ptr<T>coerce(const std::shared_ptr<Object> &obj)
+    {
+        auto obj2 = std::dynamic_pointer_cast<T>(obj);
+        if (obj2) return obj2;
+        else throw TypeError(obj.get(), T::TYPE_NAME);
+    }
+    template<class T> std::shared_ptr<const T> coerce(const std::shared_ptr<const Object> &obj)
+    {
+        auto obj2 = std::dynamic_pointer_cast<const T>(obj);
+        if (obj2) return obj2;
+        else throw TypeError(obj.get(), T::TYPE_NAME);
     }
 }

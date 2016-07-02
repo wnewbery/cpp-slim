@@ -8,37 +8,37 @@ namespace slim
     {
         ObjectPtr Negative::eval(Scope & scope) const
         {
-            return op_negative(arg->eval(scope).get());
+            return arg->eval(scope)->negate();
         }
         ObjectPtr Mul::eval(Scope & scope) const
         {
             auto lhs_v = lhs->eval(scope);
             auto rhs_v = rhs->eval(scope);
-            return op_mul(lhs_v.get(), rhs_v.get());
+            return lhs_v->mul(rhs_v.get());
         }
         ObjectPtr Div::eval(Scope & scope) const
         {
             auto lhs_v = lhs->eval(scope);
             auto rhs_v = rhs->eval(scope);
-            return op_div(lhs_v.get(), rhs_v.get());
+            return lhs_v->div(rhs_v.get());
         }
         ObjectPtr Mod::eval(Scope & scope) const
         {
             auto lhs_v = lhs->eval(scope);
             auto rhs_v = rhs->eval(scope);
-            return op_mod(lhs_v.get(), rhs_v.get());
+            return lhs_v->mod(rhs_v.get());
         }
         ObjectPtr Add::eval(Scope & scope) const
         {
             auto lhs_v = lhs->eval(scope);
             auto rhs_v = rhs->eval(scope);
-            return op_add(lhs_v.get(), rhs_v.get());
+            return lhs_v->add(rhs_v.get());
         }
         ObjectPtr Sub::eval(Scope & scope) const
         {
             auto lhs_v = lhs->eval(scope);
             auto rhs_v = rhs->eval(scope);
-            return op_sub(lhs_v.get(), rhs_v.get());
+            return lhs_v->sub(rhs_v.get());
         }
     }
 }

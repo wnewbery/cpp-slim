@@ -36,6 +36,31 @@ namespace slim
         return table;
     }
 
+    ObjectPtr Number::mul(Object *rhs)
+    {
+        return make_value(v * coerce<Number>(rhs)->get_value());
+    }
+    ObjectPtr Number::div(Object *rhs)
+    {
+        return make_value(v / coerce<Number>(rhs)->get_value());
+    }
+    ObjectPtr Number::mod(Object *rhs)
+    {
+        return make_value(std::fmod(v, coerce<Number>(rhs)->get_value()));
+    }
+    ObjectPtr Number::add(Object *rhs)
+    {
+        return make_value(v + coerce<Number>(rhs)->get_value());
+    }
+    ObjectPtr Number::sub(Object *rhs)
+    {
+        return make_value(v - coerce<Number>(rhs)->get_value());
+    }
+    ObjectPtr Number::negate()
+    {
+        return make_value(-v);
+    }
+
     std::shared_ptr<Number> Number::to_f()
     {
         return std::static_pointer_cast<Number>(shared_from_this());

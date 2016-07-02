@@ -116,34 +116,34 @@ BOOST_AUTO_TEST_CASE(binary)
     auto d = make_value("test");
 
     //mul
-    BOOST_CHECK_EQUAL(10.0, to_d(op_mul(a.get(), b.get())));
-    BOOST_CHECK_THROW(op_mul(a.get(), c.get()), UnsupportedOperandTypeError);
-    BOOST_CHECK_THROW(op_mul(c.get(), d.get()), UnsupportedOperandTypeError);
+    BOOST_CHECK_EQUAL(10.0, to_d(a->mul(b.get())));
+    BOOST_CHECK_THROW(a->mul(c.get()), TypeError);
+    BOOST_CHECK_THROW(c->mul(d.get()), NoSuchMethod);
 
     //div
-    BOOST_CHECK_EQUAL(2.0 / 5.0, to_d(op_div(a.get(), b.get())));
-    BOOST_CHECK_EQUAL(5.0 / 2.0, to_d(op_div(b.get(), a.get())));
-    BOOST_CHECK_THROW(op_div(a.get(), c.get()), UnsupportedOperandTypeError);
-    BOOST_CHECK_THROW(op_div(c.get(), d.get()), UnsupportedOperandTypeError);
+    BOOST_CHECK_EQUAL(2.0 / 5.0, to_d(a->div(b.get())));
+    BOOST_CHECK_EQUAL(5.0 / 2.0, to_d(b->div(a.get())));
+    BOOST_CHECK_THROW(a->div(c.get()), TypeError);
+    BOOST_CHECK_THROW(c->div(d.get()), NoSuchMethod);
 
     //mod
-    BOOST_CHECK_EQUAL(2.0, to_d(op_mod(a.get(), b.get())));
-    BOOST_CHECK_EQUAL(1.0, to_d(op_mod(b.get(), a.get())));
-    BOOST_CHECK_THROW(op_mod(a.get(), c.get()), UnsupportedOperandTypeError);
-    BOOST_CHECK_THROW(op_mod(c.get(), d.get()), UnsupportedOperandTypeError);
+    BOOST_CHECK_EQUAL(2.0, to_d(a->mod(b.get())));
+    BOOST_CHECK_EQUAL(1.0, to_d(b->mod(a.get())));
+    BOOST_CHECK_THROW(a->mod(c.get()), TypeError);
+    BOOST_CHECK_THROW(c->mod(d.get()), NoSuchMethod);
 
     //add
-    BOOST_CHECK_EQUAL(7.0, to_d(op_add(a.get(), b.get())));
-    BOOST_CHECK_EQUAL(7.0, to_d(op_add(b.get(), a.get())));
-    BOOST_CHECK_THROW(op_add(a.get(), c.get()), UnsupportedOperandTypeError);
-    BOOST_CHECK_EQUAL("55test", op_add(c.get(), d.get())->to_string());
-    BOOST_CHECK_EQUAL("test55", op_add(d.get(), c.get())->to_string());
+    BOOST_CHECK_EQUAL(7.0, to_d(a->add(b.get())));
+    BOOST_CHECK_EQUAL(7.0, to_d(b->add(a.get())));
+    BOOST_CHECK_THROW(a->add(c.get()), TypeError);
+    BOOST_CHECK_EQUAL("55test", c->add(d.get())->to_string());
+    BOOST_CHECK_EQUAL("test55", d->add(c.get())->to_string());
 
     //sub
-    BOOST_CHECK_EQUAL(-3.0, to_d(op_sub(a.get(), b.get())));
-    BOOST_CHECK_EQUAL(3.0, to_d(op_sub(b.get(), a.get())));
-    BOOST_CHECK_THROW(op_sub(a.get(), c.get()), UnsupportedOperandTypeError);
-    BOOST_CHECK_THROW(op_sub(c.get(), d.get()), UnsupportedOperandTypeError);
+    BOOST_CHECK_EQUAL(-3.0, to_d(a->sub(b.get())));
+    BOOST_CHECK_EQUAL(3.0, to_d(b->sub(a.get())));
+    BOOST_CHECK_THROW(a->sub(c.get()), TypeError);
+    BOOST_CHECK_THROW(c->sub(d.get()), NoSuchMethod);
 }
 BOOST_AUTO_TEST_CASE(unary)
 {
@@ -161,9 +161,9 @@ BOOST_AUTO_TEST_CASE(unary)
     BOOST_CHECK(op_not(FALSE_VALUE.get())->is_true());
 
     //negative
-    BOOST_CHECK_EQUAL(-2.0, to_d(op_negative(a.get())));
-    BOOST_CHECK_THROW(op_negative(c.get()), UnsupportedOperandTypeError);
-    BOOST_CHECK_THROW(op_negative(TRUE_VALUE.get()), UnsupportedOperandTypeError);
-    BOOST_CHECK_THROW(op_negative(NULL_VALUE.get()), UnsupportedOperandTypeError);
+    BOOST_CHECK_EQUAL(-2.0, to_d(a->negate()));
+    BOOST_CHECK_THROW(c->negate(), NoSuchMethod);
+    BOOST_CHECK_THROW(TRUE_VALUE->negate(), NoSuchMethod);
+    BOOST_CHECK_THROW(NULL_VALUE->negate(), NoSuchMethod);
 }
 BOOST_AUTO_TEST_SUITE_END()

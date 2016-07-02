@@ -13,15 +13,7 @@ namespace slim
     ObjectPtr op_gt(const Object *lhs, const Object *rhs);
     ObjectPtr op_ge(const Object *lhs, const Object *rhs);
 
-    ObjectPtr op_mul(const Object *lhs, const Object *rhs);
-    ObjectPtr op_div(const Object *lhs, const Object *rhs);
-    ObjectPtr op_mod(const Object *lhs, const Object *rhs);
-
-    ObjectPtr op_add(const Object *lhs, const Object *rhs);
-    ObjectPtr op_sub(const Object *lhs, const Object *rhs);
-
-    ObjectPtr op_not(const Object *rhs);
-    ObjectPtr op_negative(const Object *rhs);
+    ObjectPtr op_not(Object *rhs);
 
     struct ObjLess
     {
