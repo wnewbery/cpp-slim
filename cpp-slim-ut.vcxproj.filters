@@ -36,5 +36,8 @@
     <ClCompile Include="tests\BuiltinFunctions.cpp">
       <Filter>tests</Filter>
     </ClCompile>
+    <ClCompile Include="tests\types\Array.cpp">
+      <Filter>tests\types</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

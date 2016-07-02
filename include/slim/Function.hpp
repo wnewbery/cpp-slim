@@ -61,27 +61,6 @@ namespace slim
         Method(Method2 f, const std::string &name) : f(f), name(name) {}
 
         template<class T, class U>
-        Method(U(T::*f2)(const FunctionArgs &args), const std::string &name)
-            : f(), name(name)
-        {
-            f = [f2](Object *self, const FunctionArgs &args) -> ObjectPtr
-            {
-                assert(dynamic_cast<T*>(self) == static_cast<T*>(self));
-                return (static_cast<T*>(self)->*f2)(args);
-            };
-        }
-        template<class T, class U>
-        Method(U(T::*f2)(), const std::string &name)
-            : f(), name(name)
-        {
-            f = [f2, name](Object *self, const FunctionArgs &args) -> ObjectPtr
-            {
-                assert(dynamic_cast<T*>(self) == static_cast<T*>(self));
-                if (!args.empty()) throw InvalidArgument(self, name);
-                return (static_cast<T*>(self)->*f2)();
-            };
-        }
-        template<class T, class U>
         Method(U(T::*f2)(const FunctionArgs &args)const, const std::string &name)
             : f(), name(name)
         {
@@ -100,6 +79,56 @@ namespace slim
                 assert(dynamic_cast<T*>(self) == static_cast<T*>(self));
                 if (!args.empty()) throw InvalidArgument(self, name);
                 return (static_cast<T*>(self)->*f2)();
+            };
+        }
+        //varargs
+        template<class T, class U>
+        Method(U(T::*f2)(const FunctionArgs &args), const std::string &name)
+            : f(), name(name)
+        {
+            f = [f2](Object *self, const FunctionArgs &args) -> ObjectPtr
+            {
+                assert(dynamic_cast<T*>(self) == static_cast<T*>(self));
+                return (static_cast<T*>(self)->*f2)(args);
+            };
+        }
+        //no args
+        template<class T, class U>
+        Method(U(T::*f2)(), const std::string &name)
+            : f(), name(name)
+        {
+            f = [f2, name](Object *self, const FunctionArgs &args) -> ObjectPtr
+            {
+                assert(dynamic_cast<T*>(self) == static_cast<T*>(self));
+                if (!args.empty()) throw InvalidArgument(self, name);
+                return (static_cast<T*>(self)->*f2)();
+            };
+        }
+        //1 arg
+        template<class T, class U, class ARG1>
+        Method(U(T::*f2)(ARG1 arg1), const std::string &name) : f(), name(name)
+        {
+            f = [f2, name](Object *self, const FunctionArgs &args) -> ObjectPtr
+            {
+                assert(dynamic_cast<T*>(self) == static_cast<T*>(self));
+                if (args.size() != 1) throw InvalidArgument(self, name);
+                auto arg1 = dynamic_cast<ARG1>(args[0].get());
+                if (!arg1) throw InvalidArgument(name);
+                return (static_cast<T*>(self)->*f2)(arg1);
+            };
+        }
+        //2 arg
+        template<class T, class U, class ARG1, class ARG2>
+        Method(U(T::*f2)(ARG1 arg1, ARG2 arg2), const std::string &name) : f(), name(name)
+        {
+            f = [f2, name](Object *self, const FunctionArgs &args) -> ObjectPtr
+            {
+                assert(dynamic_cast<T*>(self) == static_cast<T*>(self));
+                if (args.size() != 2) throw InvalidArgument(self, name);
+                auto arg1 = dynamic_cast<ARG1>(args[0].get());
+                auto arg2 = dynamic_cast<ARG2>(args[1].get());
+                if (!arg1 || !arg2) throw InvalidArgument(name);
+                return (static_cast<T*>(self)->*f2)(arg1, arg2);
             };
         }
 

@@ -28,6 +28,11 @@ namespace slim
     public:
         using ScriptError::ScriptError;
     };
+    class IndexError : public ScriptError
+    {
+    public:
+        using ScriptError::ScriptError;
+    };
     class UnorderableTypeError : public TypeError
     {
     public:

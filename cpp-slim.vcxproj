@@ -34,6 +34,7 @@
     <ClInclude Include="include\slim\BuiltinFunctions.hpp" />
     <ClInclude Include="include\slim\Maths.hpp" />
     <ClInclude Include="include\slim\Operators.hpp" />
+    <ClInclude Include="include\slim\types\Array.hpp" />
     <ClInclude Include="include\slim\types\Boolean.hpp" />
     <ClInclude Include="include\slim\types\Null.hpp" />
     <ClInclude Include="include\slim\types\Number.hpp" />
@@ -53,6 +54,7 @@
     <ClCompile Include="source\expression\LogicalOp.cpp" />
     <ClCompile Include="source\Maths.cpp" />
     <ClCompile Include="source\Operators.cpp" />
+    <ClCompile Include="source\types\Array.cpp" />
     <ClCompile Include="source\types\Number.cpp" />
     <ClCompile Include="source\types\Object.cpp" />
   </ItemGroup>
