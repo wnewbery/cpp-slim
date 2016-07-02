@@ -31,6 +31,8 @@
     <ClInclude Include="include\slim\expression\Scope.hpp" />
     <ClInclude Include="include\slim\expression\Token.hpp" />
     <ClInclude Include="include\slim\Function.hpp" />
+    <ClInclude Include="include\slim\BuiltinFunctions.hpp" />
+    <ClInclude Include="include\slim\Maths.hpp" />
     <ClInclude Include="include\slim\Operators.hpp" />
     <ClInclude Include="include\slim\types\Boolean.hpp" />
     <ClInclude Include="include\slim\types\Null.hpp" />
@@ -40,6 +42,7 @@
     <ClInclude Include="include\slim\Value.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\BuiltinFunctions.cpp" />
     <ClCompile Include="source\Error.cpp" />
     <ClCompile Include="source\expression\ArithmeticOp.cpp" />
     <ClCompile Include="source\expression\AstOp.cpp" />
@@ -48,6 +51,7 @@
     <ClCompile Include="source\expression\Lexer.cpp" />
     <ClCompile Include="source\expression\Parser.cpp" />
     <ClCompile Include="source\expression\LogicalOp.cpp" />
+    <ClCompile Include="source\Maths.cpp" />
     <ClCompile Include="source\Operators.cpp" />
     <ClCompile Include="source\types\Number.cpp" />
     <ClCompile Include="source\types\Object.cpp" />

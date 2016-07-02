@@ -18,6 +18,35 @@ namespace slim
         Function2 f;
         std::string name;
 
+
+        Function(Function2 f, const std::string &name) : f(f), name(name) {}
+
+        //1 arg
+        template<class RET, class ARG1>
+        Function(RET(*f2)(ARG1 arg1), const std::string &name) : f(), name(name)
+        {
+            f = [f2, name](const FunctionArgs &args) -> ObjectPtr
+            {
+                if (args.size() != 1) throw InvalidArgument(name);
+                auto arg1 = dynamic_cast<ARG1>(args[0].get());
+                if (!arg1) throw InvalidArgument(name);
+                return f2(arg1);
+            };
+        }
+        //2 arg
+        template<class RET, class ARG1, class ARG2>
+        Function(RET(*f2)(ARG1 arg1, ARG2 arg2), const std::string &name) : f(), name(name)
+        {
+            f = [f2, name](const FunctionArgs &args) -> ObjectPtr
+            {
+                if (args.size() != 2) throw InvalidArgument(name);
+                auto arg1 = dynamic_cast<ARG1>(args[0].get());
+                auto arg2 = dynamic_cast<ARG2>(args[1].get());
+                if (!arg1 || !arg2) throw InvalidArgument(name);
+                return f2(arg1, arg2);
+            };
+        }
+
         ObjectPtr operator()(const FunctionArgs &args)const
         {
             return f(args);

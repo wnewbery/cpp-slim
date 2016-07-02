@@ -154,6 +154,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="tests\BuiltinFunctions.cpp" />
     <ClCompile Include="tests\expression\Expression.cpp" />
     <ClCompile Include="tests\expression\Lexer.cpp" />
     <ClCompile Include="tests\expression\Parser.cpp" />
