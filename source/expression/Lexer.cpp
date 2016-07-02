@@ -49,7 +49,6 @@ namespace slim
             case ')': ++p; return Token::RPAREN;
             case ',': ++p; return Token::COMMA;
             case '.': ++p; return Token::DOT;
-            case '-': ++p; return Token::MINUS;
             case '+': ++p; return Token::PLUS;
             case '*': ++p; return Token::MUL;
             case '/': ++p; return Token::DIV;
@@ -57,6 +56,11 @@ namespace slim
             case '\'':
             case '\"':
                 return quoted_string();
+            case '-':
+                ++p;
+                if (p >= end) error("Unexpected end");
+                else if (is_digit(p[0])) return number(true);
+                else return Token::MINUS;
             case '&':
                 if (p + 1 >= end) error("Unexpected end");
                 if (p[1] != '&') error("Expected &&");
@@ -99,7 +103,7 @@ namespace slim
                 else return Token::CMP_GT;
             default:
                 if (is_symbol_start_chr(peek)) return symbol();
-                else if (is_digit(peek)) return number();
+                else if (is_digit(peek)) return number(false);
                 else error(std::string("Unexpected: ") + peek);
             }
         }
@@ -151,10 +155,10 @@ namespace slim
             while (p < end && is_symbol_chr(*p)) ++p;
             return { Token::SYMBOL, std::string(start, p - start) };
         }
-        Token Lexer::number()
+        Token Lexer::number(bool negative)
         {
-            assert(is_digit(*p));
-            auto start = p;
+            assert(is_digit(*p) && !negative || p[-1] =='-' && negative);
+            auto start = negative ? p - 1 : p;
             while (p < end && is_digit(*p)) ++p;
 
             if (p + 1 < end && p[0] == '.' && is_digit(p[1])) //decimal
@@ -165,5 +169,6 @@ namespace slim
 
             return{ Token::NUMBER, std::string(start, p - start) };
         }
+
     }
 }

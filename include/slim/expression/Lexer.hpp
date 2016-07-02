@@ -21,7 +21,7 @@ namespace slim
             void skip_ws();
             Token quoted_string();
             Token symbol();
-            Token number();
+            Token number(bool negative);
         };
     }
 }

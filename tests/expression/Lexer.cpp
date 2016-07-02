@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(single_tokens)
     BOOST_CHECK_EQUAL(Token::COMMA, single_token(",").type);
     BOOST_CHECK_EQUAL(Token::DOT, single_token(".").type);
     BOOST_CHECK_EQUAL(Token::PLUS, single_token("+").type);
-    BOOST_CHECK_EQUAL(Token::MINUS, single_token("-").type);
+    BOOST_CHECK_EQUAL(Token::MINUS, single_token("- ").type);
     BOOST_CHECK_EQUAL(Token::MUL, single_token("*").type);
     BOOST_CHECK_EQUAL(Token::DIV, single_token("/").type);
     BOOST_CHECK_EQUAL(Token::MOD, single_token("%").type);
@@ -51,9 +51,13 @@ BOOST_AUTO_TEST_CASE(single_tokens)
     BOOST_CHECK_EQUAL(Token::NUMBER, tok.type);
     BOOST_CHECK_EQUAL("054335.0", tok.str);
 
-    tok = single_token("054335.");
+    tok = single_token("054335");
     BOOST_CHECK_EQUAL(Token::NUMBER, tok.type);
     BOOST_CHECK_EQUAL("054335", tok.str);
+
+    tok = single_token("-5.5");
+    BOOST_CHECK_EQUAL(Token::NUMBER, tok.type);
+    BOOST_CHECK_EQUAL("-5.5", tok.str);
 
     tok = single_token("test_func55");
     BOOST_CHECK_EQUAL(Token::SYMBOL, tok.type);
