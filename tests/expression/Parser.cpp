@@ -100,6 +100,19 @@ BOOST_AUTO_TEST_CASE(method_call)
     BOOST_CHECK_EQUAL("a.f(5, true)", parse("a.f(5, true)")->to_string());
     BOOST_CHECK_EQUAL("a.f().g()", parse("a.f.g")->to_string());
     BOOST_CHECK_EQUAL("a.f(5).g()", parse("a.f(5).g")->to_string());
+
+    BOOST_CHECK_EQUAL("a.f(2, 3, 4)", parse("a.f 2, 3, 4")->to_string());
+    BOOST_CHECK_EQUAL("a.f(2, 3, (4 + 4))", parse("a.f 2, 3, 4 + 4")->to_string());
+    BOOST_CHECK_EQUAL("(a.f(2, 3, 4) + 4)", parse("(a.f 2, 3, 4) + 4")->to_string());
+
+    BOOST_CHECK_EQUAL("a[5]", parse("a[5]")->to_string());
+    BOOST_CHECK_EQUAL("a[5][5, 10]", parse("a[5][5, 10]")->to_string());
+    BOOST_CHECK_EQUAL("a[5][5, 10].to_i()", parse("a[5][5, 10].to_i")->to_string());
+
+    BOOST_CHECK_EQUAL("a.f()[5]", parse("a.f[5]")->to_string());
+    BOOST_CHECK_EQUAL("a.f()[5, 7]", parse("a.f[5, 7]")->to_string());
+    BOOST_CHECK_EQUAL("a.f()[5, 7].g()", parse("a.f[5, 7].g")->to_string());
+    BOOST_CHECK_EQUAL("a.f()[5, (7 + 8)].g()", parse("a.f[5, 7 + 8].g")->to_string());
 }
 
 BOOST_AUTO_TEST_CASE(precedence)
@@ -145,6 +158,12 @@ BOOST_AUTO_TEST_CASE(basic_syntax_errors)
     BOOST_CHECK_THROW(parse("a.f(b,)"), SyntaxError);
     BOOST_CHECK_THROW(parse("a.f(b,,c)"), SyntaxError);
     BOOST_CHECK_THROW(parse("a.f(b)."), SyntaxError);
+
+    BOOST_CHECK_THROW(parse("a[]"), SyntaxError);
+    BOOST_CHECK_THROW(parse("a[a,]"), SyntaxError);
+    BOOST_CHECK_THROW(parse("a[,a]"), SyntaxError);
+    BOOST_CHECK_THROW(parse("a["), SyntaxError);
+    BOOST_CHECK_THROW(parse("a[a"), SyntaxError);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

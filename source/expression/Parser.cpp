@@ -82,7 +82,7 @@ namespace slim
                 {
                     auto name = current_token.str;
                     next();
-                    if (current_token.type == Token::LPAREN)
+                    if (current_token.type == Token::LPAREN || is_func_arg_start())
                     {
                         auto &f = global_functions.get(name);
                         FuncCall::Args args = func_args();
@@ -95,24 +95,54 @@ namespace slim
             }
         }
 
+        bool Parser::is_func_arg_start()const
+        {
+            switch (current_token.type)
+            {
+            case Token::STRING:
+            case Token::NUMBER:
+            case Token::SYMBOL:
+                return true;
+            default:
+                return false;
+            }
+        }
         std::vector<ExpressionNodePtr> Parser::func_args()
         {
-            assert(current_token.type == Token::LPAREN);
-            std::vector<ExpressionNodePtr> args;
-            next();
-            if (current_token.type != Token::RPAREN)
+            bool parens;
+            if (current_token.type == Token::LPAREN)
             {
-                while (true)
+                parens = true;
+                next();
+                if (current_token.type == Token::RPAREN)
                 {
-                    args.push_back(expression());
-                    if (current_token.type == Token::COMMA) next();
-                    else break;
+                    next();
+                    return {};
                 }
-
-                if (current_token.type != Token::RPAREN) throw SyntaxError("Expected ')'");
             }
-            next();
+            else if (!is_func_arg_start()) return {};
+            else parens = false;
+
+            auto args = func_args_inner();
+
+            if (parens)
+            {
+                if (current_token.type != Token::RPAREN)
+                    throw SyntaxError("Expected ')'");
+                next();
+            }
+
             return args;
+        }
+        std::vector<ExpressionNodePtr> Parser::func_args_inner()
+        {
+            std::vector<ExpressionNodePtr> args;
+            while (true)
+            {
+                args.push_back(expression());
+                if (current_token.type == Token::COMMA) next();
+                else return args;
+            }
         }
 
         template<class T> ExpressionNodePtr Parser::binary_op(ExpressionNodePtr &&lhs)
@@ -242,16 +272,29 @@ namespace slim
         ExpressionNodePtr Parser::member_func()
         {
             auto lhs = value();
-            while (current_token.type == Token::DOT)
+            while (true)
             {
-                next();
-                if (current_token.type != Token::SYMBOL) throw SyntaxError("Expected symbol");
-                auto name = current_token.str;
+                if (current_token.type == Token::DOT)
+                {
+                    next();
+                    if (current_token.type != Token::SYMBOL) throw SyntaxError("Expected symbol");
+                    auto name = current_token.str;
 
-                next();
-                FuncCall::Args args;
-                if (current_token.type == Token::LPAREN) args = func_args();
-                lhs = std::make_unique<MemberFuncCall>(std::move(lhs), std::move(name), std::move(args));
+                    next();
+                    auto args = func_args();
+                    lhs = std::make_unique<MemberFuncCall>(std::move(lhs), std::move(name), std::move(args));
+                }
+                else if (current_token.type == Token::L_SQ_BRACKET)
+                {
+                    next();
+                    FuncCall::Args args = func_args_inner();
+                    if (current_token.type != Token::R_SQ_BRACKET)
+                        throw SyntaxError("Expected ']'");
+
+                    next();
+                    lhs = std::make_unique<ElementRefOp>(std::move(lhs), std::move(args));
+                }
+                else break;
             }
             return lhs;
         }

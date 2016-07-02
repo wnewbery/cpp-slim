@@ -23,6 +23,8 @@ namespace slim
 
                 LPAREN,
                 RPAREN,
+                L_SQ_BRACKET,
+                R_SQ_BRACKET,
                 COMMA,
                 DOT,
 
@@ -50,6 +52,20 @@ namespace slim
 
             Type type;
             std::string str;
+
+            bool value_start()const
+            {
+                switch(type)
+                {
+                case STRING:
+                case NUMBER:
+                case SYMBOL:
+                case LPAREN:
+                    return true;
+                default:
+                    return false;
+                }
+            }
         };
     }
 }

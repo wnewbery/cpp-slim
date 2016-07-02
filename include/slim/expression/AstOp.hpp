@@ -53,5 +53,17 @@ namespace slim
             ExpressionNodePtr lhs;
             std::string name;
         };
+        /**[] operator */
+        class ElementRefOp : public FuncCall
+        {
+        public:
+            ElementRefOp(ExpressionNodePtr &&lhs, Args &&args)
+                : FuncCall(std::move(args)), lhs(std::move(lhs))
+            {}
+            virtual std::string to_string()const override;
+            virtual ObjectPtr eval(Scope &scope)const override;
+
+            ExpressionNodePtr lhs;
+        };
     }
 }

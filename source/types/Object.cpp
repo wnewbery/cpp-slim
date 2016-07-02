@@ -24,6 +24,11 @@ namespace slim
         throw UnorderableTypeError(this, "cmp", rhs);
     }
 
+    ObjectPtr Object::el_ref(const FunctionArgs & args)
+    {
+        throw NoSuchMethod(this, "[]");
+    }
+
     ObjectPtr Object::mul(Object * rhs)
     {
         throw NoSuchMethod(this, "*");

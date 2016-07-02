@@ -33,8 +33,13 @@ namespace slim
             ExpressionNodePtr sub_expression();
             /** A literal value, variable, or global function call. */
             ExpressionNodePtr value();
-            /** '(' expression , expression ')' */
+            bool is_func_arg_start()const;
+            /** '(' expression, expression ')' */
             std::vector<ExpressionNodePtr> func_args();
+            /** expression, expression
+             * Used for function calls, and element references [args].
+             */
+            std::vector<ExpressionNodePtr> func_args_inner();
 
             /**Helper that constructs a binary operator node of type T.
              * 

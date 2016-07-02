@@ -51,6 +51,7 @@ namespace slim
         virtual int cmp(const Object *rhs)const;
 
         //operators
+        virtual ObjectPtr el_ref(const FunctionArgs &args);
         virtual ObjectPtr mul(Object *rhs);
         virtual ObjectPtr div(Object *rhs);
         virtual ObjectPtr mod(Object *rhs);

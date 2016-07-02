@@ -47,6 +47,8 @@ namespace slim
             {
             case '(': ++p; return Token::LPAREN;
             case ')': ++p; return Token::RPAREN;
+            case '[': ++p; return Token::L_SQ_BRACKET;
+            case ']': ++p; return Token::R_SQ_BRACKET;
             case ',': ++p; return Token::COMMA;
             case '.': ++p; return Token::DOT;
             case '+': ++p; return Token::PLUS;

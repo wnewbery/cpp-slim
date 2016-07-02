@@ -28,11 +28,9 @@ namespace slim
         std::string FuncCall::to_string() const
         {
             std::stringstream ss;
-            ss << "(";
             if (!args.empty()) ss << args[0]->to_string();
             for (size_t i = 1; i < args.size(); ++i)
                 ss << ", " << args[i]->to_string();
-            ss << ")";
             return ss.str();
         }
         FunctionArgs FuncCall::eval_args(Scope & scope) const
@@ -44,7 +42,7 @@ namespace slim
 
         std::string GlobalFuncCall::to_string() const
         {
-            return function.name + FuncCall::to_string();
+            return function.name + "(" + FuncCall::to_string() + ")";
         }
         ObjectPtr GlobalFuncCall::eval(Scope & scope) const
         {
@@ -54,13 +52,24 @@ namespace slim
 
         std::string MemberFuncCall::to_string() const
         {
-            return lhs->to_string() + "." + name + FuncCall::to_string();
+            return lhs->to_string() + "." + name + "(" + FuncCall::to_string() + ")";
         }
         ObjectPtr MemberFuncCall::eval(Scope & scope) const
         {
             auto self = lhs->eval(scope);
             auto args = eval_args(scope);
             return self->call_method(name, args);
+        }
+
+        std::string ElementRefOp::to_string() const
+        {
+            return lhs->to_string() + "[" + FuncCall::to_string() + "]";
+        }
+        ObjectPtr ElementRefOp::eval(Scope & scope) const
+        {
+            auto self = lhs->eval(scope);
+            auto args = eval_args(scope);
+            return self->el_ref(args);
         }
     }
 }
