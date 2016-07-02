@@ -110,5 +110,8 @@
     <ClCompile Include="source\expression\Parser.cpp">
       <Filter>source\expression</Filter>
     </ClCompile>
+    <ClCompile Include="source\types\Number.cpp">
+      <Filter>source\types</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

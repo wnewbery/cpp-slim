@@ -49,6 +49,7 @@
     <ClCompile Include="source\expression\Parser.cpp" />
     <ClCompile Include="source\expression\LogicalOp.cpp" />
     <ClCompile Include="source\Operators.cpp" />
+    <ClCompile Include="source\types\Number.cpp" />
     <ClCompile Include="source\types\Object.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

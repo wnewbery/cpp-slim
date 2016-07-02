@@ -4,15 +4,11 @@
 #include "types/Number.hpp"
 #include "types/String.hpp"
 #include "Error.hpp"
-#include <sstream>
 
 namespace slim
 {
-    const FunctionTable EMPTY_METHOD_TABLE;
-
     const std::string Boolean::TYPE_NAME = "Boolean";
     const std::string Null::TYPE_NAME = "Null";
-    const std::string Number::TYPE_NAME = "Number";
     const std::string String::TYPE_NAME = "String";
 
     const std::shared_ptr<Null> NULL_VALUE = std::make_shared<Null>();
@@ -40,17 +36,19 @@ namespace slim
     {
         static const MethodTable table =
         {
-            { &Object::to_string_obj, "to_s" }
+            { &Object::to_string_obj, "to_s" },
+            { &Object::to_string_obj, "inspect" }
         };
         return table;
     }
 
-    std::string Number::to_string()const
+    double as_number(const Object *obj)
     {
-        std::stringstream ss;
-        ss << v;
-        return ss.str();
+        auto n = dynamic_cast<const Number*>(obj);
+        if (n) return n->get_value();
+        else throw TypeError("Expected number, got " + obj->type_name());
     }
+
     const MethodTable &Boolean::method_table()const
     {
         static const MethodTable table(Object::method_table(),
@@ -71,16 +69,6 @@ namespace slim
         });
         return table;
     }
-    const MethodTable &Number::method_table()const
-    {
-        static const MethodTable table(Object::method_table(),
-        {
-            { &Number::to_f, "to_f" },
-            { &Number::to_f, "to_d" },
-            { &Number::to_i, "to_i" }
-        });
-        return table;
-    }
     const MethodTable &String::method_table()const
     {
         static const MethodTable table(Object::method_table(),
@@ -94,10 +82,6 @@ namespace slim
 
 
     //to_f
-    std::shared_ptr<Number> Number::to_f()
-    {
-        return std::static_pointer_cast<Number>(shared_from_this());
-    }
     std::shared_ptr<Number> Null::to_f()
     {
         return make_value(0.0);
@@ -115,10 +99,6 @@ namespace slim
     }
 
     //to_i
-    std::shared_ptr<Number> Number::to_i()
-    {
-        return make_value(std::trunc(v));
-    }
     std::shared_ptr<Number> Null::to_i()
     {
         return make_value(0.0);

@@ -160,6 +160,7 @@
     <ClCompile Include="tests\Main.cpp" />
     <ClCompile Include="tests\Operators.cpp" />
     <ClCompile Include="tests\types\BasicTypes.cpp" />
+    <ClCompile Include="tests\types\Number.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

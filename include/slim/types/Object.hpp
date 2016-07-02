@@ -65,4 +65,10 @@ namespace slim
     {
         return T::create<T>(std::forward<Args>(args)...);
     }
+
+    double as_number(const Object *obj);
+    inline double as_number(const ObjectPtr &obj)
+    {
+        return as_number(obj.get());
+    }
 }

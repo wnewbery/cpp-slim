@@ -30,5 +30,8 @@
     <ClCompile Include="tests\expression\Expression.cpp">
       <Filter>tests\expression</Filter>
     </ClCompile>
+    <ClCompile Include="tests\types\Number.cpp">
+      <Filter>tests\types</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

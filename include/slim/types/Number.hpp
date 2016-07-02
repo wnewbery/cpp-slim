@@ -25,6 +25,32 @@ namespace slim
         double get_value()const { return v; }
         std::shared_ptr<Number> to_f();
         std::shared_ptr<Number> to_i();
+        std::shared_ptr<Number> abs();
+        std::shared_ptr<Number> next_float();
+        std::shared_ptr<Number> prev_float();
+
+        std::shared_ptr<Number> ceil();
+        std::shared_ptr<Number> floor();
+        std::shared_ptr<Number> round(const FunctionArgs &args);
+
+        //Not provided
+        //arg
+        //coerce
+        //denominator
+        //numerator
+        //divmod
+        //fdiv
+        //eql?
+        //finite?
+        //infinite?
+        //hash
+        //modulo
+        //nan?
+        //phase
+        //quo
+        //rationalize
+        //to_r
+        //zero?
     protected:
         virtual const MethodTable &method_table()const;
     private:
