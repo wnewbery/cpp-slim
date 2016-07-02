@@ -18,8 +18,11 @@ namespace slim
         virtual std::string to_string()const override;
         virtual bool eq(const Object *rhs)const override { return cmp(rhs) == 0; }
         virtual int cmp(const Object *rhs)const override;
+
+        virtual ObjectPtr el_ref(const FunctionArgs &args)override { return slice(args); }
         virtual ObjectPtr add(Object *rhs)override;
         virtual ObjectPtr sub(Object *rhs)override;
+
         const std::vector<ObjectPtr>& get_value()const { return arr; }
 
         //+, [], -, *, <<, &, |
