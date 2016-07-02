@@ -4,6 +4,7 @@
 #include <vector>
 namespace slim
 {
+    class FunctionTable;
     namespace expr
     {
         class Lexer;
@@ -14,11 +15,12 @@ namespace slim
         class Parser
         {
         public:
-            Parser(Lexer &lexer);
+            Parser(const FunctionTable &global_functions, Lexer &lexer);
 
             /**Parse the entire source as a complete expression. */
             ExpressionNodePtr parse_expression();
         private:
+            const FunctionTable &global_functions;
             Lexer &lexer;
             Token current_token;
 

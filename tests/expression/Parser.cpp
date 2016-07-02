@@ -3,6 +3,7 @@
 #include "expression/Ast.hpp"
 #include "expression/AstOp.hpp"
 #include "expression/Lexer.hpp"
+#include "Function.hpp"
 #include "Error.hpp"
 
 using namespace slim;
@@ -12,7 +13,8 @@ BOOST_AUTO_TEST_SUITE(TestExprParser)
 ExpressionNodePtr parse(const std::string &str)
 {
     Lexer lexer(str);
-    Parser parser(lexer);
+    FunctionTable functions;
+    Parser parser(functions, lexer);
     return parser.parse_expression();
 }
 

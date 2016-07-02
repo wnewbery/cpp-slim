@@ -37,8 +37,8 @@ namespace slim
                 return ret;
             }
         }
-        Parser::Parser(Lexer & lexer)
-            : lexer(lexer), current_token(Token::END)
+        Parser::Parser(const FunctionTable &global_functions, Lexer &lexer)
+            : global_functions(global_functions), lexer(lexer), current_token(Token::END)
         {
             
         }
@@ -82,7 +82,12 @@ namespace slim
                 {
                     auto name = current_token.str;
                     next();
-                    if (current_token.type == Token::LPAREN) throw std::runtime_error("Function calls not implemented");
+                    if (current_token.type == Token::LPAREN)
+                    {
+                        auto &f = global_functions.get(name);
+                        FuncCall::Args args = func_args();
+                        return std::make_unique<GlobalFuncCall>(f, std::move(args));
+                    }
                     else return std::make_unique<Variable>(name);
                 }
             case Token::LPAREN: return sub_expression();

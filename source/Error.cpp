@@ -18,4 +18,24 @@ namespace slim
         : ScriptError(obj->type_name() + " has no method " + method_name)
     {
     }
+    NoSuchMethod::NoSuchMethod(const std::string & method_name)
+        : ScriptError("No global function " + method_name)
+    {
+    }
+    DuplicateMethod::DuplicateMethod(const Object * obj, const std::string & method_name)
+        : ScriptError(obj->type_name() + " already has method " + method_name)
+    {
+    }
+    DuplicateMethod::DuplicateMethod(const std::string & method_name)
+        : ScriptError("global function " + method_name + " already exists")
+    {
+    }
+    InvalidArgument::InvalidArgument(const std::string &name)
+        : ScriptError("Invalid argument for " + name)
+    {
+    }
+    InvalidArgument::InvalidArgument(const Object *obj, const std::string &name)
+        : ScriptError("Invalid argument for " + obj->type_name() + "." + name)
+    {
+    }
 }

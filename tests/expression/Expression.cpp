@@ -3,6 +3,7 @@
 #include "expression/Ast.hpp"
 #include "expression/Lexer.hpp"
 #include "expression/Scope.hpp"
+#include "Operators.hpp"
 #include "Value.hpp"
 #include "Error.hpp"
 
@@ -10,18 +11,19 @@ using namespace slim;
 using namespace slim::expr;
 BOOST_AUTO_TEST_SUITE(TestExpr)
 
-std::string eval(const std::string &str, Scope &scope)
+std::string eval(const std::string &str, const FunctionTable &functions, Scope &scope)
 {
     Lexer lexer(str);
-    Parser parser(lexer);
+    Parser parser(functions, lexer);
     auto expr = parser.parse_expression();
     auto result = expr->eval(scope);
     return result->to_string();
 }
 std::string eval(const std::string &str)
 {
+    FunctionTable functions;
     Scope scope;
-    return eval(str, scope);
+    return eval(str, functions, scope);
 }
 
 BOOST_AUTO_TEST_CASE(literals)
@@ -35,10 +37,11 @@ BOOST_AUTO_TEST_CASE(literals)
 
 BOOST_AUTO_TEST_CASE(variables)
 {
+    FunctionTable functions;
     Scope scope;
     scope.set("test", make_value(55.0));
-    BOOST_CHECK_EQUAL("55", eval("test", scope));
-    BOOST_CHECK_EQUAL("null", eval("unset", scope));
+    BOOST_CHECK_EQUAL("55", eval("test", functions, scope));
+    BOOST_CHECK_EQUAL("null", eval("unset", functions, scope));
 }
 
 BOOST_AUTO_TEST_CASE(operators)
@@ -100,6 +103,24 @@ BOOST_AUTO_TEST_CASE(precedence)
     BOOST_CHECK_EQUAL("false", eval("20 == (100 == false)"));
     BOOST_CHECK_EQUAL("1", eval("5 && 1 || 0 && 7"));
     BOOST_CHECK_EQUAL("7", eval("((5 && 1) || 0) && 7"));
+}
+
+BOOST_AUTO_TEST_CASE(global_func)
+{
+    auto func = [](const FunctionArgs &args) -> ObjectPtr
+    {
+        if (args.size() != 2) throw InvalidArgument("test");
+        return op_add(args[0].get(), args[1].get());
+    };
+    FunctionTable functions = {{func, "func"}};
+
+    Scope scope;
+    scope.set("x", make_value(55.0));
+
+    BOOST_CHECK_EQUAL("60", eval("func(x, 5)", functions, scope));
+    BOOST_CHECK_THROW(eval("func2()", functions, scope), NoSuchMethod);
+    BOOST_CHECK_THROW(eval("func()", functions, scope), InvalidArgument);
+    BOOST_CHECK_THROW(eval("func(10, 20, 30)", functions, scope), InvalidArgument);
 }
 
 BOOST_AUTO_TEST_CASE(member_func)

@@ -43,5 +43,18 @@ namespace slim
     {
     public:
         NoSuchMethod(const Object *obj, const std::string &method_name);
+        explicit NoSuchMethod(const std::string &method_name);
+    };
+    class DuplicateMethod : public ScriptError
+    {
+    public:
+        DuplicateMethod(const Object *obj, const std::string &method_name);
+        explicit DuplicateMethod(const std::string &method_name);
+    };
+    class InvalidArgument : public ScriptError
+    {
+    public:
+        InvalidArgument(const std::string &name);
+        InvalidArgument(const Object *obj, const std::string &name);
     };
 }
