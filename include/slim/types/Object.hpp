@@ -3,6 +3,7 @@
 #include <string>
 #include "Function.hpp"
 #include "Error.hpp"
+#include "Operators.hpp"
 namespace slim
 {
     class Object;
@@ -45,6 +46,8 @@ namespace slim
          * Default is identity equality.
          */
         virtual bool eq(const Object *rhs)const;
+        /**Computes a hash value to optimise equality checks.*/
+        virtual size_t hash()const;
         /**Compare with another object of the same type.
          * Default throws UnorderableTypeError.
          */
@@ -108,4 +111,57 @@ namespace slim
         if (obj2) return obj2;
         else throw TypeError(obj.get(), T::TYPE_NAME);
     }
+
+    namespace detail
+    {
+        template<class T> size_t hash(const T &x)
+        {
+            return std::hash<T>()(x);
+        }
+        /**http://stackoverflow.com/a/2595226/6266 */
+        template<class T>
+        void hash_combine(size_t &seed, const T &v)
+        {
+            seed ^= hash(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        }
+    }
+    struct ObjLess
+    {
+        bool operator()(const Object *lhs, const Object *rhs)const
+        {
+            return cmp(lhs, rhs) < 0;
+        }
+        bool operator()(const ObjectPtr &lhs, const ObjectPtr &rhs)const
+        {
+            return cmp(lhs.get(), rhs.get()) < 0;
+        }
+    };
+    struct ObjEquals
+    {
+        bool operator()(const Object *lhs, const Object *rhs)const
+        {
+            return eq(lhs, rhs);
+        }
+        bool operator()(const ObjectPtr &lhs, const ObjectPtr &rhs)const
+        {
+            return eq(lhs.get(), rhs.get());
+        }
+    };
+    struct ObjHash
+    {
+        size_t operator()(const Object &obj)const { return obj.hash(); }
+        size_t operator()(const Object *obj)const { return obj->hash(); }
+        size_t operator()(const ObjectPtr &obj)const { return obj->hash(); }
+    };
+    typedef std::unordered_map<ObjectPtr, ObjectPtr, ObjHash, ObjEquals> ObjectMap;
+}
+namespace std
+{
+    template<> struct hash<slim::Object>
+    {
+        size_t operator()(const slim::Object &obj)const
+        {
+            return obj.hash();
+        }
+    };
 }

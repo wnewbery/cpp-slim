@@ -24,6 +24,12 @@ namespace slim
         ss << ']';
         return ss.str();
     }
+    size_t Array::hash()const
+    {
+        size_t h = 0;
+        for (auto &i : arr) detail::hash_combine(h, *i);
+        return h;
+    }
     int Array::cmp(const Object * orhs) const
     {
         auto &rhs = ((const Array*)orhs)->get_value();

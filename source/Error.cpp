@@ -42,4 +42,8 @@ namespace slim
         : ScriptError("Invalid argument for " + obj->type_name() + "." + name)
     {
     }
+    KeyError::KeyError(ObjectPtr key)
+        : ScriptError("Key not found: " + key->to_string())
+    {
+    }
 }

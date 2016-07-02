@@ -15,6 +15,7 @@ namespace slim
         {
             return v == ((const Number*)rhs)->v;
         }
+        virtual size_t hash()const { return detail::hash(v); }
         virtual int cmp(const Object *rhs)const override
         {
             double v2 = ((const Number*)rhs)->v;

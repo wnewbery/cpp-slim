@@ -87,6 +87,9 @@
     <ClInclude Include="include\slim\types\Array.hpp">
       <Filter>include\types</Filter>
     </ClInclude>
+    <ClInclude Include="include\slim\types\Hash.hpp">
+      <Filter>include\types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\types\Object.cpp">
@@ -129,6 +132,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="source\types\Array.cpp">
+      <Filter>source\types</Filter>
+    </ClCompile>
+    <ClCompile Include="source\types\Hash.cpp">
       <Filter>source\types</Filter>
     </ClCompile>
   </ItemGroup>

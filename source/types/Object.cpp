@@ -19,6 +19,10 @@ namespace slim
     {
         return this == rhs; //identity
     }
+    size_t Object::hash()const
+    {
+        return detail::hash(this);
+    }
     int Object::cmp(const Object *rhs)const
     {
         throw UnorderableTypeError(this, "cmp", rhs);

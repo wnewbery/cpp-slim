@@ -1,8 +1,10 @@
 #pragma once
 #include <stdexcept>
+#include <memory>
 namespace slim
 {
     class Object;
+    typedef std::shared_ptr<Object> ObjectPtr;
 
     class Error : public std::runtime_error
     {
@@ -33,6 +35,11 @@ namespace slim
     {
     public:
         using ScriptError::ScriptError;
+    };
+    class KeyError : public ScriptError
+    {
+    public:
+        explicit KeyError(ObjectPtr key);
     };
     class UnorderableTypeError : public TypeError
     {

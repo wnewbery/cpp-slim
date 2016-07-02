@@ -25,6 +25,7 @@ namespace slim
         {
             return b == ((const Boolean*)rhs)->b;
         }
+        virtual size_t hash()const { return b ? 1 : 0; }
         virtual int cmp(const Object *rhs)const override
         {
             return (b ? 1 : 0) - (((const Boolean*)rhs)->b ? 1 : 0);

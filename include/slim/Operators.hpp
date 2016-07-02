@@ -1,7 +1,10 @@
 #pragma once
-#include "types/Object.hpp"
+#include <memory>
 namespace slim
 {
+    class Object;
+    typedef std::shared_ptr<Object> ObjectPtr;
+
     bool eq(const Object *lhs, const Object *rhs);
     int cmp(const Object *lhs, const Object *rhs);
 
@@ -14,16 +17,4 @@ namespace slim
     ObjectPtr op_ge(const Object *lhs, const Object *rhs);
 
     ObjectPtr op_not(Object *rhs);
-
-    struct ObjLess
-    {
-        bool operator()(const Object *lhs, const Object *rhs)const
-        {
-            return cmp(lhs, rhs) < 0;
-        }
-        bool operator()(const ObjectPtr &lhs, const ObjectPtr &rhs)const
-        {
-            return cmp(lhs.get(), rhs.get()) < 0;
-        }
-    };
 }

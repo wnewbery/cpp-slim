@@ -25,6 +25,8 @@ namespace slim
                 RPAREN,
                 L_SQ_BRACKET,
                 R_SQ_BRACKET,
+                L_CURLY_BRACKET,
+                R_CURLY_BRACKET,
                 COMMA,
                 DOT,
 

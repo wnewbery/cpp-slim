@@ -22,6 +22,8 @@ BOOST_AUTO_TEST_CASE(single_tokens)
     BOOST_CHECK_EQUAL(Token::RPAREN, single_token(")").type);
     BOOST_CHECK_EQUAL(Token::L_SQ_BRACKET, single_token("[").type);
     BOOST_CHECK_EQUAL(Token::R_SQ_BRACKET, single_token("]").type);
+    BOOST_CHECK_EQUAL(Token::L_CURLY_BRACKET, single_token("{").type);
+    BOOST_CHECK_EQUAL(Token::R_CURLY_BRACKET, single_token("}").type);
     BOOST_CHECK_EQUAL(Token::COMMA, single_token(",").type);
     BOOST_CHECK_EQUAL(Token::DOT, single_token(".").type);
     BOOST_CHECK_EQUAL(Token::PLUS, single_token("+").type);

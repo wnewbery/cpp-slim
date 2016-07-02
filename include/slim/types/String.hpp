@@ -15,6 +15,7 @@ namespace slim
         {
             return v == ((const String*)rhs)->v;
         }
+        virtual size_t hash()const { return detail::hash(v); }
         virtual int cmp(const Object *rhs)const override
         {
             return v.compare(((const String*)rhs)->v);
