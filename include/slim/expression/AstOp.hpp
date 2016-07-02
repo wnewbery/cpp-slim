@@ -65,5 +65,12 @@ namespace slim
 
             ExpressionNodePtr lhs;
         };
+        class ArrayLiteral : public FuncCall
+        {
+        public:
+            ArrayLiteral(Args &&args) : FuncCall(std::move(args)) {}
+            virtual std::string to_string()const override;
+            virtual ObjectPtr eval(Scope &scope)const override;
+        };
     }
 }

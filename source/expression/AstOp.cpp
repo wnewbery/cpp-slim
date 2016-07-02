@@ -1,6 +1,7 @@
 #include "expression/AstOp.hpp"
 #include "expression/Scope.hpp"
 #include "types/Object.hpp"
+#include "types/Array.hpp"
 #include "types/String.hpp"
 #include <sstream>
 namespace slim
@@ -70,6 +71,15 @@ namespace slim
             auto self = lhs->eval(scope);
             auto args = eval_args(scope);
             return self->el_ref(args);
+        }
+        std::string ArrayLiteral::to_string() const
+        {
+            return "[" + FuncCall::to_string() + "]";
+        }
+        ObjectPtr ArrayLiteral::eval(Scope & scope) const
+        {
+            auto args = eval_args(scope);
+            return make_array(args);
         }
     }
 }

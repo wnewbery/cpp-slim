@@ -33,6 +33,9 @@ namespace slim
             ExpressionNodePtr sub_expression();
             /** A literal value, variable, or global function call. */
             ExpressionNodePtr value();
+            /** Array [a, b, c] literal */
+            ExpressionNodePtr array_literal();
+
             bool is_func_arg_start()const;
             /** '(' expression, expression ')' */
             std::vector<ExpressionNodePtr> func_args();

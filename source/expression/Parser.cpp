@@ -91,7 +91,32 @@ namespace slim
                     else return std::make_unique<Variable>(name);
                 }
             case Token::LPAREN: return sub_expression();
+            case Token::L_SQ_BRACKET: return array_literal();
             default: throw SyntaxError("Expected value");
+            }
+        }
+
+        ExpressionNodePtr Parser::array_literal()
+        {
+            assert(current_token.type == Token::L_SQ_BRACKET);
+            next();
+            if (current_token.type == Token::R_SQ_BRACKET)
+            {
+                next();
+                return std::make_unique<ArrayLiteral>(FuncCall::Args());
+            }
+            
+            FuncCall::Args args;
+            while (true)
+            {
+                args.push_back(expression());
+                if (current_token.type == Token::COMMA) next();
+                else if (current_token.type == Token::R_SQ_BRACKET)
+                {
+                    next();
+                    return std::make_unique<ArrayLiteral>(std::move(args));
+                }
+                else throw SyntaxError("Expected ']'");
             }
         }
 

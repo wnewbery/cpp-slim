@@ -46,6 +46,11 @@ BOOST_AUTO_TEST_CASE(single_values)
     BOOST_CHECK_THROW(parse("55.5.5"), SyntaxError);
 
 
+    BOOST_CHECK(is_node_type<ArrayLiteral>(parse("[5]")));
+    BOOST_CHECK_EQUAL("[]", parse("[]")->to_string());
+    BOOST_CHECK_EQUAL("[5]", parse("[5]")->to_string());
+    BOOST_CHECK_EQUAL("[2, true]", parse("[2,true]")->to_string());
+
     BOOST_CHECK(is_node_type<Variable>(parse("myvar")));
     BOOST_CHECK_EQUAL("myvar", parse("myvar")->to_string());
 }
@@ -90,6 +95,8 @@ BOOST_AUTO_TEST_CASE(grouping)
     BOOST_CHECK_EQUAL("(5 - 5)", parse("(((5) - 5))")->to_string()); //because groups dont exist in the AST
     BOOST_CHECK_EQUAL("((5 - 5) * 6)", parse("(5 - 5) * 6")->to_string());
     BOOST_CHECK_EQUAL("(-((5 - 5) * 6))", parse("-((5 - 5) * 6)")->to_string());
+
+    BOOST_CHECK_EQUAL("[2, (5 + 5), a.f()]", parse("[2,5+5,a.f]")->to_string());
 }
 
 BOOST_AUTO_TEST_CASE(method_call)
