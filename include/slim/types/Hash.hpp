@@ -17,7 +17,8 @@ namespace slim
         explicit Hash(ObjectPtr def_value, ObjectMap &&map = {});
 
         virtual const std::string& type_name()const override { return TYPE_NAME; }
-        virtual std::string to_string()const override;
+        virtual std::string to_string()const override { return inspect(); }
+        virtual std::string inspect()const override;
         virtual size_t hash()const;
         virtual bool eq(const Object *rhs)const override;
 

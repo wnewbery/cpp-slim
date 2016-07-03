@@ -59,6 +59,9 @@ BOOST_AUTO_TEST_CASE(string)
     BOOST_CHECK_EQUAL("", a->to_string());
     BOOST_CHECK_EQUAL("a", b->to_string());
     BOOST_CHECK_EQUAL("test", c->to_string());
+    BOOST_CHECK_EQUAL("\"\"", a->inspect());
+    BOOST_CHECK_EQUAL("\"a\"", b->inspect());
+    BOOST_CHECK_EQUAL("\"test\"", c->inspect());
     BOOST_CHECK_EQUAL(false, a->is_true());
     BOOST_CHECK_EQUAL(true, b->is_true());
     BOOST_CHECK_EQUAL(true, c->is_true());

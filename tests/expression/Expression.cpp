@@ -17,7 +17,7 @@ std::string eval(const std::string &str, const FunctionTable &functions, Scope &
     Parser parser(functions, lexer);
     auto expr = parser.parse_expression();
     auto result = expr->eval(scope);
-    return result->to_string();
+    return result->inspect();
 }
 std::string eval(const std::string &str)
 {
@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(literals)
     BOOST_CHECK_EQUAL("true", eval("true"));
     BOOST_CHECK_EQUAL("false", eval("false"));
     BOOST_CHECK_EQUAL("null", eval("null"));
-    BOOST_CHECK_EQUAL("Hello World", eval("'Hello World'"));
+    BOOST_CHECK_EQUAL("\"Hello World\"", eval("'Hello World'"));
     BOOST_CHECK_EQUAL("60", eval("60"));
 }
 
@@ -127,9 +127,9 @@ BOOST_AUTO_TEST_CASE(global_func)
 
 BOOST_AUTO_TEST_CASE(member_func)
 {
-    BOOST_CHECK_EQUAL("200", eval("20.to_s + '0'"));
-    BOOST_CHECK_EQUAL("200", eval("20.to_s() + '0'"));
-    BOOST_CHECK_EQUAL("300", eval("(20 + 10).to_s() + '0'"));
+    BOOST_CHECK_EQUAL("\"200\"", eval("20.to_s + '0'"));
+    BOOST_CHECK_EQUAL("\"200\"", eval("20.to_s() + '0'"));
+    BOOST_CHECK_EQUAL("\"300\"", eval("(20 + 10).to_s() + '0'"));
 
     BOOST_CHECK_EQUAL("200", eval("'20.5'.to_i * 10"));
     BOOST_CHECK_EQUAL("205", eval("'20.5'.to_f * 10"));

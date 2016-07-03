@@ -19,7 +19,7 @@ std::string eval(const std::string &str, Scope &scope)
     Parser parser(functions, lexer);
     auto expr = parser.parse_expression();
     auto result = expr->eval(scope);
-    return result->to_string();
+    return result->inspect();
 }
 std::string eval(const std::string &str)
 {
@@ -184,13 +184,13 @@ BOOST_AUTO_TEST_CASE(assoc)
     Scope scope;
     scope.set("a", make_array({s1, s2, s3}));
     //assoc
-    BOOST_CHECK_EQUAL("[letters, a, b, c]", eval("a.assoc('letters')", scope));
+    BOOST_CHECK_EQUAL("[\"letters\", \"a\", \"b\", \"c\"]", eval("a.assoc('letters')", scope));
     BOOST_CHECK_EQUAL("null", eval("a.assoc('foo')", scope));
     BOOST_CHECK_EQUAL("null", eval("a.assoc('red')", scope));
     //rassoc
     BOOST_CHECK_EQUAL("null", eval("a.rassoc('letters')", scope));
     BOOST_CHECK_EQUAL("null", eval("a.rassoc('foo')", scope));
-    BOOST_CHECK_EQUAL("[colors, red, blue, green]", eval("a.rassoc('red')", scope));
+    BOOST_CHECK_EQUAL("[\"colors\", \"red\", \"blue\", \"green\"]", eval("a.rassoc('red')", scope));
 }
 
 BOOST_AUTO_TEST_CASE(compact)
@@ -220,7 +220,7 @@ BOOST_AUTO_TEST_CASE(join)
 {
     Scope scope;
     scope.set("a", make_array2({ 1.0, 2.0, 3.0, 5.0, 8.0, 11.0 }));
-    BOOST_CHECK_EQUAL("1, 2, 3, 5, 8, 11", eval("a.join(', ')", scope));
+    BOOST_CHECK_EQUAL("\"1, 2, 3, 5, 8, 11\"", eval("a.join(', ')", scope));
 }
 BOOST_AUTO_TEST_CASE(rotate)
 {
@@ -246,7 +246,7 @@ BOOST_AUTO_TEST_CASE(uniq)
 {
     Scope scope;
     scope.set("a", make_array({ make_value("5"), make_value(5.0), make_value(5.0), make_value("z") }));
-    BOOST_CHECK_EQUAL("[5, 5, z]", eval("a.uniq", scope));
+    BOOST_CHECK_EQUAL("[\"5\", 5, \"z\"]", eval("a.uniq", scope));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

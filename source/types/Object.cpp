@@ -67,12 +67,16 @@ namespace slim
     {
         return make_value(to_string());
     }
+    ObjectPtr Object::inspect_obj()const
+    {
+        return make_value(inspect());
+    }
     const MethodTable &Object::method_table()const
     {
         static const MethodTable table =
         {
             { &Object::to_string_obj, "to_s" },
-            { &Object::to_string_obj, "inspect" }
+            { &Object::inspect_obj, "inspect" }
         };
         return table;
     }
@@ -113,6 +117,26 @@ namespace slim
             { &String::to_i, "to_i" }
         });
         return table;
+    }
+
+    std::string String::inspect()const
+    {
+        std::string out = "\"";
+        for (auto c : v)
+        {
+            switch (c)
+            {
+            case '\\': out += "\\\\"; break;
+            case '\'': out += "\\\'"; break;
+            case '\"': out += "\\\""; break;
+            case '\r': out += "\\r"; break;
+            case '\n': out += "\\n"; break;
+            case '\t': out += "\\t"; break;
+            default: out.push_back(c); break;
+            }
+        }
+        out += "\"";
+        return out;
     }
 
     ObjectPtr String::add(Object *rhs)

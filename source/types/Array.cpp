@@ -10,7 +10,7 @@ namespace slim
 {
     const std::string Array::TYPE_NAME = "Array";
 
-    std::string Array::to_string() const
+    std::string Array::inspect() const
     {
         std::stringstream ss;
         ss << '[';
@@ -19,7 +19,7 @@ namespace slim
         {
             if (first) first = false;
             else ss << ", ";
-            ss << i->to_string();
+            ss << i->inspect();
         }
         ss << ']';
         return ss.str();

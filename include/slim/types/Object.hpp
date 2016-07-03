@@ -38,8 +38,14 @@ namespace slim
         virtual const std::string& type_name()const = 0;
         /**Convert this instance to a displayable string.*/
         virtual std::string to_string()const = 0;
+        /**Convert this instance to a displayable representation of this object.*/
+        virtual std::string inspect()const = 0;
         /**Convert this instance to a displayable string object. The default uses to_string. */
         virtual ObjectPtr to_string_obj()const;
+        /**Convert this instance to a displayable representation of this object.
+         * The default uses inspect.
+         */
+        virtual ObjectPtr inspect_obj()const;
         /**Returns if this object instance should be considered true in a boolean context.*/
         virtual bool is_true()const { return true; }
         /**Compare with another object of the same type.

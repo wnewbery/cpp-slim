@@ -21,7 +21,7 @@ namespace slim
         : map(std::move(map)), def_value(def_value)
     {}
 
-    std::string Hash::to_string() const
+    std::string Hash::inspect() const
     {
         std::stringstream ss;
         ss << '{';
@@ -30,7 +30,7 @@ namespace slim
         {
             if (first) first = false;
             else ss << ", ";
-            ss << i.first->to_string() << " => " << i.second->to_string();
+            ss << i.first->inspect() << " => " << i.second->inspect();
         }
         ss << '}';
         return ss.str();

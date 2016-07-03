@@ -103,30 +103,30 @@ BOOST_AUTO_TEST_CASE(basic_access)
     //BOOST_CHECK_EQUAL("true", eval("c.value?(5)", scope));
     //BOOST_CHECK_EQUAL("false", eval("c.value?('5')", scope));
 
-    BOOST_CHECK_EQUAL("[a, b]", eval("b.keys", scope));
+    BOOST_CHECK_EQUAL("[\"a\", \"b\"]", eval("b.keys", scope));
     BOOST_CHECK_EQUAL("[5, 10]", eval("b.values", scope));
 }
 
 BOOST_AUTO_TEST_CASE(invert)
 {
-    BOOST_CHECK_EQUAL("{5 => a, [15, 20] => b}", eval("{a: 5, b: [15, 20]}.invert"));
+    BOOST_CHECK_EQUAL("{5 => \"a\", [15, 20] => \"b\"}", eval("{a: 5, b: [15, 20]}.invert"));
 }
 
 BOOST_AUTO_TEST_CASE(flatten)
 {
-    BOOST_CHECK_EQUAL("[a, 5, b, [15, 20, [-1, -2]]]", eval("{a: 5, b: [15, 20, [-1, -2]]}.flatten"));
-    BOOST_CHECK_EQUAL("[a, 5, b, 15, 20, [-1, -2]]", eval("{a: 5, b: [15, 20, [-1, -2]]}.flatten 2"));
-    BOOST_CHECK_EQUAL("[a, 5, b, 15, 20, -1, -2]", eval("{a: 5, b: [15, 20, [-1, -2]]}.flatten 3"));
+    BOOST_CHECK_EQUAL("[\"a\", 5, \"b\", [15, 20, [-1, -2]]]", eval("{a: 5, b: [15, 20, [-1, -2]]}.flatten"));
+    BOOST_CHECK_EQUAL("[\"a\", 5, \"b\", 15, 20, [-1, -2]]", eval("{a: 5, b: [15, 20, [-1, -2]]}.flatten 2"));
+    BOOST_CHECK_EQUAL("[\"a\", 5, \"b\", 15, 20, -1, -2]", eval("{a: 5, b: [15, 20, [-1, -2]]}.flatten 3"));
 }
 
 BOOST_AUTO_TEST_CASE(to_a)
 {
-    BOOST_CHECK_EQUAL("[[a, 5], [b, 10]]", eval("{a: 5, b: 10}.to_a"));
+    BOOST_CHECK_EQUAL("[[\"a\", 5], [\"b\", 10]]", eval("{a: 5, b: 10}.to_a"));
 }
 
 BOOST_AUTO_TEST_CASE(merge)
 {
-    BOOST_CHECK_EQUAL("{a => 5, b => 15, c => 20}", eval("{a: 5, b: 10}.merge({c: 20, b: 15})"));
+    BOOST_CHECK_EQUAL("{\"a\" => 5, \"b\" => 15, \"c\" => 20}", eval("{a: 5, b: 10}.merge({c: 20, b: 15})"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
