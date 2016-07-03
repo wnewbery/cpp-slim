@@ -28,6 +28,12 @@ namespace slim
             auto rhs_v = rhs->eval(scope);
             return lhs_v->mod(rhs_v.get());
         }
+        ObjectPtr Pow::eval(Scope & scope) const
+        {
+            auto lhs_v = lhs->eval(scope);
+            auto rhs_v = rhs->eval(scope);
+            return lhs_v->pow(rhs_v.get());
+        }
         ObjectPtr Add::eval(Scope & scope) const
         {
             auto lhs_v = lhs->eval(scope);

@@ -56,6 +56,20 @@ BOOST_AUTO_TEST_CASE(basic_methods)
     BOOST_CHECK_EQUAL("-inf", eval("min.prev_float", scope));
 }
 
+BOOST_AUTO_TEST_CASE(operators)
+{
+    BOOST_CHECK_EQUAL("5", eval("+5"));
+    BOOST_CHECK_EQUAL("-5", eval("-5"));
+    BOOST_CHECK_EQUAL("false", eval("!5"));
+
+    BOOST_CHECK_EQUAL("5", eval("1 + 4"));
+    BOOST_CHECK_EQUAL("5", eval("6 - 1"));
+    BOOST_CHECK_EQUAL("6", eval("2 * 3"));
+    BOOST_CHECK_EQUAL("6", eval("24 / 4"));
+    BOOST_CHECK_EQUAL("6", eval("16 % 10"));
+    BOOST_CHECK_EQUAL("9", eval("3 ** 2"));
+}
+
 BOOST_AUTO_TEST_CASE(rounding)
 {
     BOOST_CHECK_EQUAL("0", eval("0.ceil"));

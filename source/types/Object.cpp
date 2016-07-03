@@ -45,6 +45,10 @@ namespace slim
     {
         throw NoSuchMethod(this, "%");
     }
+    ObjectPtr Object::pow(Object * rhs)
+    {
+        throw NoSuchMethod(this, "**");
+    }
     ObjectPtr Object::add(Object * rhs)
     {
         throw NoSuchMethod(this, "+");

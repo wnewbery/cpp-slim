@@ -48,6 +48,10 @@ namespace slim
     {
         return make_value(std::fmod(v, coerce<Number>(rhs)->get_value()));
     }
+    ObjectPtr Number::pow(Object *rhs)
+    {
+        return make_value(std::pow(v, coerce<Number>(rhs)->get_value()));
+    }
     ObjectPtr Number::add(Object *rhs)
     {
         return make_value(v + coerce<Number>(rhs)->get_value());

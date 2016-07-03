@@ -69,6 +69,8 @@ namespace slim
             ExpressionNodePtr mul_op();
             /** ! + - */
             ExpressionNodePtr unary_op();
+            /** ** */
+            ExpressionNodePtr pow_op();
             /** .func(args) */
             ExpressionNodePtr member_func();
 

@@ -328,9 +328,19 @@ namespace slim
                     next();
                     rhs = unary_op();
                     return std::make_unique<LogicalNot>(std::move(rhs));
-                default: return member_func();
+                default: return pow_op();
                 }
             }
+        }
+
+        ExpressionNodePtr Parser::pow_op()
+        {
+            auto lhs = member_func();
+            while (current_token.type == Token::POW)
+            {
+                next_binary_op<Pow>(lhs, &Parser::member_func); break;
+            }
+            return lhs;
         }
 
         ExpressionNodePtr Parser::member_func()

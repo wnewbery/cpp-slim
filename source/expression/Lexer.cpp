@@ -54,12 +54,15 @@ namespace slim
             case ',': ++p; return Token::COMMA;
             case '.': ++p; return Token::DOT;
             case '+': ++p; return Token::PLUS;
-            case '*': ++p; return Token::MUL;
             case '/': ++p; return Token::DIV;
             case '%': ++p; return Token::MOD;
             case '\'':
             case '\"':
                 return quoted_string();
+            case '*':
+                if (p + 1 >= end) error("Unexpected end");
+                if (p[1] == '*') return p += 2, Token::POW;
+                else return ++p, Token::MUL;
             case '-':
                 ++p;
                 if (p >= end) error("Unexpected end");

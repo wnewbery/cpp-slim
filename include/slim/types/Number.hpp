@@ -30,6 +30,7 @@ namespace slim
         virtual ObjectPtr mul(Object *rhs);
         virtual ObjectPtr div(Object *rhs);
         virtual ObjectPtr mod(Object *rhs);
+        virtual ObjectPtr pow(Object *rhs);
         virtual ObjectPtr add(Object *rhs);
         virtual ObjectPtr sub(Object *rhs);
         virtual ObjectPtr negate();

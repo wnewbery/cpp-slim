@@ -14,7 +14,7 @@ namespace slim
                 END = 0,
                 /**A string literal. Value stored in str.*/
                 STRING,
-                /**A number literal. Unparsed value stored in str.*/
+                /**A non-negative number literal. Unparsed value stored in str.*/
                 NUMBER,
                 /**A symbol.
                  * May be a value such as 'true', a variable name, function name, etc.
@@ -39,6 +39,7 @@ namespace slim
                 PLUS,
                 MINUS,
                 MUL,
+                POW,
                 DIV,
                 MOD,
 
