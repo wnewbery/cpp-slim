@@ -67,9 +67,9 @@ BOOST_AUTO_TEST_CASE(basic_methods)
     scope.set("b", make_array2({ 5.0, 10.0 }));
     scope.set("c", make_array2({ 5.0, 10.0, 5.0 }));
 
-    //BOOST_CHECK_EQUAL("true", eval("a.frozen?", scope));
-    //BOOST_CHECK_EQUAL("true", eval("a.empty?", scope));
-    //BOOST_CHECK_EQUAL("false", eval("b.empty?", scope));
+    BOOST_CHECK_EQUAL("true", eval("a.frozen?", scope));
+    BOOST_CHECK_EQUAL("true", eval("a.empty?", scope));
+    BOOST_CHECK_EQUAL("false", eval("b.empty?", scope));
 
     //size
     BOOST_CHECK_EQUAL("0", eval("a.length", scope));

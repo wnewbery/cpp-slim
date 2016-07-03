@@ -75,6 +75,10 @@ BOOST_AUTO_TEST_CASE(single_tokens)
     BOOST_CHECK_EQUAL(Token::SYMBOL, tok.type);
     BOOST_CHECK_EQUAL("test_func55", tok.str);
 
+    tok = single_token("empty?");
+    BOOST_CHECK_EQUAL(Token::SYMBOL, tok.type);
+    BOOST_CHECK_EQUAL("empty?", tok.str);
+
     tok = single_token("test_func55:");
     BOOST_CHECK_EQUAL(Token::HASH_SYMBOL, tok.type);
     BOOST_CHECK_EQUAL("test_func55", tok.str);

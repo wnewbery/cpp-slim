@@ -24,7 +24,6 @@ namespace slim
             {
                 return is_symbol_start_chr(c) || is_digit(c);
             }
-
         }
         
         void Lexer::error(const std::string &msg)
@@ -157,10 +156,17 @@ namespace slim
             auto sym_end = p;
             auto type = Token::SYMBOL;
 
-            if (p < end && *p == ':')
+            if (p < end)
             {
-                ++p;
-                type = Token::HASH_SYMBOL;
+                if (*p == ':')
+                {
+                    ++p;
+                    type = Token::HASH_SYMBOL;
+                }
+                else if(*p == '?') //trailing '?' is part of method symbols
+                {
+                    sym_end = ++p;
+                }
             }
             return { type, std::string(sym_start, sym_end - sym_start) };
         }

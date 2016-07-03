@@ -63,9 +63,8 @@ BOOST_AUTO_TEST_CASE(compare)
 BOOST_AUTO_TEST_CASE(basic_methods)
 {
     Scope scope;
-    //BOOST_CHECK_EQUAL("true", eval("a.frozen?", scope));
-    //BOOST_CHECK_EQUAL("true", eval("a.empty?", scope));
-    //BOOST_CHECK_EQUAL("false", eval("b.empty?", scope));
+    BOOST_CHECK_EQUAL("true", eval("{}.empty?", scope));
+    BOOST_CHECK_EQUAL("false", eval("{a: 5}.empty?", scope));
 
     //size
     BOOST_CHECK_EQUAL("0", eval("{}.length", scope));
@@ -96,12 +95,12 @@ BOOST_AUTO_TEST_CASE(basic_access)
     BOOST_CHECK_EQUAL("88", eval("c.fetch(10, 88)", scope));
 
     //key?
-    //BOOST_CHECK_EQUAL("true", eval("c.key?('10')", scope));
-    //BOOST_CHECK_EQUAL("false", eval("c.key?(10)", scope));
+    BOOST_CHECK_EQUAL("true", eval("c.key?('10')", scope));
+    BOOST_CHECK_EQUAL("false", eval("c.key?(10)", scope));
 
     //value?
-    //BOOST_CHECK_EQUAL("true", eval("c.value?(5)", scope));
-    //BOOST_CHECK_EQUAL("false", eval("c.value?('5')", scope));
+    BOOST_CHECK_EQUAL("true", eval("c.value?(5)", scope));
+    BOOST_CHECK_EQUAL("false", eval("c.value?('5')", scope));
 
     BOOST_CHECK_EQUAL("[\"a\", \"b\"]", eval("b.keys", scope));
     BOOST_CHECK_EQUAL("[5, 10]", eval("b.values", scope));

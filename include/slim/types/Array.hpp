@@ -27,7 +27,7 @@ namespace slim
 
         const std::vector<ObjectPtr>& get_value()const { return arr; }
 
-        //+, [], -, *, <<, &, |
+        //[]=. <<
         //any?
         std::shared_ptr<Object> assoc(const Object *a);
         std::shared_ptr<Object> at(const Number *n);
