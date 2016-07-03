@@ -58,16 +58,25 @@ namespace slim
             template<class T, class U>
             void next_binary_op(ExpressionNodePtr &lhs, U get_rhs);
 
+            /** || */
             ExpressionNodePtr logical_or_op();
+            /** && */
             ExpressionNodePtr logical_and_op();
+            /** == != */
             ExpressionNodePtr equality_op();
             /** < <= > >= */
             ExpressionNodePtr cmp_op();
+            /** | ^ */
+            ExpressionNodePtr bitor_op();
+            /** & */
+            ExpressionNodePtr bitand_op();
+            /** << >> */
+            ExpressionNodePtr bitshift_op();
             /** + -*/
             ExpressionNodePtr add_op();
             /** * / % */
             ExpressionNodePtr mul_op();
-            /** ! + - */
+            /** ! + - ~ */
             ExpressionNodePtr unary_op();
             /** ** */
             ExpressionNodePtr pow_op();

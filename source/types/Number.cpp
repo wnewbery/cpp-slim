@@ -65,6 +65,31 @@ namespace slim
         return make_value(-v);
     }
 
+    ObjectPtr Number::lshift(Object * rhs)
+    {
+        return make_value((int)v << (int)coerce<Number>(rhs)->get_value());
+    }
+    ObjectPtr Number::rshift(Object * rhs)
+    {
+        return make_value((int)v >> (int)coerce<Number>(rhs)->get_value());
+    }
+    ObjectPtr Number::and(Object * rhs)
+    {
+        return make_value((int)v & (int)coerce<Number>(rhs)->get_value());
+    }
+    ObjectPtr Number::or(Object * rhs)
+    {
+        return make_value((int)v | (int)coerce<Number>(rhs)->get_value());
+    }
+    ObjectPtr Number::xor(Object * rhs)
+    {
+        return make_value((int)v ^ (int)coerce<Number>(rhs)->get_value());
+    }
+    ObjectPtr Number::not()
+    {
+        return make_value(~(int)v);
+    }
+
     std::shared_ptr<Number> Number::to_f()
     {
         return std::static_pointer_cast<Number>(shared_from_this());

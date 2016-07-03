@@ -267,15 +267,54 @@ namespace slim
 
         ExpressionNodePtr Parser::cmp_op()
         {
+            auto lhs = bitor_op();
+            while (true)
+            {
+                switch (current_token.type)
+                {
+                case Token::CMP_LT: next_binary_op<Lt>(lhs, &Parser::bitor_op); break;
+                case Token::CMP_LE: next_binary_op<Le>(lhs, &Parser::bitor_op); break;
+                case Token::CMP_GT: next_binary_op<Gt>(lhs, &Parser::bitor_op); break;
+                case Token::CMP_GE: next_binary_op<Ge>(lhs, &Parser::bitor_op); break;
+                default: return lhs;
+                }
+            }
+        }
+
+        ExpressionNodePtr Parser::bitor_op()
+        {
+            auto lhs = bitand_op();
+            while (true)
+            {
+                switch (current_token.type)
+                {
+                case Token::XOR: next_binary_op<Xor>(lhs, &Parser::bitand_op); break;
+                case Token::OR: next_binary_op<Or>(lhs, &Parser::bitand_op); break;
+                default: return lhs;
+                }
+            }
+        }
+        ExpressionNodePtr Parser::bitand_op()
+        {
+            auto lhs = bitshift_op();
+            while (true)
+            {
+                switch (current_token.type)
+                {
+                case Token::AND: next_binary_op<And>(lhs, &Parser::bitshift_op); break;
+                default: return lhs;
+                }
+            }
+        }
+        ExpressionNodePtr Parser::bitshift_op()
+        {
             auto lhs = add_op();
             while (true)
             {
                 switch (current_token.type)
                 {
-                case Token::CMP_LT: next_binary_op<Lt>(lhs, &Parser::add_op); break;
-                case Token::CMP_LE: next_binary_op<Le>(lhs, &Parser::add_op); break;
-                case Token::CMP_GT: next_binary_op<Gt>(lhs, &Parser::add_op); break;
-                case Token::CMP_GE: next_binary_op<Ge>(lhs, &Parser::add_op); break;
+                case Token::LSHIFT: next_binary_op<Lshift>(lhs, &Parser::add_op); break;
+                case Token::RSHIFT: next_binary_op<Rshift>(lhs, &Parser::add_op); break;
                 default: return lhs;
                 }
             }
@@ -324,6 +363,10 @@ namespace slim
                     next();
                     rhs = unary_op();
                     return std::make_unique<Negative>(std::move(rhs));
+                case Token::NOT:
+                    next();
+                    rhs = unary_op();
+                    return std::make_unique<Not>(std::move(rhs));
                 case Token::LOGICAL_NOT:
                     next();
                     rhs = unary_op();

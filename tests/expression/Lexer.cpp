@@ -33,6 +33,12 @@ BOOST_AUTO_TEST_CASE(single_tokens)
     BOOST_CHECK_EQUAL(Token::POW, single_token("**").type);
     BOOST_CHECK_EQUAL(Token::DIV, single_token("/").type);
     BOOST_CHECK_EQUAL(Token::MOD, single_token("%").type);
+    BOOST_CHECK_EQUAL(Token::AND, single_token("& ").type);
+    BOOST_CHECK_EQUAL(Token::OR, single_token("| ").type);
+    BOOST_CHECK_EQUAL(Token::XOR, single_token("^ ").type);
+    BOOST_CHECK_EQUAL(Token::NOT, single_token("~ ").type);
+    BOOST_CHECK_EQUAL(Token::LSHIFT, single_token("<<").type);
+    BOOST_CHECK_EQUAL(Token::RSHIFT, single_token(">>").type);
     BOOST_CHECK_EQUAL(Token::LOGICAL_NOT, single_token("! ").type);
     BOOST_CHECK_EQUAL(Token::LOGICAL_AND, single_token("&&").type);
     BOOST_CHECK_EQUAL(Token::LOGICAL_OR, single_token("||").type);

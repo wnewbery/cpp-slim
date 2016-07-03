@@ -43,6 +43,13 @@ namespace slim
                 DIV,
                 MOD,
 
+                AND,
+                OR,
+                XOR,
+                NOT,
+                LSHIFT,
+                RSHIFT,
+
                 CMP,
                 CMP_EQ,
                 CMP_NE,

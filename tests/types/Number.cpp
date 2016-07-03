@@ -68,6 +68,16 @@ BOOST_AUTO_TEST_CASE(operators)
     BOOST_CHECK_EQUAL("6", eval("24 / 4"));
     BOOST_CHECK_EQUAL("6", eval("16 % 10"));
     BOOST_CHECK_EQUAL("9", eval("3 ** 2"));
+
+
+    BOOST_CHECK_EQUAL("8", eval("2 << 2"));
+    BOOST_CHECK_EQUAL("1", eval("2 >> 1"));
+    BOOST_CHECK_EQUAL("0", eval("2 >> 3"));
+    BOOST_CHECK_EQUAL("2", eval("7 & 2"));
+    BOOST_CHECK_EQUAL("7", eval("6 | 3"));
+    BOOST_CHECK_EQUAL("10", eval("8 ^ 2"));
+    BOOST_CHECK_EQUAL("8", eval("10 ^ 2"));
+    BOOST_CHECK_EQUAL("-9", eval("~8"));
 }
 
 BOOST_AUTO_TEST_CASE(rounding)

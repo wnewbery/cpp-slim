@@ -56,6 +56,8 @@ namespace slim
             case '+': ++p; return Token::PLUS;
             case '/': ++p; return Token::DIV;
             case '%': ++p; return Token::MOD;
+            case '~': ++p; return Token::NOT;
+            case '^': ++p; return Token::XOR;
             case '\'':
             case '\"':
                 return quoted_string();
@@ -70,44 +72,36 @@ namespace slim
                 else return Token::MINUS;
             case '&':
                 if (p + 1 >= end) error("Unexpected end");
-                if (p[1] != '&') error("Expected &&");
-                p += 2;
-                return Token::LOGICAL_AND;
+                if (p[1] == '&') return p += 2, Token::LOGICAL_AND;
+                else return ++p, Token::AND;
             case '|':
                 if (p + 1 >= end) error("Unexpected end");
-                if (p[1] != '|') error("Expected ||");
-                p += 2;
-                return Token::LOGICAL_OR;
+                if (p[1] == '|') return p += 2, Token::LOGICAL_OR;
+                else return ++p, Token::OR;
             case '!':
-                ++p;
-                if (p >= end) error("Unexpected end");
-                if (p[0] == '=') { ++p; return Token::CMP_NE; }
-                else return Token::LOGICAL_NOT;
+                if (p + 1 >= end) error("Unexpected end");
+                if (p[1] == '=') return p += 2, Token::CMP_NE;
+                else return ++p, Token::LOGICAL_NOT;
             case '=':
                 if (p + 1 >= end) error("Unexpected end");
                 if (p[1] == '=') return p += 2, Token::CMP_EQ;
                 if (p[1] == '>') return p += 2, Token::HASH_KEY_VALUE_SEP;
                 error("Expected == or =>");
             case '<':
-                ++p;
-                if (p >= end) error("Unexpected end");
-                if (p[0] == '=')
+                if (p + 1 >= end) error("Unexpected end");
+                if (p[1] == '<') return p += 2, Token::LSHIFT;
+                if (p[1] == '=')
                 {
-                    ++p;
-                    if (p >= end) error("Unexpected end");
-                    if (p[0] == '>')
-                    {
-                        ++p;
-                        return Token::CMP;
-                    }
-                    else return Token::CMP_LE;
+                    if (p + 2 >= end) error("Unexpected end");
+                    if (p[2] == '>') return p += 3, Token::CMP;
+                    else return p += 2, Token::CMP_LE;
                 }
-                else return Token::CMP_LT;
+                else return ++p, Token::CMP_LT;
             case '>':
-                ++p;
-                if (p >= end) error("Unexpected end");
-                if (p[0] == '=') { ++p; return Token::CMP_GE; }
-                else return Token::CMP_GT;
+                if (p + 1 >= end) error("Unexpected end");
+                if (p[1] == '>') return p += 2, Token::RSHIFT;
+                if (p[1] == '=') return p += 2, Token::CMP_GE;
+                else return ++p, Token::CMP_GT;
             default:
                 if (is_symbol_start_chr(peek)) return symbol();
                 else if (is_digit(peek)) return number(false);

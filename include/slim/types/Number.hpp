@@ -27,13 +27,19 @@ namespace slim
         double get_value()const { return v; }
 
         //operators
-        virtual ObjectPtr mul(Object *rhs);
-        virtual ObjectPtr div(Object *rhs);
-        virtual ObjectPtr mod(Object *rhs);
-        virtual ObjectPtr pow(Object *rhs);
-        virtual ObjectPtr add(Object *rhs);
-        virtual ObjectPtr sub(Object *rhs);
-        virtual ObjectPtr negate();
+        virtual ObjectPtr mul(Object *rhs)override;
+        virtual ObjectPtr div(Object *rhs)override;
+        virtual ObjectPtr mod(Object *rhs)override;
+        virtual ObjectPtr pow(Object *rhs)override;
+        virtual ObjectPtr add(Object *rhs)override;
+        virtual ObjectPtr sub(Object *rhs)override;
+        virtual ObjectPtr negate()override;
+        virtual ObjectPtr lshift(Object *rhs)override;
+        virtual ObjectPtr rshift(Object *rhs)override;
+        virtual ObjectPtr and(Object *rhs)override;
+        virtual ObjectPtr or(Object *rhs)override;
+        virtual ObjectPtr xor(Object *rhs)override;
+        virtual ObjectPtr not()override;
 
         std::shared_ptr<Number> to_f();
         std::shared_ptr<Number> to_i();

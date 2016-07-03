@@ -68,6 +68,12 @@ namespace slim
         virtual ObjectPtr add(Object *rhs);
         virtual ObjectPtr sub(Object *rhs);
         virtual ObjectPtr negate();
+        virtual ObjectPtr lshift(Object *rhs);
+        virtual ObjectPtr rshift(Object *rhs);
+        virtual ObjectPtr and(Object *rhs);
+        virtual ObjectPtr or(Object *rhs);
+        virtual ObjectPtr xor(Object *rhs);
+        virtual ObjectPtr not();
 
         virtual ObjectPtr call_method(const std::string &name, const FunctionArgs &args);
     protected:

@@ -61,6 +61,30 @@ namespace slim
     {
         throw NoSuchMethod(this, "-negate");
     }
+    ObjectPtr Object::lshift(Object *rhs)
+    {
+        throw NoSuchMethod(this, "<<");
+    }
+    ObjectPtr Object::rshift(Object *rhs)
+    {
+        throw NoSuchMethod(this, ">>");
+    }
+    ObjectPtr Object::and(Object *rhs)
+    {
+        throw NoSuchMethod(this, "&");
+    }
+    ObjectPtr Object::or(Object *rhs)
+    {
+        throw NoSuchMethod(this, "|");
+    }
+    ObjectPtr Object::xor(Object *rhs)
+    {
+        throw NoSuchMethod(this, "^");
+    }
+    ObjectPtr Object::not()
+    {
+        throw NoSuchMethod(this, "~");
+    }
 
     ObjectPtr Object::call_method(const std::string &name, const FunctionArgs &args)
     {
