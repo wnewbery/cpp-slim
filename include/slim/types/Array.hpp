@@ -39,7 +39,8 @@ namespace slim
         std::shared_ptr<Number> count(const FunctionArgs &args);
         //cycle
         //delete, delete_at, delete_if, drop, drop_while
-        //each, each_index
+        std::shared_ptr<Object> each(const FunctionArgs &args);
+        //each_index
         std::shared_ptr<Boolean> empty_q();
         std::shared_ptr<Object> fetch(const FunctionArgs &args);
         //fill

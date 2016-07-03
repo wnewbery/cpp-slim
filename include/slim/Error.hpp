@@ -69,5 +69,6 @@ namespace slim
     public:
         InvalidArgument(const std::string &name);
         InvalidArgument(const Object *obj, const std::string &name);
+        InvalidArgument(const Object *obj, const std::string &name, const std::string &msg);
     };
 }

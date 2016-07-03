@@ -4,6 +4,8 @@
 #include "types/Number.hpp"
 #include "types/String.hpp"
 #include "Error.hpp"
+#include <iomanip>
+#include <sstream>
 
 namespace slim
 {
@@ -15,6 +17,15 @@ namespace slim
     const std::shared_ptr<Boolean> TRUE_VALUE = std::make_shared<Boolean>(true);
     const std::shared_ptr<Boolean> FALSE_VALUE = std::make_shared<Boolean>(false);
 
+    std::string Object::inspect()const
+    {
+        std::stringstream ss;
+        ss << "#<" << type_name() << ": ";
+        ss << std::hex << std::setw(sizeof(void*)) << std::setfill('-') << std::right;
+        ss << ((uintptr_t)this);
+        ss << ">";
+        return ss.str();
+    }
     bool Object::eq(const Object *rhs)const
     {
         return this == rhs; //identity

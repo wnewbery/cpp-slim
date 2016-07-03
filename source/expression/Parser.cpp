@@ -82,7 +82,9 @@ namespace slim
                 {
                     auto name = current_token.str;
                     next();
-                    if (current_token.type == Token::LPAREN || is_func_arg_start())
+                    if (current_token.type == Token::LPAREN ||
+                        current_token.type == Token::L_CURLY_BRACKET ||
+                        is_func_arg_start())
                     {
                         auto &f = global_functions.get(name);
                         FuncCall::Args args = func_args();
@@ -184,17 +186,22 @@ namespace slim
                     return {};
                 }
             }
-            else if (!is_func_arg_start()) return {};
             else parens = false;
 
-            auto args = func_args_inner();
-
-            if (parens)
+            FuncCall::Args args;
+            if (parens || is_func_arg_start())
             {
-                if (current_token.type != Token::RPAREN)
-                    throw SyntaxError("Expected ')'");
-                next();
+                args = func_args_inner();
+                if (parens) 
+                {
+                    if (current_token.type != Token::RPAREN)
+                        throw SyntaxError("Expected ')'");
+                    next();
+                }
             }
+
+            if (current_token.type == Token::L_CURLY_BRACKET)
+                args.push_back(block());
 
             return args;
         }
@@ -207,6 +214,48 @@ namespace slim
                 if (current_token.type == Token::COMMA) next();
                 else return args;
             }
+        }
+
+        ExpressionNodePtr Parser::block()
+        {
+            assert(current_token.type == Token::L_CURLY_BRACKET);
+            next();
+
+            std::vector<std::string> args;
+            if (current_token.type == Token::OR)
+            {
+                next();
+                if (current_token.type == Token::OR) next();
+                else
+                {
+                    while (true)
+                    {
+                        if (current_token.type != Token::SYMBOL) throw SyntaxError("Expected symbol");
+                        args.push_back(current_token.str);
+                        next();
+
+                        if (current_token.type == Token::OR)
+                        {
+                            next();
+                            break;
+                        }
+                        else if (current_token.type == Token::COMMA)
+                        {
+                            next();
+                            continue;
+                        }
+                        else throw SyntaxError("Expected ',' or '|'");
+                    }
+                }
+            }
+            else if (current_token.type == Token::LOGICAL_OR) next();
+
+            auto expr = expression();
+
+            if (current_token.type != Token::R_CURLY_BRACKET) throw SyntaxError("Expected '}'");
+            next();
+
+            return std::make_unique<Block>(std::move(args), std::move(expr));
         }
 
         template<class T> ExpressionNodePtr Parser::binary_op(ExpressionNodePtr &&lhs)

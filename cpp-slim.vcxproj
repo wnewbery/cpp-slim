@@ -36,9 +36,11 @@
     <ClInclude Include="include\slim\Operators.hpp" />
     <ClInclude Include="include\slim\types\Array.hpp" />
     <ClInclude Include="include\slim\types\Boolean.hpp" />
+    <ClInclude Include="include\slim\types\Enumerator.hpp" />
     <ClInclude Include="include\slim\types\Hash.hpp" />
     <ClInclude Include="include\slim\types\Nil.hpp" />
     <ClInclude Include="include\slim\types\Number.hpp" />
+    <ClInclude Include="include\slim\types\Proc.hpp" />
     <ClInclude Include="include\slim\types\String.hpp" />
     <ClInclude Include="include\slim\types\Object.hpp" />
     <ClInclude Include="include\slim\Value.hpp" />
@@ -56,9 +58,11 @@
     <ClCompile Include="source\Maths.cpp" />
     <ClCompile Include="source\Operators.cpp" />
     <ClCompile Include="source\types\Array.cpp" />
+    <ClCompile Include="source\types\Enumerator.cpp" />
     <ClCompile Include="source\types\Hash.cpp" />
     <ClCompile Include="source\types\Number.cpp" />
     <ClCompile Include="source\types\Object.cpp" />
+    <ClCompile Include="source\types\Proc.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1DD2F697-0EE9-43B0-BEAB-4FCEE1B35CD3}</ProjectGuid>

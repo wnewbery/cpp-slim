@@ -12,14 +12,22 @@ using namespace slim;
 using namespace slim::expr;
 BOOST_AUTO_TEST_SUITE(TestArray)
 
-std::string eval(const std::string &str, Scope &scope)
+ObjectPtr eval_obj(const std::string &str, const FunctionTable &functions, Scope &scope)
 {
-    FunctionTable functions;
     Lexer lexer(str);
     Parser parser(functions, lexer);
     auto expr = parser.parse_expression();
     auto result = expr->eval(scope);
-    return result->inspect();
+    return result;
+}
+std::string eval(const std::string &str, const FunctionTable &functions, Scope &scope)
+{
+    return eval_obj(str, functions, scope)->inspect();
+}
+std::string eval(const std::string &str, Scope &scope)
+{
+    FunctionTable functions;
+    return eval(str, functions, scope);
 }
 std::string eval(const std::string &str)
 {
@@ -247,6 +255,30 @@ BOOST_AUTO_TEST_CASE(uniq)
     Scope scope;
     scope.set("a", make_array({ make_value("5"), make_value(5.0), make_value(5.0), make_value("z") }));
     BOOST_CHECK_EQUAL("[\"5\", 5, \"z\"]", eval("a.uniq", scope));
+}
+
+BOOST_AUTO_TEST_CASE(enumerate)
+{
+    Scope scope;
+    FunctionTable functions;
+    double sum = 0;
+    Function2 test = [&sum](const FunctionArgs &args) -> ObjectPtr
+    {
+        sum += coerce<Number>(args[0])->get_value();
+        return NIL_VALUE;
+    };
+    functions.add({test, "test"});
+
+    BOOST_CHECK_EQUAL("[]", eval("[].each{|x| test x}", functions, scope));
+    BOOST_CHECK_EQUAL(0, sum);
+    BOOST_CHECK_EQUAL("[1, 2, 3]", eval("[1, 2, 3].each{|x| test x}", functions, scope));
+    BOOST_CHECK_EQUAL(6, sum);
+
+    auto enumerator = eval_obj("[5, 6, 9].each", functions, scope);
+    scope.set("e", enumerator);
+    BOOST_CHECK_EQUAL("[5, 6, 9]", eval("e.each{|x| test x}", functions, scope));
+    BOOST_CHECK_EQUAL(26, sum);
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()

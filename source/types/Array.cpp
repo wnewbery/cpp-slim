@@ -1,4 +1,6 @@
 #include "types/Array.hpp"
+#include "types/Enumerator.hpp"
+#include "types/Proc.hpp"
 #include "Value.hpp"
 #include "Function.hpp"
 #include "Operators.hpp"
@@ -104,6 +106,23 @@ namespace slim
             if (slim::eq(args[0].get(), i.get())) ++c;
         }
         return make_value((double)c);
+    }
+    std::shared_ptr<Object> Array::each(const FunctionArgs &args)
+    {
+        if (args.size() == 1)
+        {
+            auto proc = coerce<Proc>(args[0]);
+            for (auto &i : arr)
+            {
+                proc->call({i});
+            }
+            return shared_from_this();
+        }
+        else if(args.size() == 0)
+        {
+            return make_enumerator(this, { &Array::each, "each" });
+        }
+        else throw InvalidArgument(this, "each");
     }
     std::shared_ptr<Boolean> Array::empty_q()
     {
@@ -326,6 +345,7 @@ namespace slim
             { &Array::at, "at" },
             { &Array::compact, "compact" },
             { &Array::count, "count" },
+            { &Array::each, "each" },
             { &Array::empty_q, "empty?" },
             { &Array::fetch, "fetch" },
             { &Array::first, "first" },

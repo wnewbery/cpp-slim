@@ -4,6 +4,7 @@
 #include "types/Array.hpp"
 #include "types/Hash.hpp"
 #include "types/String.hpp"
+#include "types/Proc.hpp"
 #include <sstream>
 namespace slim
 {
@@ -100,6 +101,23 @@ namespace slim
         {
             auto args = eval_args(scope);
             return make_hash(args);
+        }
+
+        std::string Block::to_string() const
+        {
+            std::stringstream ss;
+            ss << "{|";
+            if (!param_names.empty()) ss << param_names[0];
+            for (size_t i = 1; i < param_names.size(); ++i)
+                ss << ", " << param_names[i];
+            ss << "| ";
+            ss << code->to_string();
+            ss << "}";
+            return ss.str();
+        }
+        ObjectPtr Block::eval(Scope & scope) const
+        {
+            return std::make_shared<Proc>(*code, param_names, scope);
         }
     }
 }

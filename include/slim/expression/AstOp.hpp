@@ -79,5 +79,18 @@ namespace slim
             virtual std::string to_string()const override;
             virtual ObjectPtr eval(Scope &scope)const override;
         };
+
+        class Block : public ExpressionNode
+        {
+        public:
+            Block(std::vector<std::string> &&param_names, std::unique_ptr<ExpressionNode> &&code)
+                : param_names(std::move(param_names)), code(std::move(code))
+            {}
+            virtual std::string to_string()const override;
+            virtual ObjectPtr eval(Scope &scope)const override;
+        private:
+            std::vector<std::string> param_names;
+            std::unique_ptr<ExpressionNode> code;
+        };
     }
 }

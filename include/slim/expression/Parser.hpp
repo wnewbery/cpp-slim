@@ -45,6 +45,8 @@ namespace slim
              * Used for function calls, and element references [args].
              */
             std::vector<ExpressionNodePtr> func_args_inner();
+            /**Parses a "{|args| expr}" block limited to a single expression.*/
+            ExpressionNodePtr block();
 
             /**Helper that constructs a binary operator node of type T.
              * 

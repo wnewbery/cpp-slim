@@ -133,6 +133,10 @@ BOOST_AUTO_TEST_CASE(method_call)
     BOOST_CHECK_EQUAL("a.f()[5, 7]", parse("a.f[5, 7]")->to_string());
     BOOST_CHECK_EQUAL("a.f()[5, 7].g()", parse("a.f[5, 7].g")->to_string());
     BOOST_CHECK_EQUAL("a.f()[5, (7 + 8)].g()", parse("a.f[5, 7 + 8].g")->to_string());
+
+    BOOST_CHECK_EQUAL("a.f({|| 5})", parse("a.f{|| 5}")->to_string());
+    BOOST_CHECK_EQUAL("a.f(4, {|x| x})", parse("a.f(4){|x| x}")->to_string());
+    BOOST_CHECK_EQUAL("a.f({|x, y| (x * y)})", parse("a.f{|x, y| x * y}")->to_string());
 }
 
 BOOST_AUTO_TEST_CASE(precedence)

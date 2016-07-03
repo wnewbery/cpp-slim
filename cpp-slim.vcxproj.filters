@@ -90,6 +90,12 @@
     <ClInclude Include="include\slim\types\Nil.hpp">
       <Filter>include\types</Filter>
     </ClInclude>
+    <ClInclude Include="include\slim\types\Enumerator.hpp">
+      <Filter>include\types</Filter>
+    </ClInclude>
+    <ClInclude Include="include\slim\types\Proc.hpp">
+      <Filter>include\types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\types\Object.cpp">
@@ -135,6 +141,12 @@
       <Filter>source\types</Filter>
     </ClCompile>
     <ClCompile Include="source\types\Hash.cpp">
+      <Filter>source\types</Filter>
+    </ClCompile>
+    <ClCompile Include="source\types\Enumerator.cpp">
+      <Filter>source\types</Filter>
+    </ClCompile>
+    <ClCompile Include="source\types\Proc.cpp">
       <Filter>source\types</Filter>
     </ClCompile>
   </ItemGroup>

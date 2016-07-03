@@ -37,9 +37,9 @@ namespace slim
          */
         virtual const std::string& type_name()const = 0;
         /**Convert this instance to a displayable string.*/
-        virtual std::string to_string()const = 0;
+        virtual std::string to_string()const { return inspect(); }
         /**Convert this instance to a displayable representation of this object.*/
-        virtual std::string inspect()const = 0;
+        virtual std::string inspect()const;
         /**Convert this instance to a displayable string object. The default uses to_string. */
         virtual ObjectPtr to_string_obj()const;
         /**Convert this instance to a displayable representation of this object.

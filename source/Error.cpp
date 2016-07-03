@@ -42,6 +42,10 @@ namespace slim
         : ScriptError("Invalid argument for " + obj->type_name() + "." + name)
     {
     }
+    InvalidArgument::InvalidArgument(const Object *obj, const std::string &name, const std::string &msg)
+        : ScriptError("InvalidArgument: " + obj->type_name() + "." + name + " " + msg)
+    {
+    }
     KeyError::KeyError(ObjectPtr key)
         : ScriptError("Key not found: " + key->to_string())
     {
