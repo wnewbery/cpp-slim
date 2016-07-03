@@ -2,6 +2,6 @@
 #include "types/Object.hpp"
 
 #include "types/Boolean.hpp"
-#include "types/Null.hpp"
+#include "types/Nil.hpp"
 #include "types/Number.hpp"
 #include "types/String.hpp"

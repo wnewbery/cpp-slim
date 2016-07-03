@@ -31,8 +31,8 @@ BOOST_AUTO_TEST_CASE(single_values)
     BOOST_CHECK(is_node_type<Literal>(parse("false")));
     BOOST_CHECK_EQUAL("false", parse("false")->to_string());
 
-    BOOST_CHECK(is_node_type<Literal>(parse("null")));
-    BOOST_CHECK_EQUAL("null", parse("null")->to_string());
+    BOOST_CHECK(is_node_type<Literal>(parse("nil")));
+    BOOST_CHECK_EQUAL("nil", parse("nil")->to_string());
 
     BOOST_CHECK(is_node_type<Literal>(parse("55")));
     BOOST_CHECK_EQUAL("55", parse("55")->to_string());
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE(method_call)
 BOOST_AUTO_TEST_CASE(precedence)
 {
     BOOST_CHECK_EQUAL("((5 - 5) && 10)", parse("5 - 5 && 10")->to_string());
-    BOOST_CHECK_EQUAL("(((5 - 5) == 0) && (10 != null))", parse("5 - 5 == 0 && 10 != null")->to_string());
+    BOOST_CHECK_EQUAL("(((5 - 5) == 0) && (10 != nil))", parse("5 - 5 == 0 && 10 != nil")->to_string());
     BOOST_CHECK_EQUAL("((5 < 10) == (15 >= 10))", parse("5 < 10 == 15 >= 10")->to_string());
     BOOST_CHECK_EQUAL("((5 - (-5)) == 0)", parse("5 - - 5 == 0")->to_string());
     BOOST_CHECK_EQUAL("(c + (m * x))", parse("c + m * x")->to_string());

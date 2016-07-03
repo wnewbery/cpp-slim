@@ -1,7 +1,7 @@
 #include "Operators.hpp"
 #include "Error.hpp"
 #include "types/Boolean.hpp"
-#include "types/Null.hpp"
+#include "types/Nil.hpp"
 #include "types/Number.hpp"
 #include "types/String.hpp"
 namespace slim

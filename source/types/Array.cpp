@@ -74,13 +74,13 @@ namespace slim
                 return arr2->shared_from_this();
             }
         }
-        return NULL_VALUE;
+        return NIL_VALUE;
     }
     std::shared_ptr<Object> Array::at(const Number * n)
     {
         int i = (int)n->get_value();
         if (i < 0) i = ((int)arr.size()) + i;
-        if (i < 0 || i >= (int)arr.size()) return NULL_VALUE;
+        if (i < 0 || i >= (int)arr.size()) return NIL_VALUE;
         else return arr[(size_t)i];
     }
     std::shared_ptr<Array> Array::compact()
@@ -88,7 +88,7 @@ namespace slim
         std::vector<ObjectPtr> compacted;
         for (auto &i : arr)
         {
-            if (i != NULL_VALUE) compacted.push_back(i);
+            if (i != NIL_VALUE) compacted.push_back(i);
         }
         return make_value(std::move(compacted));
     }
@@ -121,7 +121,7 @@ namespace slim
     {
         if (args.size() == 0)
         {
-            return arr.empty() ? NULL_VALUE : arr.front();
+            return arr.empty() ? NIL_VALUE : arr.front();
         }
         else if (args.size() == 1)
         {
@@ -176,7 +176,7 @@ namespace slim
         {
             if (slim::eq(obj, arr[i].get())) return make_value((double)i);
         }
-        return NULL_VALUE;
+        return NIL_VALUE;
     }
     std::shared_ptr<String> Array::join(const String * o_sep)
     {
@@ -190,7 +190,7 @@ namespace slim
     {
         if (args.size() == 0)
         {
-            return arr.empty() ? NULL_VALUE : arr.back();
+            return arr.empty() ? NIL_VALUE : arr.back();
         }
         else if (args.size() == 1)
         {
@@ -218,7 +218,7 @@ namespace slim
                 return arr2->shared_from_this();
             }
         }
-        return NULL_VALUE;
+        return NIL_VALUE;
     }
     std::shared_ptr<Array> Array::reverse()
     {
@@ -231,7 +231,7 @@ namespace slim
         {
             if (slim::eq(obj, arr[i].get())) return make_value((double)i);
         }
-        return NULL_VALUE;
+        return NIL_VALUE;
     }
     std::shared_ptr<Array> Array::rotate(const FunctionArgs & args)
     {
@@ -259,7 +259,7 @@ namespace slim
             int i = (int)as_number(args[0]);
             if (i < 0) i = ((int)arr.size() + i);
             if (i >= 0 && i < (int)arr.size()) return arr[(size_t)i];
-            else return NULL_VALUE;
+            else return NIL_VALUE;
         }
         else if (args.size() == 2)
         {
@@ -276,7 +276,7 @@ namespace slim
                 return make_value(std::move(out));
             }
             else if (start == (int)arr.size()) return make_array({});
-            else return NULL_VALUE;
+            else return NIL_VALUE;
         }
         else throw InvalidArgument(this, "slice");
     }
@@ -314,7 +314,7 @@ namespace slim
         {
             auto i = (int)as_number(arg);
             if (i >= 0 && i < (int)arr.size()) out.push_back(arr[i]);
-            else out.push_back(NULL_VALUE);
+            else out.push_back(NIL_VALUE);
         }
         return make_value(std::move(out));
     }

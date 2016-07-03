@@ -82,10 +82,10 @@ BOOST_AUTO_TEST_CASE(basic_access)
     scope.set("c", make_hash2({ { "a", 5.0 },{ "c", 15}, {"10", 20} }));
 
     //[key]
-    BOOST_CHECK_EQUAL("null", eval("c['x']", scope));
+    BOOST_CHECK_EQUAL("nil", eval("c['x']", scope));
     BOOST_CHECK_EQUAL("5", eval("c['a']", scope));
     BOOST_CHECK_EQUAL("20", eval("c['10']", scope));
-    BOOST_CHECK_EQUAL("null", eval("c[10]", scope));
+    BOOST_CHECK_EQUAL("nil", eval("c[10]", scope));
     //fetch(index)
     BOOST_CHECK_EQUAL("5", eval("c.fetch('a')", scope));
     BOOST_CHECK_THROW(eval("c.fetch('x')", scope), KeyError);

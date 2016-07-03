@@ -12,10 +12,10 @@ namespace slim
     const std::string Hash::TYPE_NAME = "Hash";
 
     Hash::Hash()
-        : map(), def_value(NULL_VALUE)
+        : map(), def_value(NIL_VALUE)
     {}
     Hash::Hash(ObjectMap &&map)
-        : map(std::move(map)), def_value(NULL_VALUE)
+        : map(std::move(map)), def_value(NIL_VALUE)
     {}
     Hash::Hash(ObjectPtr def_value, ObjectMap &&map)
         : map(std::move(map)), def_value(def_value)
@@ -119,7 +119,7 @@ namespace slim
     ObjectPtr Hash::key(const Object *val)
     {
         for (auto &i : map) if (slim::eq(i.second.get(), val)) return i.first;
-        return NULL;
+        return NIL_VALUE;
     }
 
     std::shared_ptr<Array> Hash::keys()

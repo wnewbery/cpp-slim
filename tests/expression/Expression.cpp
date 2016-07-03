@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(literals)
 {
     BOOST_CHECK_EQUAL("true", eval("true"));
     BOOST_CHECK_EQUAL("false", eval("false"));
-    BOOST_CHECK_EQUAL("null", eval("null"));
+    BOOST_CHECK_EQUAL("nil", eval("nil"));
     BOOST_CHECK_EQUAL("\"Hello World\"", eval("'Hello World'"));
     BOOST_CHECK_EQUAL("60", eval("60"));
 }
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(variables)
     Scope scope;
     scope.set("test", make_value(55.0));
     BOOST_CHECK_EQUAL("55", eval("test", functions, scope));
-    BOOST_CHECK_EQUAL("null", eval("unset", functions, scope));
+    BOOST_CHECK_EQUAL("nil", eval("unset", functions, scope));
 }
 
 BOOST_AUTO_TEST_CASE(operators)
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(operators)
     BOOST_CHECK_EQUAL("false", eval("!55"));
     BOOST_CHECK_EQUAL("false", eval("!true"));
     BOOST_CHECK_EQUAL("true", eval("!false"));
-    BOOST_CHECK_EQUAL("true", eval("!null"));
+    BOOST_CHECK_EQUAL("true", eval("!nil"));
 
     //binary
     BOOST_CHECK_EQUAL("10", eval("55 && 10"));
@@ -141,13 +141,13 @@ BOOST_AUTO_TEST_CASE(runtime_error)
 {
     BOOST_CHECK_THROW(eval("5 < true"), UnorderableTypeError);
     BOOST_CHECK_THROW(eval("5 < '5'"), UnorderableTypeError);
-    BOOST_CHECK_THROW(eval("null < null"), UnorderableTypeError);
+    BOOST_CHECK_THROW(eval("nil < nil"), UnorderableTypeError);
 
-    BOOST_CHECK_THROW(eval("null + null"), NoSuchMethod);
-    BOOST_CHECK_THROW(eval("null - null"), NoSuchMethod);
-    BOOST_CHECK_THROW(eval("- null"), NoSuchMethod);
+    BOOST_CHECK_THROW(eval("nil + nil"), NoSuchMethod);
+    BOOST_CHECK_THROW(eval("nil - nil"), NoSuchMethod);
+    BOOST_CHECK_THROW(eval("- nil"), NoSuchMethod);
 
-    BOOST_CHECK_THROW(eval("5 + null"), TypeError);
+    BOOST_CHECK_THROW(eval("5 + nil"), TypeError);
     BOOST_CHECK_THROW(eval("5 + true"), TypeError);
     BOOST_CHECK_THROW(eval("5 + 'str'"), TypeError);
     BOOST_CHECK_THROW(eval("'str' + 5"), TypeError);

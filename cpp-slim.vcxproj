@@ -37,7 +37,7 @@
     <ClInclude Include="include\slim\types\Array.hpp" />
     <ClInclude Include="include\slim\types\Boolean.hpp" />
     <ClInclude Include="include\slim\types\Hash.hpp" />
-    <ClInclude Include="include\slim\types\Null.hpp" />
+    <ClInclude Include="include\slim\types\Nil.hpp" />
     <ClInclude Include="include\slim\types\Number.hpp" />
     <ClInclude Include="include\slim\types\String.hpp" />
     <ClInclude Include="include\slim\types\Object.hpp" />

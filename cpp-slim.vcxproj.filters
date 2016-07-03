@@ -21,9 +21,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\slim\types\Null.hpp">
-      <Filter>include\types</Filter>
-    </ClInclude>
     <ClInclude Include="include\slim\types\Boolean.hpp">
       <Filter>include\types</Filter>
     </ClInclude>
@@ -88,6 +85,9 @@
       <Filter>include\types</Filter>
     </ClInclude>
     <ClInclude Include="include\slim\types\Hash.hpp">
+      <Filter>include\types</Filter>
+    </ClInclude>
+    <ClInclude Include="include\slim\types\Nil.hpp">
       <Filter>include\types</Filter>
     </ClInclude>
   </ItemGroup>

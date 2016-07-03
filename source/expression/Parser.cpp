@@ -9,7 +9,7 @@
 #include "expression/LogicalOp.hpp"
 
 #include "types/Boolean.hpp"
-#include "types/Null.hpp"
+#include "types/Nil.hpp"
 #include "types/Number.hpp"
 #include "types/String.hpp"
 
@@ -77,7 +77,7 @@ namespace slim
             case Token::SYMBOL:
                 if (current_token.str == "true") return lit(TRUE_VALUE);
                 else if (current_token.str == "false") return lit(FALSE_VALUE);
-                else if (current_token.str == "null") return lit(NULL_VALUE);
+                else if (current_token.str == "nil") return lit(NIL_VALUE);
                 else
                 {
                     auto name = current_token.str;

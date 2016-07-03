@@ -20,16 +20,16 @@ BOOST_AUTO_TEST_CASE(boolean)
     BOOST_CHECK_EQUAL(false, false_val->is_true());
 }
 
-BOOST_AUTO_TEST_CASE(null)
+BOOST_AUTO_TEST_CASE(nil)
 {
-    auto null_val = create_object<Null>();
+    auto nil_val = create_object<Nil>();
 
-    BOOST_CHECK_EQUAL(null_val, NULL_VALUE);
+    BOOST_CHECK_EQUAL(nil_val, NIL_VALUE);
 
-    BOOST_CHECK_EQUAL("Null", Null::TYPE_NAME);
-    BOOST_CHECK_EQUAL("Null", null_val->type_name());
-    BOOST_CHECK_EQUAL("null", null_val->to_string());
-    BOOST_CHECK_EQUAL(false, null_val->is_true());
+    BOOST_CHECK_EQUAL("Nil", Nil::TYPE_NAME);
+    BOOST_CHECK_EQUAL("Nil", nil_val->type_name());
+    BOOST_CHECK_EQUAL("nil", nil_val->to_string());
+    BOOST_CHECK_EQUAL(false, nil_val->is_true());
 }
 
 BOOST_AUTO_TEST_CASE(number)
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(to_f)
     BOOST_CHECK_EQUAL(0.0, make_value("x")->to_f()->get_value());
     BOOST_CHECK_EQUAL(1.0, make_value(true)->to_f()->get_value());
     BOOST_CHECK_EQUAL(0.0, make_value(false)->to_f()->get_value());
-    BOOST_CHECK_EQUAL(0.0, NULL_VALUE->to_f()->get_value());
+    BOOST_CHECK_EQUAL(0.0, NIL_VALUE->to_f()->get_value());
 }
 
 BOOST_AUTO_TEST_CASE(to_i)
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(to_i)
     BOOST_CHECK_EQUAL(0.0, make_value("x")->to_i()->get_value());
     BOOST_CHECK_EQUAL(1.0, make_value(true)->to_i()->get_value());
     BOOST_CHECK_EQUAL(0.0, make_value(false)->to_i()->get_value());
-    BOOST_CHECK_EQUAL(0.0, NULL_VALUE->to_i()->get_value());
+    BOOST_CHECK_EQUAL(0.0, NIL_VALUE->to_i()->get_value());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

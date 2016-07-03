@@ -1,6 +1,6 @@
 #pragma once
 #include "types/Object.hpp"
-#include "types/Null.hpp"
+#include "types/Nil.hpp"
 #include <string>
 #include <unordered_map>
 
@@ -19,7 +19,7 @@ namespace slim { namespace expr
         {
             auto it = map.find(name);
             if (it !=  map.end()) return it->second;
-            else return NULL_VALUE;
+            else return NIL_VALUE;
         }
     private:
         Map map;

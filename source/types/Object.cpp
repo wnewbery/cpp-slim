@@ -1,6 +1,6 @@
 #include "types/Object.hpp"
 #include "types/Boolean.hpp"
-#include "types/Null.hpp"
+#include "types/Nil.hpp"
 #include "types/Number.hpp"
 #include "types/String.hpp"
 #include "Error.hpp"
@@ -8,10 +8,10 @@
 namespace slim
 {
     const std::string Boolean::TYPE_NAME = "Boolean";
-    const std::string Null::TYPE_NAME = "Null";
+    const std::string Nil::TYPE_NAME = "Nil";
     const std::string String::TYPE_NAME = "String";
 
-    const std::shared_ptr<Null> NULL_VALUE = std::make_shared<Null>();
+    const std::shared_ptr<Nil> NIL_VALUE = std::make_shared<Nil>();
     const std::shared_ptr<Boolean> TRUE_VALUE = std::make_shared<Boolean>(true);
     const std::shared_ptr<Boolean> FALSE_VALUE = std::make_shared<Boolean>(false);
 
@@ -98,13 +98,13 @@ namespace slim
         });
         return table;
     }
-    const MethodTable &Null::method_table()const
+    const MethodTable &Nil::method_table()const
     {
         static const MethodTable table(Object::method_table(),
         {
-            { &Null::to_f, "to_f" },
-            { &Null::to_f, "to_d" },
-            { &Null::to_i, "to_i" }
+            { &Nil::to_f, "to_f" },
+            { &Nil::to_f, "to_d" },
+            { &Nil::to_i, "to_i" }
         });
         return table;
     }
@@ -145,7 +145,7 @@ namespace slim
     }
 
     //to_f
-    std::shared_ptr<Number> Null::to_f()
+    std::shared_ptr<Number> Nil::to_f()
     {
         return make_value(0.0);
     }
@@ -162,7 +162,7 @@ namespace slim
     }
 
     //to_i
-    std::shared_ptr<Number> Null::to_i()
+    std::shared_ptr<Number> Nil::to_i()
     {
         return make_value(0.0);
     }

@@ -111,13 +111,13 @@ BOOST_AUTO_TEST_CASE(basic_access)
     scope.set("a", make_array2({ 1.0, 2.0, 3.0, 5.0, 8.0, 11.0 }));
     scope.set("b", make_array({}));
     //at(index)
-    BOOST_CHECK_EQUAL("null", eval("b.at(0)", scope));
+    BOOST_CHECK_EQUAL("nil", eval("b.at(0)", scope));
     BOOST_CHECK_EQUAL("1", eval("a.at(0)", scope));
     BOOST_CHECK_EQUAL("5", eval("a.at(3)", scope));
     BOOST_CHECK_EQUAL("8", eval("a.at(-2)", scope));
-    BOOST_CHECK_EQUAL("null", eval("a.at(6)", scope));
+    BOOST_CHECK_EQUAL("nil", eval("a.at(6)", scope));
     BOOST_CHECK_EQUAL("1", eval("a.at(-6)", scope));
-    BOOST_CHECK_EQUAL("null", eval("a.at(-7)", scope));
+    BOOST_CHECK_EQUAL("nil", eval("a.at(-7)", scope));
     //fetch(index)
     BOOST_CHECK_EQUAL("2", eval("a.fetch(1)", scope));
     BOOST_CHECK_THROW(eval("a.fetch(-1)", scope), IndexError);
@@ -129,14 +129,14 @@ BOOST_AUTO_TEST_CASE(basic_access)
     BOOST_CHECK_EQUAL("88", eval("b.fetch(0, 88)", scope));
     //first()
     BOOST_CHECK_EQUAL("1", eval("a.first", scope));
-    BOOST_CHECK_EQUAL("null", eval("b.first", scope));
+    BOOST_CHECK_EQUAL("nil", eval("b.first", scope));
     //first(n)
     BOOST_CHECK_EQUAL("[1, 2, 3]", eval("a.first(3)", scope));
     BOOST_CHECK_EQUAL("[1, 2, 3, 5, 8, 11]", eval("a.first(8)", scope));
     BOOST_CHECK_EQUAL("[]", eval("b.first(3)", scope));
     //last()
     BOOST_CHECK_EQUAL("11", eval("a.last", scope));
-    BOOST_CHECK_EQUAL("null", eval("b.last", scope));
+    BOOST_CHECK_EQUAL("nil", eval("b.last", scope));
     //last(n)
     BOOST_CHECK_EQUAL("[5, 8, 11]", eval("a.last(3)", scope));
     BOOST_CHECK_EQUAL("[1, 2, 3, 5, 8, 11]", eval("a.last(8)", scope));
@@ -145,8 +145,8 @@ BOOST_AUTO_TEST_CASE(basic_access)
     //slice(index)
     BOOST_CHECK_EQUAL("2", eval("a.slice(1)", scope));
     BOOST_CHECK_EQUAL("11", eval("a.slice(-1)", scope));
-    BOOST_CHECK_EQUAL("null", eval("a.slice(6)", scope));
-    BOOST_CHECK_EQUAL("null", eval("a.slice(-7)", scope));
+    BOOST_CHECK_EQUAL("nil", eval("a.slice(6)", scope));
+    BOOST_CHECK_EQUAL("nil", eval("a.slice(-7)", scope));
     BOOST_CHECK_EQUAL("2", eval("a[1]", scope));
     //slice(start, index)
     BOOST_CHECK_EQUAL("[2, 3, 5]", eval("a.slice(1, 3)", scope));
@@ -155,11 +155,11 @@ BOOST_AUTO_TEST_CASE(basic_access)
     BOOST_CHECK_EQUAL("[1, 2, 3, 5, 8, 11]", eval("a.slice(-6, 10)", scope));
     BOOST_CHECK_EQUAL("[]", eval("a.slice(6, 3)", scope));
     BOOST_CHECK_EQUAL("[1, 2, 3]", eval("a.slice(-6, 3)", scope));
-    BOOST_CHECK_EQUAL("null", eval("a.slice(-7, 3)", scope));
-    BOOST_CHECK_EQUAL("null", eval("a.slice(7, 3)", scope));
+    BOOST_CHECK_EQUAL("nil", eval("a.slice(-7, 3)", scope));
+    BOOST_CHECK_EQUAL("nil", eval("a.slice(7, 3)", scope));
 
     BOOST_CHECK_EQUAL("[1, 2, 3, 5, 8, 11]", eval("a[-6, 10]", scope));
-    BOOST_CHECK_EQUAL("null", eval("a[7, 3]", scope));
+    BOOST_CHECK_EQUAL("nil", eval("a[7, 3]", scope));
     //TODO: slice(range)
 
     //take(count)
@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_CASE(basic_access)
     //TODO: With ranges
     BOOST_CHECK_EQUAL("[1, 3, 8]", eval("a.values_at(0, 2, 4)", scope));
     BOOST_CHECK_EQUAL("[1, 8, 3]", eval("a.values_at(0, 4, 2)", scope));
-    BOOST_CHECK_EQUAL("[1, 8, 3, null]", eval("a.values_at(0, 4, 2, 10)", scope));;
+    BOOST_CHECK_EQUAL("[1, 8, 3, nil]", eval("a.values_at(0, 4, 2, 10)", scope));;
 }
 
 BOOST_AUTO_TEST_CASE(assoc)
@@ -185,11 +185,11 @@ BOOST_AUTO_TEST_CASE(assoc)
     scope.set("a", make_array({s1, s2, s3}));
     //assoc
     BOOST_CHECK_EQUAL("[\"letters\", \"a\", \"b\", \"c\"]", eval("a.assoc('letters')", scope));
-    BOOST_CHECK_EQUAL("null", eval("a.assoc('foo')", scope));
-    BOOST_CHECK_EQUAL("null", eval("a.assoc('red')", scope));
+    BOOST_CHECK_EQUAL("nil", eval("a.assoc('foo')", scope));
+    BOOST_CHECK_EQUAL("nil", eval("a.assoc('red')", scope));
     //rassoc
-    BOOST_CHECK_EQUAL("null", eval("a.rassoc('letters')", scope));
-    BOOST_CHECK_EQUAL("null", eval("a.rassoc('foo')", scope));
+    BOOST_CHECK_EQUAL("nil", eval("a.rassoc('letters')", scope));
+    BOOST_CHECK_EQUAL("nil", eval("a.rassoc('foo')", scope));
     BOOST_CHECK_EQUAL("[\"colors\", \"red\", \"blue\", \"green\"]", eval("a.rassoc('red')", scope));
 }
 
@@ -197,7 +197,7 @@ BOOST_AUTO_TEST_CASE(compact)
 {
     Scope scope;
     scope.set("a", make_array({ make_value(1.0), make_value(5.0), make_value(5.0), make_value(0.0) }));
-    scope.set("b", make_array({ NULL_VALUE, make_value(1.0), make_value(5.0), NULL_VALUE, make_value(5.0), make_value(0.0) }));
+    scope.set("b", make_array({ NIL_VALUE, make_value(1.0), make_value(5.0), NIL_VALUE, make_value(5.0), make_value(0.0) }));
 
     BOOST_CHECK_EQUAL("[1, 5, 5, 0]", eval("a.compact()", scope));
     BOOST_CHECK_EQUAL("[1, 5, 5, 0]", eval("b.compact()", scope));
@@ -208,13 +208,13 @@ BOOST_AUTO_TEST_CASE(index)
     scope.set("a", make_array2({ 1.0, 2.0, 3.0, 5.0, 8.0, 5.0, 1.0 }));
     //index
     BOOST_CHECK_EQUAL("3", eval("a.index(5)", scope));
-    BOOST_CHECK_EQUAL("null", eval("a.index(5.5)", scope));
+    BOOST_CHECK_EQUAL("nil", eval("a.index(5.5)", scope));
     //TODO: index block
     //TODO: index enumerator
 
     //rindex
     BOOST_CHECK_EQUAL("5", eval("a.rindex(5)", scope));
-    BOOST_CHECK_EQUAL("null", eval("a.rindex(5.5)", scope));
+    BOOST_CHECK_EQUAL("nil", eval("a.rindex(5.5)", scope));
 }
 BOOST_AUTO_TEST_CASE(join)
 {

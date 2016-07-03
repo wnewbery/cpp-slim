@@ -32,12 +32,12 @@ BOOST_AUTO_TEST_CASE(equals)
     BOOST_CHECK(op_ne(FALSE_VALUE.get(), TRUE_VALUE.get())->is_true());
 
     //Null
-    BOOST_CHECK(op_eq(NULL_VALUE.get(), NULL_VALUE.get())->is_true());
-    BOOST_CHECK(!op_ne(NULL_VALUE.get(), NULL_VALUE.get())->is_true());
+    BOOST_CHECK(op_eq(NIL_VALUE.get(), NIL_VALUE.get())->is_true());
+    BOOST_CHECK(!op_ne(NIL_VALUE.get(), NIL_VALUE.get())->is_true());
 
     //Null and Boolean
-    BOOST_CHECK(!op_eq(TRUE_VALUE.get(), NULL_VALUE.get())->is_true());
-    BOOST_CHECK(!op_eq(FALSE_VALUE.get(), NULL_VALUE.get())->is_true());
+    BOOST_CHECK(!op_eq(TRUE_VALUE.get(), NIL_VALUE.get())->is_true());
+    BOOST_CHECK(!op_eq(FALSE_VALUE.get(), NIL_VALUE.get())->is_true());
 
     //Number
     BOOST_CHECK(op_eq(a.get(), a2.get())->is_true());
@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE(rel_cmp)
     BOOST_CHECK(!op_gt(FALSE_VALUE.get(), TRUE_VALUE.get())->is_true());
 
     //Null, no-order
-    BOOST_CHECK_THROW(op_lt(NULL_VALUE.get(), NULL_VALUE.get()), UnorderableTypeError);
+    BOOST_CHECK_THROW(op_lt(NIL_VALUE.get(), NIL_VALUE.get()), UnorderableTypeError);
 
     //Number and Boolean, different types
     BOOST_CHECK_THROW(op_le(FALSE_VALUE.get(), a.get()), UnorderableTypeError);
@@ -164,6 +164,6 @@ BOOST_AUTO_TEST_CASE(unary)
     BOOST_CHECK_EQUAL(-2.0, to_d(a->negate()));
     BOOST_CHECK_THROW(c->negate(), NoSuchMethod);
     BOOST_CHECK_THROW(TRUE_VALUE->negate(), NoSuchMethod);
-    BOOST_CHECK_THROW(NULL_VALUE->negate(), NoSuchMethod);
+    BOOST_CHECK_THROW(NIL_VALUE->negate(), NoSuchMethod);
 }
 BOOST_AUTO_TEST_SUITE_END()
