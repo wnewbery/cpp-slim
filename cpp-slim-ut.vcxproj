@@ -162,6 +162,7 @@
     <ClCompile Include="tests\Operators.cpp" />
     <ClCompile Include="tests\types\Array.cpp" />
     <ClCompile Include="tests\types\BasicTypes.cpp" />
+    <ClCompile Include="tests\types\Hash.cpp" />
     <ClCompile Include="tests\types\Number.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

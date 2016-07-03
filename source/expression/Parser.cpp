@@ -92,6 +92,7 @@ namespace slim
                 }
             case Token::LPAREN: return sub_expression();
             case Token::L_SQ_BRACKET: return array_literal();
+            case Token::L_CURLY_BRACKET: return hash_literal();
             default: throw SyntaxError("Expected value");
             }
         }
@@ -117,6 +118,44 @@ namespace slim
                     return std::make_unique<ArrayLiteral>(std::move(args));
                 }
                 else throw SyntaxError("Expected ']'");
+            }
+        }
+
+        ExpressionNodePtr Parser::hash_literal()
+        {
+            assert(current_token.type == Token::L_CURLY_BRACKET);
+            next();
+            if (current_token.type == Token::R_CURLY_BRACKET)
+            {
+                next();
+                return std::make_unique<HashLiteral>(FuncCall::Args());
+            }
+
+            FuncCall::Args args;
+            while (true)
+            {
+                //key_symbol: or key_expr =>
+                if (current_token.type == Token::HASH_SYMBOL)
+                {
+                    args.push_back(std::make_unique<Literal>(make_value(current_token.str)));
+                    next();
+                }
+                else
+                {
+                    args.push_back(expression());
+                    if (current_token.type != Token::HASH_KEY_VALUE_SEP) throw SyntaxError("Expected =>");
+                    next();
+                }
+                //value
+                args.push_back(expression());
+
+                if (current_token.type == Token::COMMA) next();
+                else if (current_token.type == Token::R_CURLY_BRACKET)
+                {
+                    next();
+                    return std::make_unique<HashLiteral>(std::move(args));
+                }
+                else throw SyntaxError("Expected '}'");
             }
         }
 

@@ -35,6 +35,8 @@ namespace slim
             ExpressionNodePtr value();
             /** Array [a, b, c] literal */
             ExpressionNodePtr array_literal();
+            /** Hash {key: value, 'key2' => 5} literal */
+            ExpressionNodePtr hash_literal();
 
             bool is_func_arg_start()const;
             /** '(' expression, expression ')' */

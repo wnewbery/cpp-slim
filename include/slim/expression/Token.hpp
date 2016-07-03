@@ -20,6 +20,12 @@ namespace slim
                  * May be a value such as 'true', a variable name, function name, etc.
                  */
                 SYMBOL,
+                /**A symbol followed directly by a colon. Used for hashes. e.g:
+                 * key: "value"
+                 */
+                HASH_SYMBOL,
+                /** '=>' symbol used to seperate hash literal key-values. */
+                HASH_KEY_VALUE_SEP,
 
                 LPAREN,
                 RPAREN,

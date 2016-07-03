@@ -82,9 +82,9 @@ namespace slim
                 else return Token::LOGICAL_NOT;
             case '=':
                 if (p + 1 >= end) error("Unexpected end");
-                if (p[1] != '=') error("Expected ==");
-                p += 2;
-                return Token::CMP_EQ;
+                if (p[1] == '=') return p += 2, Token::CMP_EQ;
+                if (p[1] == '>') return p += 2, Token::HASH_KEY_VALUE_SEP;
+                error("Expected == or =>");
             case '<':
                 ++p;
                 if (p >= end) error("Unexpected end");
@@ -155,9 +155,17 @@ namespace slim
         Token Lexer::symbol()
         {
             assert(is_symbol_start_chr(*p));
-            auto start = p;
+            auto sym_start = p;
             while (p < end && is_symbol_chr(*p)) ++p;
-            return { Token::SYMBOL, std::string(start, p - start) };
+            auto sym_end = p;
+            auto type = Token::SYMBOL;
+
+            if (p < end && *p == ':')
+            {
+                ++p;
+                type = Token::HASH_SYMBOL;
+            }
+            return { type, std::string(sym_start, sym_end - sym_start) };
         }
         Token Lexer::number(bool negative)
         {

@@ -1,6 +1,7 @@
 #pragma once
 #include "Object.hpp"
 #include <vector>
+#include <cassert>
 namespace slim
 {
     class Array;
@@ -68,6 +69,18 @@ namespace slim
 
     inline std::shared_ptr<Hash> make_hash(ObjectMap &&map)
     {
+        return std::make_shared<Hash>(std::move(map));
+    }
+    inline std::shared_ptr<Hash> make_hash(const std::vector<ObjectPtr> &arr)
+    {
+        assert(arr.size() % 2 == 0);
+        ObjectMap map;
+        for (auto i = arr.begin(); i != arr.end();)
+        {
+            auto key = *i++;
+            auto val = *i++;
+            map[key] = val;
+        }
         return std::make_shared<Hash>(std::move(map));
     }
 }

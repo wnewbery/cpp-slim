@@ -51,6 +51,12 @@ BOOST_AUTO_TEST_CASE(single_values)
     BOOST_CHECK_EQUAL("[5]", parse("[5]")->to_string());
     BOOST_CHECK_EQUAL("[2, true]", parse("[2,true]")->to_string());
 
+
+    BOOST_CHECK(is_node_type<HashLiteral>(parse("{a: 5}")));
+    BOOST_CHECK_EQUAL("{}", parse("{}")->to_string());
+    BOOST_CHECK_EQUAL("{\"a\" => 5}", parse("{a: 5}")->to_string());
+    BOOST_CHECK_EQUAL("{1 => 2, 5 => true}", parse("{1 => 2, 5 => true}")->to_string());
+
     BOOST_CHECK(is_node_type<Variable>(parse("myvar")));
     BOOST_CHECK_EQUAL("myvar", parse("myvar")->to_string());
 }
@@ -171,6 +177,22 @@ BOOST_AUTO_TEST_CASE(basic_syntax_errors)
     BOOST_CHECK_THROW(parse("a[,a]"), SyntaxError);
     BOOST_CHECK_THROW(parse("a["), SyntaxError);
     BOOST_CHECK_THROW(parse("a[a"), SyntaxError);
+    //array
+    BOOST_CHECK_THROW(parse("["), SyntaxError);
+    BOOST_CHECK_THROW(parse("]"), SyntaxError);
+    BOOST_CHECK_THROW(parse("[,]"), SyntaxError);
+    BOOST_CHECK_THROW(parse("[5"), SyntaxError);
+    BOOST_CHECK_THROW(parse("[5,"), SyntaxError);
+    BOOST_CHECK_THROW(parse("[5,]"), SyntaxError);
+    //hash
+    BOOST_CHECK_THROW(parse("{"), SyntaxError);
+    BOOST_CHECK_THROW(parse("}"), SyntaxError);
+    BOOST_CHECK_THROW(parse("{,}"), SyntaxError);
+    BOOST_CHECK_THROW(parse("{5"), SyntaxError);
+    BOOST_CHECK_THROW(parse("{5 =>"), SyntaxError);
+    BOOST_CHECK_THROW(parse("{5 => 6"), SyntaxError);
+    BOOST_CHECK_THROW(parse("{5 => 6,"), SyntaxError);
+    BOOST_CHECK_THROW(parse("{5 => 6,}"), SyntaxError);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

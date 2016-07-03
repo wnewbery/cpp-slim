@@ -167,7 +167,7 @@ namespace slim
             { &Hash::empty_q, "empty?" },
             { &Hash::fetch, "fetch" },
             { &Hash::flatten, "flatten" },
-            { &Hash::has_key_q, "has_key" },
+            { &Hash::has_key_q, "has_key?" },
             { &Hash::has_key_q, "include?" },
             { &Hash::has_key_q, "key?" },
             { &Hash::has_key_q, "member?" },

@@ -2,6 +2,7 @@
 #include "expression/Scope.hpp"
 #include "types/Object.hpp"
 #include "types/Array.hpp"
+#include "types/Hash.hpp"
 #include "types/String.hpp"
 #include <sstream>
 namespace slim
@@ -80,6 +81,25 @@ namespace slim
         {
             auto args = eval_args(scope);
             return make_array(args);
+        }
+        std::string HashLiteral::to_string() const
+        {
+            std::stringstream ss;
+            ss << "{";
+            for (auto i = args.begin(); i != args.end();)
+            {
+                if (i != args.begin()) ss << ", ";
+                ss << (*i++)->to_string();
+                ss << " => ";
+                ss << (*i++)->to_string();
+            }
+            ss << "}";
+            return ss.str();
+        }
+        ObjectPtr HashLiteral::eval(Scope & scope) const
+        {
+            auto args = eval_args(scope);
+            return make_hash(args);
         }
     }
 }

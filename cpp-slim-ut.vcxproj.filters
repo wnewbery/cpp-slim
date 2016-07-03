@@ -39,5 +39,8 @@
     <ClCompile Include="tests\types\Array.cpp">
       <Filter>tests\types</Filter>
     </ClCompile>
+    <ClCompile Include="tests\types\Hash.cpp">
+      <Filter>tests\types</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
