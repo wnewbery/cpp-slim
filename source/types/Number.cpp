@@ -65,27 +65,27 @@ namespace slim
         return make_value(-v);
     }
 
-    ObjectPtr Number::lshift(Object * rhs)
+    ObjectPtr Number::bit_lshift(Object * rhs)
     {
         return make_value((int)v << (int)coerce<Number>(rhs)->get_value());
     }
-    ObjectPtr Number::rshift(Object * rhs)
+    ObjectPtr Number::bit_rshift(Object * rhs)
     {
         return make_value((int)v >> (int)coerce<Number>(rhs)->get_value());
     }
-    ObjectPtr Number::and(Object * rhs)
+    ObjectPtr Number::bit_and(Object * rhs)
     {
         return make_value((int)v & (int)coerce<Number>(rhs)->get_value());
     }
-    ObjectPtr Number::or(Object * rhs)
+    ObjectPtr Number::bit_or(Object * rhs)
     {
         return make_value((int)v | (int)coerce<Number>(rhs)->get_value());
     }
-    ObjectPtr Number::xor(Object * rhs)
+    ObjectPtr Number::bit_xor(Object * rhs)
     {
         return make_value((int)v ^ (int)coerce<Number>(rhs)->get_value());
     }
-    ObjectPtr Number::not()
+    ObjectPtr Number::bit_not()
     {
         return make_value(~(int)v);
     }

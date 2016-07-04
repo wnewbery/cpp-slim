@@ -68,12 +68,12 @@ namespace slim
         virtual ObjectPtr add(Object *rhs);
         virtual ObjectPtr sub(Object *rhs);
         virtual ObjectPtr negate();
-        virtual ObjectPtr lshift(Object *rhs);
-        virtual ObjectPtr rshift(Object *rhs);
-        virtual ObjectPtr and(Object *rhs);
-        virtual ObjectPtr or(Object *rhs);
-        virtual ObjectPtr xor(Object *rhs);
-        virtual ObjectPtr not();
+        virtual ObjectPtr bit_lshift(Object *rhs);
+        virtual ObjectPtr bit_rshift(Object *rhs);
+        virtual ObjectPtr bit_and(Object *rhs);
+        virtual ObjectPtr bit_or(Object *rhs);
+        virtual ObjectPtr bit_xor(Object *rhs);
+        virtual ObjectPtr bit_not();
 
         virtual ObjectPtr call_method(const std::string &name, const FunctionArgs &args);
     protected:
@@ -90,7 +90,7 @@ namespace slim
     template<class T, class... Args>
     std::shared_ptr<T> create_object(Args && ... args)
     {
-        return T::create<T>(std::forward<Args>(args)...);
+        return T::template create<T>(std::forward<Args>(args)...);
     }
 
     double as_number(const Object *obj);

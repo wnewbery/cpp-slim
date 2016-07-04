@@ -172,7 +172,7 @@ namespace slim
         }
         Token Lexer::number(bool negative)
         {
-            assert(is_digit(*p) && !negative || p[-1] =='-' && negative);
+            assert((is_digit(*p) && !negative) || (p[-1] =='-' && negative));
             auto start = negative ? p - 1 : p;
             while (p < end && is_digit(*p)) ++p;
 

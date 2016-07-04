@@ -72,27 +72,27 @@ namespace slim
     {
         throw NoSuchMethod(this, "-negate");
     }
-    ObjectPtr Object::lshift(Object *rhs)
+    ObjectPtr Object::bit_lshift(Object *rhs)
     {
         throw NoSuchMethod(this, "<<");
     }
-    ObjectPtr Object::rshift(Object *rhs)
+    ObjectPtr Object::bit_rshift(Object *rhs)
     {
         throw NoSuchMethod(this, ">>");
     }
-    ObjectPtr Object::and(Object *rhs)
+    ObjectPtr Object::bit_and(Object *rhs)
     {
         throw NoSuchMethod(this, "&");
     }
-    ObjectPtr Object::or(Object *rhs)
+    ObjectPtr Object::bit_or(Object *rhs)
     {
         throw NoSuchMethod(this, "|");
     }
-    ObjectPtr Object::xor(Object *rhs)
+    ObjectPtr Object::bit_xor(Object *rhs)
     {
         throw NoSuchMethod(this, "^");
     }
-    ObjectPtr Object::not()
+    ObjectPtr Object::bit_not()
     {
         throw NoSuchMethod(this, "~");
     }

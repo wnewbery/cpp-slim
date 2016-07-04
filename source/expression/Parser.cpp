@@ -14,6 +14,7 @@
 #include "types/String.hpp"
 
 #include "Error.hpp"
+#include "Util.hpp"
 
 #include <cassert>
 
@@ -69,7 +70,7 @@ namespace slim
         }
         ExpressionNodePtr Parser::value()
         {
-            auto lit = [this](ObjectPtr val) { return next(), std::make_unique<Literal>(val); };
+            auto lit = [this](ObjectPtr val) { return next(), make_unique<Literal>(val); };
             switch (current_token.type)
             {
             case Token::STRING: return lit(make_value(current_token.str));
@@ -88,9 +89,9 @@ namespace slim
                     {
                         auto &f = global_functions.get(name);
                         FuncCall::Args args = func_args();
-                        return std::make_unique<GlobalFuncCall>(f, std::move(args));
+                        return make_unique<GlobalFuncCall>(f, std::move(args));
                     }
-                    else return std::make_unique<Variable>(name);
+                    else return make_unique<Variable>(name);
                 }
             case Token::LPAREN: return sub_expression();
             case Token::L_SQ_BRACKET: return array_literal();
@@ -106,7 +107,7 @@ namespace slim
             if (current_token.type == Token::R_SQ_BRACKET)
             {
                 next();
-                return std::make_unique<ArrayLiteral>(FuncCall::Args());
+                return make_unique<ArrayLiteral>(FuncCall::Args());
             }
             
             FuncCall::Args args;
@@ -117,7 +118,7 @@ namespace slim
                 else if (current_token.type == Token::R_SQ_BRACKET)
                 {
                     next();
-                    return std::make_unique<ArrayLiteral>(std::move(args));
+                    return make_unique<ArrayLiteral>(std::move(args));
                 }
                 else throw SyntaxError("Expected ']'");
             }
@@ -130,7 +131,7 @@ namespace slim
             if (current_token.type == Token::R_CURLY_BRACKET)
             {
                 next();
-                return std::make_unique<HashLiteral>(FuncCall::Args());
+                return make_unique<HashLiteral>(FuncCall::Args());
             }
 
             FuncCall::Args args;
@@ -139,7 +140,7 @@ namespace slim
                 //key_symbol: or key_expr =>
                 if (current_token.type == Token::HASH_SYMBOL)
                 {
-                    args.push_back(std::make_unique<Literal>(make_value(current_token.str)));
+                    args.push_back(make_unique<Literal>(make_value(current_token.str)));
                     next();
                 }
                 else
@@ -155,7 +156,7 @@ namespace slim
                 else if (current_token.type == Token::R_CURLY_BRACKET)
                 {
                     next();
-                    return std::make_unique<HashLiteral>(std::move(args));
+                    return make_unique<HashLiteral>(std::move(args));
                 }
                 else throw SyntaxError("Expected '}'");
             }
@@ -255,14 +256,7 @@ namespace slim
             if (current_token.type != Token::R_CURLY_BRACKET) throw SyntaxError("Expected '}'");
             next();
 
-            return std::make_unique<Block>(std::move(args), std::move(expr));
-        }
-
-        template<class T> ExpressionNodePtr Parser::binary_op(ExpressionNodePtr &&lhs)
-        {
-            next();
-            auto rhs = op2();
-            return std::make_unique<LogicalAnd>(std::move(lhs), std::move(rhs));
+            return make_unique<Block>(std::move(args), std::move(expr));
         }
 
         template<class T, class U>
@@ -270,7 +264,7 @@ namespace slim
         {
             next();
             auto rhs = (this->*get_rhs)();
-            lhs = std::make_unique<T>(std::move(lhs), std::move(rhs));
+            lhs = make_unique<T>(std::move(lhs), std::move(rhs));
         }
 
         ExpressionNodePtr Parser::logical_or_op()
@@ -411,15 +405,15 @@ namespace slim
                 case Token::MINUS:
                     next();
                     rhs = unary_op();
-                    return std::make_unique<Negative>(std::move(rhs));
+                    return make_unique<Negative>(std::move(rhs));
                 case Token::NOT:
                     next();
                     rhs = unary_op();
-                    return std::make_unique<Not>(std::move(rhs));
+                    return make_unique<Not>(std::move(rhs));
                 case Token::LOGICAL_NOT:
                     next();
                     rhs = unary_op();
-                    return std::make_unique<LogicalNot>(std::move(rhs));
+                    return make_unique<LogicalNot>(std::move(rhs));
                 default: return pow_op();
                 }
             }
@@ -448,7 +442,7 @@ namespace slim
 
                     next();
                     auto args = func_args();
-                    lhs = std::make_unique<MemberFuncCall>(std::move(lhs), std::move(name), std::move(args));
+                    lhs = make_unique<MemberFuncCall>(std::move(lhs), std::move(name), std::move(args));
                 }
                 else if (current_token.type == Token::L_SQ_BRACKET)
                 {
@@ -458,7 +452,7 @@ namespace slim
                         throw SyntaxError("Expected ']'");
 
                     next();
-                    lhs = std::make_unique<ElementRefOp>(std::move(lhs), std::move(args));
+                    lhs = make_unique<ElementRefOp>(std::move(lhs), std::move(args));
                 }
                 else break;
             }

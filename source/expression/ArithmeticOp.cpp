@@ -50,36 +50,36 @@ namespace slim
         {
             auto lhs_v = lhs->eval(scope);
             auto rhs_v = rhs->eval(scope);
-            return lhs_v->lshift(rhs_v.get());
+            return lhs_v->bit_lshift(rhs_v.get());
         }
         ObjectPtr Rshift::eval(Scope & scope) const
         {
             auto lhs_v = lhs->eval(scope);
             auto rhs_v = rhs->eval(scope);
-            return lhs_v->rshift(rhs_v.get());
+            return lhs_v->bit_rshift(rhs_v.get());
         }
         ObjectPtr And::eval(Scope & scope) const
         {
             auto lhs_v = lhs->eval(scope);
             auto rhs_v = rhs->eval(scope);
-            return lhs_v->and(rhs_v.get());
+            return lhs_v->bit_and(rhs_v.get());
         }
         ObjectPtr Or::eval(Scope & scope) const
         {
             auto lhs_v = lhs->eval(scope);
             auto rhs_v = rhs->eval(scope);
-            return lhs_v->or(rhs_v.get());
+            return lhs_v->bit_or(rhs_v.get());
         }
         ObjectPtr Xor::eval(Scope & scope) const
         {
             auto lhs_v = lhs->eval(scope);
             auto rhs_v = rhs->eval(scope);
-            return lhs_v->xor(rhs_v.get());
+            return lhs_v->bit_xor(rhs_v.get());
         }
         ObjectPtr Not::eval(Scope & scope) const
         {
             auto lhs_v = arg->eval(scope);
-            return lhs_v->not();
+            return lhs_v->bit_not();
         }
     }
 }

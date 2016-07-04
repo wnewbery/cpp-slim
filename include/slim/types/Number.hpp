@@ -34,12 +34,12 @@ namespace slim
         virtual ObjectPtr add(Object *rhs)override;
         virtual ObjectPtr sub(Object *rhs)override;
         virtual ObjectPtr negate()override;
-        virtual ObjectPtr lshift(Object *rhs)override;
-        virtual ObjectPtr rshift(Object *rhs)override;
-        virtual ObjectPtr and(Object *rhs)override;
-        virtual ObjectPtr or(Object *rhs)override;
-        virtual ObjectPtr xor(Object *rhs)override;
-        virtual ObjectPtr not()override;
+        virtual ObjectPtr bit_lshift(Object *rhs)override;
+        virtual ObjectPtr bit_rshift(Object *rhs)override;
+        virtual ObjectPtr bit_and(Object *rhs)override;
+        virtual ObjectPtr bit_or(Object *rhs)override;
+        virtual ObjectPtr bit_xor(Object *rhs)override;
+        virtual ObjectPtr bit_not()override;
 
         std::shared_ptr<Number> to_f();
         std::shared_ptr<Number> to_i();

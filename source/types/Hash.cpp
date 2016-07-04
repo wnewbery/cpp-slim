@@ -12,13 +12,13 @@ namespace slim
     const std::string Hash::TYPE_NAME = "Hash";
 
     Hash::Hash()
-        : map(), def_value(NIL_VALUE)
+        : def_value(NIL_VALUE), map()
     {}
     Hash::Hash(ObjectMap &&map)
-        : map(std::move(map)), def_value(NIL_VALUE)
+        : def_value(NIL_VALUE), map(std::move(map))
     {}
     Hash::Hash(ObjectPtr def_value, ObjectMap &&map)
-        : map(std::move(map)), def_value(def_value)
+        : def_value(def_value), map(std::move(map))
     {}
 
     std::string Hash::inspect() const
