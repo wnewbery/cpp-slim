@@ -134,5 +134,21 @@ namespace slim
         {
             return std::make_shared<Proc>(*code, param_names, scope);
         }
+
+        std::string Conditional::to_string() const
+        {
+            return "(" + cond->to_string() + " ? " + true_expr->to_string() + " : " + false_expr->to_string() + ")";
+        }
+        ObjectPtr Conditional::eval(Scope & scope) const
+        {
+            if (cond->eval(scope)->is_true())
+            {
+                return true_expr->eval(scope);
+            }
+            else
+            {
+                return false_expr->eval(scope);
+            }
+        }
     }
 }

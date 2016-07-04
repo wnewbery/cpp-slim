@@ -37,6 +37,9 @@ namespace slim
                 DOT,
                 /**&.*/
                 SAFE_NAV,
+                COLON,
+                /**?*/
+                CONDITIONAL,
 
                 PLUS,
                 MINUS,

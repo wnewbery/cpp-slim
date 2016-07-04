@@ -91,10 +91,15 @@ BOOST_AUTO_TEST_CASE(single_ops)
     BOOST_CHECK_EQUAL("(!10)", parse("! 10")->to_string());
     BOOST_CHECK_EQUAL("-10", parse("-10")->to_string());
     BOOST_CHECK_EQUAL("10", parse("+10")->to_string());
+
+    BOOST_CHECK_EQUAL("(5 ? a : b)", parse("5 ? a : b")->to_string());
 }
 
 BOOST_AUTO_TEST_CASE(associativity_single)
 {
+    //conditional right to left
+    BOOST_CHECK_EQUAL("(5 ? a : (b ? d : e))", parse("5 ? a : b ? d : e")->to_string());
+
     // binary, left to right
     BOOST_CHECK_EQUAL("(((5 && 10) && 5) && true)", parse("5 && 10 && 5 && true")->to_string());
 

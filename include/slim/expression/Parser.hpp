@@ -60,6 +60,8 @@ namespace slim
             template<class T, class U>
             void next_binary_op(ExpressionNodePtr &lhs, U get_rhs);
 
+            /** cond ? true : false */
+            ExpressionNodePtr conditional_op();
             /** || */
             ExpressionNodePtr logical_or_op();
             /** && */

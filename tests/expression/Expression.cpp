@@ -92,6 +92,10 @@ BOOST_AUTO_TEST_CASE(operators)
     BOOST_CHECK_EQUAL("550", eval("55 * 10"));
     BOOST_CHECK_EQUAL("5.5", eval("55 / 10"));
     BOOST_CHECK_EQUAL("5", eval("55 % 10"));
+
+    //ternary
+    BOOST_CHECK_EQUAL("1", eval("true ? 1 : 2"));
+    BOOST_CHECK_EQUAL("2", eval("false ? 1 : 2"));
 }
 
 BOOST_AUTO_TEST_CASE(precedence)
@@ -103,6 +107,9 @@ BOOST_AUTO_TEST_CASE(precedence)
     BOOST_CHECK_EQUAL("false", eval("20 == (100 == false)"));
     BOOST_CHECK_EQUAL("1", eval("5 && 1 || 0 && 7"));
     BOOST_CHECK_EQUAL("7", eval("((5 && 1) || 0) && 7"));
+
+    BOOST_CHECK_EQUAL("12", eval("5 < 7 ? 3 * 4 : 2 ** 2"));
+    BOOST_CHECK_EQUAL("4", eval("9 < 7 ? 3 * 4 : 2 ** 2"));
 }
 
 BOOST_AUTO_TEST_CASE(global_func)

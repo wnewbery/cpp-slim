@@ -57,7 +57,7 @@ namespace slim
         }
         ExpressionNodePtr Parser::expression()
         {
-            return logical_or_op();
+            return conditional_op();
         }
         ExpressionNodePtr Parser::sub_expression()
         {
@@ -265,6 +265,24 @@ namespace slim
             next();
             auto rhs = (this->*get_rhs)();
             lhs = slim::make_unique<T>(std::move(lhs), std::move(rhs));
+        }
+
+        ExpressionNodePtr Parser::conditional_op()
+        {
+            auto lhs = logical_or_op();
+            if (current_token.type == Token::CONDITIONAL)
+            {
+                next();
+                auto true_expr = logical_or_op();
+
+                if (current_token.type != Token::COLON) throw SyntaxError("Expected ':'");
+                next();
+
+                auto false_expr = conditional_op();
+
+                lhs = slim::make_unique<Conditional>(std::move(lhs), std::move(true_expr), std::move(false_expr));
+            }
+            return lhs;
         }
 
         ExpressionNodePtr Parser::logical_or_op()

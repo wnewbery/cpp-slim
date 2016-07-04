@@ -57,6 +57,8 @@ namespace slim
             case '%': ++p; return Token::MOD;
             case '~': ++p; return Token::NOT;
             case '^': ++p; return Token::XOR;
+            case ':': ++p; return Token::COLON;
+            case '?': ++p; return Token::CONDITIONAL;
             case '\'':
             case '\"':
                 return quoted_string();

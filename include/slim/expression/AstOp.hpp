@@ -104,5 +104,23 @@ namespace slim
             std::vector<std::string> param_names;
             std::unique_ptr<ExpressionNode> code;
         };
+
+        /**Conditional ternary operator. cond ? true : false. */
+        class Conditional : public ExpressionNode
+        {
+        public:
+            Conditional(
+                std::unique_ptr<ExpressionNode> &&cond,
+                std::unique_ptr<ExpressionNode> &&true_expr,
+                std::unique_ptr<ExpressionNode> &&false_expr)
+                : cond(std::move(cond)), true_expr(std::move(true_expr)), false_expr(std::move(false_expr))
+            {}
+            virtual std::string to_string()const override;
+            virtual ObjectPtr eval(Scope &scope)const override;
+        private:
+            std::unique_ptr<ExpressionNode> cond;
+            std::unique_ptr<ExpressionNode> true_expr;
+            std::unique_ptr<ExpressionNode> false_expr;
+        };
     }
 }
