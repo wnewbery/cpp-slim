@@ -28,22 +28,22 @@ std::string eval(const std::string &str)
     return eval(str, scope);
 }
 
-std::shared_ptr<Hash> make_hash2(const std::unordered_map<std::string, double> &map)
+std::shared_ptr<Hash> make_hash2(const std::vector<std::pair<std::string, double>> &map)
 {
-    ObjectMap map2;
+    auto map2 = create_object<Hash>();
     for (auto &i : map)
     {
-        map2[make_value(i.first)] = make_value(i.second);
+        map2->set(make_value(i.first), make_value(i.second));
     }
-    return make_hash(std::move(map2));
+    return map2;
 }
 
 BOOST_AUTO_TEST_CASE(compare)
 {
     Scope scope;
     scope.set("a", make_hash2({}));
-    scope.set("b", make_hash2({ {"a", 5.0}, {"b", 10.0} }));
-    scope.set("c", make_hash2({ {"a", 5.0}, {"c", 15} }));
+    scope.set("b", make_hash2({ { "a", 5.0 },{ "b", 10.0 } }));
+    scope.set("c", make_hash2({ { "a", 5.0 },{ "c", 15 } }));
 
 
     BOOST_CHECK_EQUAL("true", eval("a == a", scope));
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(basic_access)
     Scope scope;
     scope.set("a", make_hash2({}));
     scope.set("b", make_hash2({ { "a", 5.0 },{ "b", 10.0 } }));
-    scope.set("c", make_hash2({ { "a", 5.0 },{ "c", 15}, {"10", 20} }));
+    scope.set("c", make_hash2({ { "a", 5.0 },{ "c", 15 },{ "10", 20 } }));
 
     //[key]
     BOOST_CHECK_EQUAL("nil", eval("c['x']", scope));
