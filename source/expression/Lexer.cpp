@@ -72,6 +72,7 @@ namespace slim
             case '&':
                 if (p + 1 >= end) error("Unexpected end");
                 if (p[1] == '&') return p += 2, Token::LOGICAL_AND;
+                if (p[1] == '.') return p += 2, Token::SAFE_NAV;
                 else return ++p, Token::AND;
             case '|':
                 if (p + 1 >= end) error("Unexpected end");

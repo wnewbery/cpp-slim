@@ -444,6 +444,16 @@ namespace slim
                     auto args = func_args();
                     lhs = slim::make_unique<MemberFuncCall>(std::move(lhs), std::move(name), std::move(args));
                 }
+                else if (current_token.type == Token::SAFE_NAV)
+                {
+                    next();
+                    if (current_token.type != Token::SYMBOL) throw SyntaxError("Expected symbol");
+                    auto name = current_token.str;
+
+                    next();
+                    auto args = func_args();
+                    lhs = slim::make_unique<SafeNavMemberFuncCall>(std::move(lhs), std::move(name), std::move(args));
+                }
                 else if (current_token.type == Token::L_SQ_BRACKET)
                 {
                     next();

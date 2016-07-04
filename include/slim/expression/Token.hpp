@@ -35,6 +35,8 @@ namespace slim
                 R_CURLY_BRACKET,
                 COMMA,
                 DOT,
+                /**&.*/
+                SAFE_NAV,
 
                 PLUS,
                 MINUS,

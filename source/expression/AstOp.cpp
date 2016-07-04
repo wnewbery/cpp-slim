@@ -64,6 +64,21 @@ namespace slim
             return self->call_method(name, args);
         }
 
+        std::string SafeNavMemberFuncCall::to_string() const
+        {
+            return lhs->to_string() + "&." + name + "(" + FuncCall::to_string() + ")";
+        }
+        ObjectPtr SafeNavMemberFuncCall::eval(Scope & scope) const
+        {
+            auto self = lhs->eval(scope);
+            if (self == NIL_VALUE) return NIL_VALUE;
+            else
+            {
+                auto args = eval_args(scope);
+                return self->call_method(name, args);
+            }
+        }
+
         std::string ElementRefOp::to_string() const
         {
             return lhs->to_string() + "[" + FuncCall::to_string() + "]";

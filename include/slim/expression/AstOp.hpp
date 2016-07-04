@@ -53,6 +53,18 @@ namespace slim
             ExpressionNodePtr lhs;
             std::string name;
         };
+        class SafeNavMemberFuncCall : public FuncCall
+        {
+        public:
+            SafeNavMemberFuncCall(ExpressionNodePtr &&lhs, const std::string &name, Args &&args)
+                : FuncCall(std::move(args)), lhs(std::move(lhs)), name(name)
+            {}
+            virtual std::string to_string()const override;
+            virtual ObjectPtr eval(Scope &scope)const override;
+
+            ExpressionNodePtr lhs;
+            std::string name;
+        };
         /**[] operator */
         class ElementRefOp : public FuncCall
         {

@@ -125,6 +125,8 @@ BOOST_AUTO_TEST_CASE(method_call)
     BOOST_CHECK_EQUAL("a.f(2, 3, (4 + 4))", parse("a.f 2, 3, 4 + 4")->to_string());
     BOOST_CHECK_EQUAL("(a.f(2, 3, 4) + 4)", parse("(a.f 2, 3, 4) + 4")->to_string());
 
+    BOOST_CHECK_EQUAL("a&.f(2, 3, 4)", parse("a&.f 2, 3, 4")->to_string());
+
     BOOST_CHECK_EQUAL("a[5]", parse("a[5]")->to_string());
     BOOST_CHECK_EQUAL("a[5][5, 10]", parse("a[5][5, 10]")->to_string());
     BOOST_CHECK_EQUAL("a[5][5, 10].to_i()", parse("a[5][5, 10].to_i")->to_string());
