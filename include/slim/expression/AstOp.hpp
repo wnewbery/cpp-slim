@@ -17,10 +17,10 @@ namespace slim
         class Variable : public ExpressionNode
         {
         public:
-            Variable(const std::string &name) : name(name) {}
-            virtual std::string to_string()const override { return name; }
+            Variable(const SymPtr &name) : name(name) {}
+            virtual std::string to_string()const override { return name->str(); }
             virtual ObjectPtr eval(Scope &scope)const override;
-            std::string name;
+            SymPtr name;
         };
         class FuncCall : public ExpressionNode
         {
@@ -44,26 +44,26 @@ namespace slim
         class MemberFuncCall : public FuncCall
         {
         public:
-            MemberFuncCall(ExpressionNodePtr &&lhs, const std::string &name, Args &&args)
+            MemberFuncCall(ExpressionNodePtr &&lhs, const SymPtr &name, Args &&args)
                 : FuncCall(std::move(args)), lhs(std::move(lhs)), name(name)
             {}
             virtual std::string to_string()const override;
             virtual ObjectPtr eval(Scope &scope)const override;
 
             ExpressionNodePtr lhs;
-            std::string name;
+            SymPtr name;
         };
         class SafeNavMemberFuncCall : public FuncCall
         {
         public:
-            SafeNavMemberFuncCall(ExpressionNodePtr &&lhs, const std::string &name, Args &&args)
+            SafeNavMemberFuncCall(ExpressionNodePtr &&lhs, const SymPtr &name, Args &&args)
                 : FuncCall(std::move(args)), lhs(std::move(lhs)), name(name)
             {}
             virtual std::string to_string()const override;
             virtual ObjectPtr eval(Scope &scope)const override;
 
             ExpressionNodePtr lhs;
-            std::string name;
+            SymPtr name;
         };
         /**[] operator */
         class ElementRefOp : public FuncCall
@@ -95,13 +95,13 @@ namespace slim
         class Block : public ExpressionNode
         {
         public:
-            Block(std::vector<std::string> &&param_names, std::unique_ptr<ExpressionNode> &&code)
+            Block(std::vector<SymPtr> &&param_names, std::unique_ptr<ExpressionNode> &&code)
                 : param_names(std::move(param_names)), code(std::move(code))
             {}
             virtual std::string to_string()const override;
             virtual ObjectPtr eval(Scope &scope)const override;
         private:
-            std::vector<std::string> param_names;
+            std::vector<SymPtr> param_names;
             std::unique_ptr<ExpressionNode> code;
         };
 

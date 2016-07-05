@@ -3,6 +3,7 @@
 #include "types/Nil.hpp"
 #include "types/Number.hpp"
 #include "types/String.hpp"
+#include "Function.hpp"
 #include "Error.hpp"
 #include <iomanip>
 #include <sstream>
@@ -97,7 +98,7 @@ namespace slim
         throw NoSuchMethod(this, "~");
     }
 
-    ObjectPtr Object::call_method(const std::string &name, const FunctionArgs &args)
+    ObjectPtr Object::call_method(SymPtr name, const FunctionArgs &args)
     {
         auto &method = method_table().get(this, name);
         return method(this, args);

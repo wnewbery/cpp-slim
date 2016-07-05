@@ -41,7 +41,7 @@ namespace slim
 
         std::string GlobalFuncCall::to_string() const
         {
-            return function.name + "(" + FuncCall::to_string() + ")";
+            return function.name->str() + "(" + FuncCall::to_string() + ")";
         }
         ObjectPtr GlobalFuncCall::eval(Scope & scope) const
         {
@@ -51,7 +51,7 @@ namespace slim
 
         std::string MemberFuncCall::to_string() const
         {
-            return lhs->to_string() + "." + name + "(" + FuncCall::to_string() + ")";
+            return lhs->to_string() + "." + name->str() + "(" + FuncCall::to_string() + ")";
         }
         ObjectPtr MemberFuncCall::eval(Scope & scope) const
         {
@@ -62,7 +62,7 @@ namespace slim
 
         std::string SafeNavMemberFuncCall::to_string() const
         {
-            return lhs->to_string() + "&." + name + "(" + FuncCall::to_string() + ")";
+            return lhs->to_string() + "&." + name->str() + "(" + FuncCall::to_string() + ")";
         }
         ObjectPtr SafeNavMemberFuncCall::eval(Scope & scope) const
         {
@@ -118,9 +118,9 @@ namespace slim
         {
             std::stringstream ss;
             ss << "{|";
-            if (!param_names.empty()) ss << param_names[0];
+            if (!param_names.empty()) ss << param_names[0]->str();
             for (size_t i = 1; i < param_names.size(); ++i)
-                ss << ", " << param_names[i];
+                ss << ", " << param_names[i]->str();
             ss << "| ";
             ss << code->to_string();
             ss << "}";

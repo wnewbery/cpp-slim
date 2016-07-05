@@ -1,7 +1,8 @@
 #pragma once
 #include <memory>
 #include <string>
-#include "Function.hpp"
+#include <vector>
+#include <unordered_map>
 #include "Error.hpp"
 #include "Operators.hpp"
 namespace slim
@@ -11,6 +12,14 @@ namespace slim
     class Number;
     typedef std::shared_ptr<Object> ObjectPtr;
     typedef std::shared_ptr<const Object> CObjectPtr;
+    class Symbol;
+    typedef std::shared_ptr<Symbol> SymPtr;
+
+    typedef std::vector<ObjectPtr> FunctionArgs;
+    class MethodTable;
+
+    SymPtr symbol(const std::string &str);
+
     /**Base abstract object for the expression interpreter.*/
     class Object : public std::enable_shared_from_this<Object>
     {
@@ -75,7 +84,7 @@ namespace slim
         virtual ObjectPtr bit_xor(Object *rhs);
         virtual ObjectPtr bit_not();
 
-        virtual ObjectPtr call_method(const std::string &name, const FunctionArgs &args);
+        virtual ObjectPtr call_method(SymPtr name, const FunctionArgs &args);
     protected:
         /**Get a function table for the default implementation of call_method.*/
         virtual const MethodTable &method_table()const;

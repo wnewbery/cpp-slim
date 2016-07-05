@@ -18,17 +18,18 @@ namespace slim
         virtual size_t hash()const override;
         virtual int cmp(const Object *rhs)const override;
 
-        const std::shared_ptr<String> &get_str()const  { return str; }
+        const std::shared_ptr<String> &str_obj()const { return _str; }
+        const std::string &str()const;
         const char *c_str()const;
     protected:
         virtual const MethodTable &method_table()const;
     private:
         explicit Symbol(std::shared_ptr<String> str);
-        std::shared_ptr<String> str;
+        std::shared_ptr<String> _str;
 
         friend std::shared_ptr<Symbol> symbol(const std::string &str);
     };
 
-    std::shared_ptr<Symbol> symbol(const std::string &str);
-    std::shared_ptr<Symbol> symbol(std::shared_ptr<String> str);
+    SymPtr symbol(const std::string &str);
+    SymPtr symbol(std::shared_ptr<String> str);
 }

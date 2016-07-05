@@ -16,7 +16,7 @@ namespace slim
         static const std::string TYPE_NAME;
         Proc(
             const expr::ExpressionNode &code,
-            const std::vector<std::string> &param_names,
+            const std::vector<SymPtr> &param_names,
             expr::Scope &scope);
         ~Proc();
 
@@ -27,7 +27,7 @@ namespace slim
         virtual const MethodTable &method_table()const override;
     private:
         const expr::ExpressionNode &code;
-        const std::vector<std::string> &param_names;
+        const std::vector<SymPtr> &param_names;
         expr::Scope &scope;
     };
 }

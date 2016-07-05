@@ -1,5 +1,6 @@
 #include "Error.hpp"
 #include "types/Object.hpp"
+#include "types/Symbol.hpp"
 namespace slim
 {
     TypeError::TypeError(const Object *type, const std::string &type_name)
@@ -18,12 +19,17 @@ namespace slim
         : TypeError("unsupported operand types: " + std::string(op) + " " + rhs->type_name())
     {
     }
-    NoSuchMethod::NoSuchMethod(const Object * obj, const std::string & method_name)
+    
+    NoSuchMethod::NoSuchMethod(const Object *obj, const std::string &method_name)
         : ScriptError(obj->type_name() + " has no method " + method_name)
     {
     }
-    NoSuchMethod::NoSuchMethod(const std::string & method_name)
-        : ScriptError("No global function " + method_name)
+    NoSuchMethod::NoSuchMethod(const Object * obj, const Symbol *method_name)
+        : ScriptError(obj->type_name() + " has no method " + method_name->str())
+    {
+    }
+    NoSuchMethod::NoSuchMethod(const Symbol *method_name)
+        : ScriptError("No global function " + method_name->str())
     {
     }
     DuplicateMethod::DuplicateMethod(const Object * obj, const std::string & method_name)
@@ -34,16 +40,16 @@ namespace slim
         : ScriptError("global function " + method_name + " already exists")
     {
     }
-    InvalidArgument::InvalidArgument(const std::string &name)
-        : ScriptError("Invalid argument for " + name)
+    InvalidArgument::InvalidArgument(const std::string &method_name)
+        : ScriptError("Invalid argument for " + method_name)
     {
     }
-    InvalidArgument::InvalidArgument(const Object *obj, const std::string &name)
-        : ScriptError("Invalid argument for " + obj->type_name() + "." + name)
+    InvalidArgument::InvalidArgument(const Object *obj, const std::string &method_name)
+        : ScriptError("Invalid argument for " + obj->type_name() + "." + method_name)
     {
     }
-    InvalidArgument::InvalidArgument(const Object *obj, const std::string &name, const std::string &msg)
-        : ScriptError("InvalidArgument: " + obj->type_name() + "." + name + " " + msg)
+    InvalidArgument::InvalidArgument(const Object *obj, const std::string &method_name, const std::string &msg)
+        : ScriptError("InvalidArgument: " + obj->type_name() + "." + method_name + " " + msg)
     {
     }
     KeyError::KeyError(ObjectPtr key)

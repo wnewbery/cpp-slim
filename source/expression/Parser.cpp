@@ -88,11 +88,11 @@ namespace slim
                         current_token.type == Token::L_CURLY_BRACKET ||
                         is_func_arg_start())
                     {
-                        auto &f = global_functions.get(name);
+                        auto &f = global_functions.get(symbol(name));
                         FuncCall::Args args = func_args();
                         return slim::make_unique<GlobalFuncCall>(f, std::move(args));
                     }
-                    else return slim::make_unique<Variable>(name);
+                    else return slim::make_unique<Variable>(symbol(name));
                 }
             case Token::LPAREN: return sub_expression();
             case Token::L_SQ_BRACKET: return array_literal();
@@ -227,7 +227,7 @@ namespace slim
             assert(current_token.type == Token::L_CURLY_BRACKET);
             next();
 
-            std::vector<std::string> args;
+            std::vector<SymPtr> args;
             if (current_token.type == Token::OR)
             {
                 next();
@@ -237,7 +237,7 @@ namespace slim
                     while (true)
                     {
                         if (current_token.type != Token::SYMBOL) throw SyntaxError("Expected symbol");
-                        args.push_back(current_token.str);
+                        args.push_back(symbol(current_token.str));
                         next();
 
                         if (current_token.type == Token::OR)
@@ -461,7 +461,7 @@ namespace slim
                 {
                     next();
                     if (current_token.type != Token::SYMBOL) throw SyntaxError("Expected symbol");
-                    auto name = current_token.str;
+                    auto name = symbol(current_token.str);
 
                     next();
                     auto args = func_args();
@@ -471,7 +471,7 @@ namespace slim
                 {
                     next();
                     if (current_token.type != Token::SYMBOL) throw SyntaxError("Expected symbol");
-                    auto name = current_token.str;
+                    auto name = symbol(current_token.str);
 
                     next();
                     auto args = func_args();

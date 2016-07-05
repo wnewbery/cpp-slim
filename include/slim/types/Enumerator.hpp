@@ -1,5 +1,6 @@
 #pragma once
 #include "Object.hpp"
+#include "Function.hpp"
 #include <functional>
 namespace slim
 {

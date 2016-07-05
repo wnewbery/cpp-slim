@@ -1,4 +1,5 @@
 #include "types/Enumerator.hpp"
+#include "Function.hpp"
 
 namespace slim
 {

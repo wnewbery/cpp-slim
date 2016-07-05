@@ -1,6 +1,7 @@
 #include "types/Proc.hpp"
 #include "expression/Ast.hpp"
 #include "expression/Scope.hpp"
+#include "Function.hpp"
 #include <sstream>
 
 namespace slim
@@ -9,7 +10,7 @@ namespace slim
 
     Proc::Proc(
         const expr::ExpressionNode &code,
-        const std::vector<std::string> &param_names,
+        const std::vector<SymPtr> &param_names,
         expr::Scope &scope)
         : code(code), param_names(param_names), scope(scope)
     {

@@ -1,5 +1,6 @@
 #include "types/Number.hpp"
 #include "Error.hpp"
+#include "Function.hpp"
 #include <sstream>
 #include <cmath>
 

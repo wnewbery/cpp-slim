@@ -4,7 +4,9 @@
 namespace slim
 {
     class Object;
+    class Symbol;
     typedef std::shared_ptr<Object> ObjectPtr;
+    typedef std::shared_ptr<Symbol> SymPtr;
 
     class Error : public std::runtime_error
     {
@@ -56,7 +58,8 @@ namespace slim
     {
     public:
         NoSuchMethod(const Object *obj, const std::string &method_name);
-        explicit NoSuchMethod(const std::string &method_name);
+        NoSuchMethod(const Object *obj, const Symbol *method_name);
+        explicit NoSuchMethod(const Symbol *method_name);
     };
     class DuplicateMethod : public ScriptError
     {
@@ -67,8 +70,8 @@ namespace slim
     class InvalidArgument : public ScriptError
     {
     public:
-        InvalidArgument(const std::string &name);
-        InvalidArgument(const Object *obj, const std::string &name);
-        InvalidArgument(const Object *obj, const std::string &name, const std::string &msg);
+        InvalidArgument(const std::string &method_name);
+        InvalidArgument(const Object *obj, const std::string &method_name);
+        InvalidArgument(const Object *obj, const std::string &method_name, const std::string &msg);
     };
 }
