@@ -12,6 +12,7 @@
 #include "types/Nil.hpp"
 #include "types/Number.hpp"
 #include "types/String.hpp"
+#include "types/Symbol.hpp"
 
 #include "Error.hpp"
 #include "Util.hpp"
@@ -96,6 +97,10 @@ namespace slim
             case Token::LPAREN: return sub_expression();
             case Token::L_SQ_BRACKET: return array_literal();
             case Token::L_CURLY_BRACKET: return hash_literal();
+            case Token::COLON:
+                next();
+                if (current_token.type != Token::SYMBOL) throw SyntaxError("Expected symbol");
+                return lit(symbol(current_token.str));
             default: throw SyntaxError("Expected value");
             }
         }
@@ -140,7 +145,7 @@ namespace slim
                 //key_symbol: or key_expr =>
                 if (current_token.type == Token::HASH_SYMBOL)
                 {
-                    args.push_back(slim::make_unique<Literal>(make_value(current_token.str)));
+                    args.push_back(slim::make_unique<Literal>(symbol(current_token.str)));
                     next();
                 }
                 else

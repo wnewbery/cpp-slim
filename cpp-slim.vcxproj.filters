@@ -96,6 +96,9 @@
     <ClInclude Include="include\slim\types\Proc.hpp">
       <Filter>include\types</Filter>
     </ClInclude>
+    <ClInclude Include="include\slim\types\Symbol.hpp">
+      <Filter>include\types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\types\Object.cpp">
@@ -147,6 +150,9 @@
       <Filter>source\types</Filter>
     </ClCompile>
     <ClCompile Include="source\types\Proc.cpp">
+      <Filter>source\types</Filter>
+    </ClCompile>
+    <ClCompile Include="source\types\Symbol.cpp">
       <Filter>source\types</Filter>
     </ClCompile>
   </ItemGroup>

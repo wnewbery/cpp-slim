@@ -43,6 +43,7 @@
     <ClInclude Include="include\slim\types\Proc.hpp" />
     <ClInclude Include="include\slim\types\String.hpp" />
     <ClInclude Include="include\slim\types\Object.hpp" />
+    <ClInclude Include="include\slim\types\Symbol.hpp" />
     <ClInclude Include="include\slim\Value.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -58,6 +59,7 @@
     <ClCompile Include="source\Maths.cpp" />
     <ClCompile Include="source\Operators.cpp" />
     <ClCompile Include="source\types\Array.cpp" />
+    <ClCompile Include="source\types\Symbol.cpp" />
     <ClCompile Include="source\types\Enumerator.cpp" />
     <ClCompile Include="source\types\Hash.cpp" />
     <ClCompile Include="source\types\Number.cpp" />

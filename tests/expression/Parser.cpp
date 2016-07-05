@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(single_values)
 
     BOOST_CHECK(is_node_type<HashLiteral>(parse("{a: 5}")));
     BOOST_CHECK_EQUAL("{}", parse("{}")->to_string());
-    BOOST_CHECK_EQUAL("{\"a\" => 5}", parse("{a: 5}")->to_string());
+    BOOST_CHECK_EQUAL("{:a => 5}", parse("{a: 5}")->to_string());
     BOOST_CHECK_EQUAL("{1 => 2, 5 => true}", parse("{1 => 2, 5 => true}")->to_string());
 
     BOOST_CHECK(is_node_type<Variable>(parse("myvar")));

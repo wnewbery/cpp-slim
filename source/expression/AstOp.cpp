@@ -12,11 +12,7 @@ namespace slim
     {
         std::string Literal::to_string() const
         {
-            if (auto str = dynamic_cast<const String*>(value.get()))
-            {
-                return "\"" + value->to_string() + "\"";
-            }
-            else return value->to_string();
+            return value->inspect();
         }
         ObjectPtr Literal::eval(Scope & scope) const
         {

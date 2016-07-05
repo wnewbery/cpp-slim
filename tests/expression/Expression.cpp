@@ -32,6 +32,7 @@ BOOST_AUTO_TEST_CASE(literals)
     BOOST_CHECK_EQUAL("false", eval("false"));
     BOOST_CHECK_EQUAL("nil", eval("nil"));
     BOOST_CHECK_EQUAL("\"Hello World\"", eval("'Hello World'"));
+    BOOST_CHECK_EQUAL(":symbol", eval(":symbol"));
     BOOST_CHECK_EQUAL("60", eval("60"));
 }
 
