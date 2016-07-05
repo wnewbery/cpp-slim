@@ -12,7 +12,7 @@ namespace slim
     const std::string Hash::TYPE_NAME = "Hash";
 
     Hash::Hash()
-        : def_value(NIL_VALUE), map(), insert_order()
+        : def_value(NIL_VALUE), map(), list()
     {}
 
     std::string Hash::inspect() const
@@ -20,31 +20,31 @@ namespace slim
         std::stringstream ss;
         ss << '{';
         bool first = true;
-        for (auto &i : insert_order)
+        for (auto &i : list)
         {
             if (first) first = false;
             else ss << ", ";
-            ss << i->first->inspect() << " => " << i->second->inspect();
+            ss << i.first->inspect() << " => " << i.second->inspect();
         }
         ss << '}';
         return ss.str();
     }
     bool Hash::eq(const Object * orhs) const
     {
-        auto &rhs = ((const Hash*)orhs)->get_value();
-        if (map.size() != rhs.size()) return false;
+        auto rhs = coerce<Hash>(orhs);
+        if (map.size() != rhs->map.size()) return false;
         for (auto &i : map)
         {
-            auto it = rhs.find(i.first);
-            if (it == rhs.end()) return false;
-            if (!slim::eq(i.second.get(), it->second.get())) return false;
+            auto it = rhs->map.find(i.first);
+            if (it == rhs->map.end()) return false;
+            if (!slim::eq(list[i.second].second.get(), rhs->list[it->second].second.get())) return false;
         }
         return true;
     }
     size_t Hash::hash() const
     {
         size_t h = 0;
-        for (auto &i : map)
+        for (auto &i : list)
         {
             auto h2 = detail::hash(*i.first);
             detail::hash_combine(h2, *i.second);
@@ -55,16 +55,20 @@ namespace slim
 
     void Hash::set(ObjectPtr key, ObjectPtr val)
     {
-        auto x = map.emplace(key, val);
-        if (x.second) insert_order.push_back(x.first);
-        else x.first->second = val;
+        auto x = map.emplace(key, 0);
+        if (x.second)
+        {
+            x.first->second = list.size();
+            list.emplace_back(key, val);
+        }
+        else list[x.first->second].second = val;
     }
 
     ObjectPtr Hash::el_ref(const FunctionArgs &args)
     {
         if (args.size() != 1) throw InvalidArgument(this, "[]");
         auto it = map.find(args[0]);
-        if (it != map.end()) return it->second;
+        if (it != map.end()) return list[it->second].second;
         else return def_value;
     }
 
@@ -77,7 +81,7 @@ namespace slim
     {
         if (args.empty()) throw InvalidArgument(this, "fetch");
         auto it = map.find(args[0]);
-        if (it != map.end()) return it->second;
+        if (it != map.end()) return list[it->second].second;
 
         if (args.size() == 1) throw KeyError(args[0]);
         //TODO: Block
@@ -90,10 +94,10 @@ namespace slim
         else if (args.size() > 1) throw InvalidArgument(this, "flatten");
 
         std::vector<ObjectPtr> out;
-        for (auto &i : insert_order)
+        for (auto &i : list)
         {
-            out.push_back(i->first);
-            out.push_back(i->second);
+            out.push_back(i.first);
+            out.push_back(i.second);
         }
 
         auto arr = make_array(std::move(out));
@@ -107,35 +111,35 @@ namespace slim
     }
     ObjectPtr Hash::has_value_q(const Object * obj)
     {
-        for (auto &i : map) if (slim::eq(i.second.get(), obj)) return TRUE_VALUE;
+        for (auto &i : list) if (slim::eq(i.second.get(), obj)) return TRUE_VALUE;
         return FALSE_VALUE;
     }
 
     std::shared_ptr<Hash> Hash::invert()
     {
         auto out = create_object<Hash>(def_value);
-        for (auto &i : insert_order)
-            out->set(i->second, i->first);
+        for (auto &i : list)
+            out->set(i.second, i.first);
         return out;
     }
 
     ObjectPtr Hash::key(const Object *val)
     {
-        for (auto &i : map) if (slim::eq(i.second.get(), val)) return i.first;
+        for (auto &i : list) if (slim::eq(i.second.get(), val)) return i.first;
         return NIL_VALUE;
     }
 
     std::shared_ptr<Array> Hash::keys()
     {
         std::vector<ObjectPtr> out;
-        for (auto &i : insert_order) out.push_back(i->first);
+        for (auto &i : list) out.push_back(i.first);
         return make_array(std::move(out));
     }
 
     std::shared_ptr<Array> Hash::values()
     {
         std::vector<ObjectPtr> out;
-        for (auto &i : insert_order) out.push_back(i->second);
+        for (auto &i : list) out.push_back(i.second);
         return make_array(std::move(out));
     }
 
@@ -148,18 +152,18 @@ namespace slim
     {
         //TODO: Block
         auto out = create_object<Hash>(def_value);
-        for (auto &i : insert_order)
-            out->set(i->first, i->second);
-        for (auto &i : other_hash->insert_order)
-            out->set(i->first, i->second);
+        for (auto &i : list)
+            out->set(i.first, i.second);
+        for (auto &i : other_hash->list)
+            out->set(i.first, i.second);
         return out;
     }
 
     std::shared_ptr<Array> Hash::to_a()
     {
         std::vector<ObjectPtr> out;
-        for (auto &i : insert_order)
-            out.push_back(make_array({ i->first, i->second }));
+        for (auto &i : list)
+            out.push_back(make_array({ i.first, i.second }));
         return make_array(std::move(out));
     }
     std::shared_ptr<Hash> Hash::to_h()

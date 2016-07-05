@@ -14,7 +14,7 @@ namespace slim
         static const std::string TYPE_NAME;
         Hash();
         Hash(ObjectPtr def_value)
-            : def_value(), map(), insert_order()
+            : def_value(), map(), list()
         {}
 
         virtual const std::string& type_name()const override { return TYPE_NAME; }
@@ -25,7 +25,6 @@ namespace slim
 
         virtual ObjectPtr el_ref(const FunctionArgs &args)override;
 
-        const ObjectMap& get_value()const { return map; }
         void set(ObjectPtr key, ObjectPtr val);
 
         //any?
@@ -66,10 +65,12 @@ namespace slim
     protected:
         virtual const MethodTable &method_table()const;
     private:
+        typedef std::unordered_map<ObjectPtr, size_t, ObjHash, ObjEquals> Map;
+        typedef std::vector<std::pair<ObjectPtr, ObjectPtr>> List;
 
         ObjectPtr def_value;
-        ObjectMap map;
-        std::vector<ObjectMap::iterator> insert_order;
+        Map map;
+        List list;
     };
 
     inline std::shared_ptr<Hash> make_hash(const std::vector<ObjectPtr> &arr)
