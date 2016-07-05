@@ -25,6 +25,7 @@ namespace slim
         virtual ObjectPtr add(Object *rhs);
         std::shared_ptr<Number> to_f();
         std::shared_ptr<Number> to_i();
+        std::shared_ptr<Symbol> to_sym();
     protected:
         virtual const MethodTable &method_table()const;
     private:

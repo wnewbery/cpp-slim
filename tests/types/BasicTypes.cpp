@@ -1,5 +1,6 @@
 #include <boost/test/unit_test.hpp>
 #include "Value.hpp"
+#include "types/Symbol.hpp"
 
 using namespace slim;
 BOOST_AUTO_TEST_SUITE(TestBasicTypes)
@@ -65,6 +66,23 @@ BOOST_AUTO_TEST_CASE(string)
     BOOST_CHECK_EQUAL(false, a->is_true());
     BOOST_CHECK_EQUAL(true, b->is_true());
     BOOST_CHECK_EQUAL(true, c->is_true());
+}
+
+BOOST_AUTO_TEST_CASE(symbol)
+{
+    auto a = slim::symbol("a");
+    auto b = slim::symbol("b");
+    auto a2 = slim::symbol("a");
+    BOOST_CHECK(a == a2);
+    BOOST_CHECK(a != b);
+
+    BOOST_CHECK_EQUAL(":a", a->inspect());
+    BOOST_CHECK_EQUAL("a", a->to_string());
+
+    BOOST_CHECK(a.get() != (Object*)make_value("a").get());
+    BOOST_CHECK(a.get() == (Object*)make_value("a")->to_sym().get());
+    BOOST_CHECK(b.get() == (Object*)make_value("b")->to_sym().get());
+    BOOST_CHECK(a.get() != (Object*)make_value("b")->to_sym().get());
 }
 
 BOOST_AUTO_TEST_CASE(to_f)

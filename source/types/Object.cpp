@@ -154,7 +154,8 @@ namespace slim
         {
             { &String::to_f, "to_f" },
             { &String::to_f, "to_d" },
-            { &String::to_i, "to_i" }
+            { &String::to_i, "to_i" },
+            { &String::to_sym, "to_sym" }
         });
         return table;
     }
@@ -216,6 +217,11 @@ namespace slim
         try { i = std::stoi(v.c_str()); }
         catch (const std::exception &) {}
         return make_value((double)i);
+    }
+
+    std::shared_ptr<Symbol> String::to_sym()
+    {
+        return symbol(v);
     }
 
 
