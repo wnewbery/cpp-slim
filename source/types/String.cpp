@@ -107,7 +107,7 @@ namespace slim
     std::shared_ptr<String> String::capitalize()
     {
         std::string ret = v;
-        if (!ret.empty() && ret[0] >= 'a' && ret[0] <= 'z') ret[0] = ret[0] - 'a' + 'A';
+        if (!ret.empty() && ret[0] >= 'a' && ret[0] <= 'z') ret[0] = (char)(ret[0] - 'a' + 'A');
         return make_value(ret);
     }
 
@@ -153,7 +153,7 @@ namespace slim
         if (width <= (int)v.size()) return make_value(v);
 
         std::string ret = v;
-        for (int i = 0; i < width - v.size(); ++i) ret += padstr[i % padstr.size()];
+        for (int i = 0; i < width - (int)v.size(); ++i) ret += padstr[i % padstr.size()];
         return make_value(ret);
     }
     std::shared_ptr<String> String::rjust(const FunctionArgs & args)
@@ -166,7 +166,7 @@ namespace slim
         if (width <= (int)v.size()) return make_value(v);
 
         std::string ret;
-        for (int i = 0; i < width - v.size(); ++i) ret += padstr[i % padstr.size()];
+        for (int i = 0; i < width - (int)v.size(); ++i) ret += padstr[i % padstr.size()];
         ret += v;
         return make_value(ret);
     }
@@ -276,7 +276,7 @@ namespace slim
         unpack<1>(args, &pattern, &offset);
 
         if (offset < 0) offset = ((int)v.size()) + offset;
-        if (offset < 0 || offset >= v.size()) return NIL_VALUE;
+        if (offset < 0 || offset >= (int)v.size()) return NIL_VALUE;
         auto p = v.find(pattern, (size_t)offset);
         if (p == std::string::npos) return NIL_VALUE;
         else return make_value((double)p);
@@ -326,7 +326,7 @@ namespace slim
             offset = (int)coerce<Number>(args[2])->get_value();
             if (offset < 0) offset = ((int)v.size()) + offset;
         }
-        if (offset < 0 || offset >= v.size()) return NIL_VALUE;
+        if (offset < 0 || offset >= (int)v.size()) return NIL_VALUE;
         auto p = v.rfind(pattern->v, (size_t)offset);
         if (p == std::string::npos) return NIL_VALUE;
         else return make_value((double)p);
