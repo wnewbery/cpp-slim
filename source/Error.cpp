@@ -1,6 +1,8 @@
 #include "Error.hpp"
 #include "types/Object.hpp"
 #include "types/Symbol.hpp"
+#include <sstream>
+#include <cassert>
 namespace slim
 {
     TypeError::TypeError(const Object *type, const std::string &type_name)
@@ -55,5 +57,20 @@ namespace slim
     KeyError::KeyError(ObjectPtr key)
         : ScriptError("Key not found: " + key->to_string())
     {
+    }
+
+    InvalidArgumentCount::InvalidArgumentCount(size_t given, size_t min, size_t max)
+        : ScriptError(make_message(given, min, max))
+    {
+    }
+    std::string InvalidArgumentCount::make_message(size_t given, size_t min, size_t max)
+    {
+        assert(min <= max);
+        std::stringstream ss;
+        ss << "ArgumentError: wrong number of arguments (given " << given << ", expected ";
+        if (min == max) ss << min;
+        else ss << min << ".." << max;
+        ss << ")";
+        return ss.str();
     }
 }

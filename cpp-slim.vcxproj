@@ -32,6 +32,7 @@
     <ClInclude Include="include\slim\expression\Token.hpp" />
     <ClInclude Include="include\slim\Function.hpp" />
     <ClInclude Include="include\slim\BuiltinFunctions.hpp" />
+    <ClInclude Include="include\slim\FunctionHelpers.hpp" />
     <ClInclude Include="include\slim\Maths.hpp" />
     <ClInclude Include="include\slim\Operators.hpp" />
     <ClInclude Include="include\slim\types\Array.hpp" />
@@ -59,6 +60,7 @@
     <ClCompile Include="source\Maths.cpp" />
     <ClCompile Include="source\Operators.cpp" />
     <ClCompile Include="source\types\Array.cpp" />
+    <ClCompile Include="source\types\String.cpp" />
     <ClCompile Include="source\types\Symbol.cpp" />
     <ClCompile Include="source\types\Enumerator.cpp" />
     <ClCompile Include="source\types\Hash.cpp" />

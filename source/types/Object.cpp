@@ -12,7 +12,6 @@ namespace slim
 {
     const std::string Boolean::TYPE_NAME = "Boolean";
     const std::string Nil::TYPE_NAME = "Nil";
-    const std::string String::TYPE_NAME = "String";
 
     const std::shared_ptr<Nil> NIL_VALUE = std::make_shared<Nil>();
     const std::shared_ptr<Boolean> TRUE_VALUE = std::make_shared<Boolean>(true);
@@ -148,37 +147,6 @@ namespace slim
         });
         return table;
     }
-    const MethodTable &String::method_table()const
-    {
-        static const MethodTable table(Object::method_table(),
-        {
-            { &String::to_f, "to_f" },
-            { &String::to_f, "to_d" },
-            { &String::to_i, "to_i" },
-            { &String::to_sym, "to_sym" }
-        });
-        return table;
-    }
-
-    std::string String::inspect()const
-    {
-        std::string out = "\"";
-        for (auto c : v)
-        {
-            switch (c)
-            {
-            case '\\': out += "\\\\"; break;
-            case '\'': out += "\\\'"; break;
-            case '\"': out += "\\\""; break;
-            case '\r': out += "\\r"; break;
-            case '\n': out += "\\n"; break;
-            case '\t': out += "\\t"; break;
-            default: out.push_back(c); break;
-            }
-        }
-        out += "\"";
-        return out;
-    }
 
     ObjectPtr String::add(Object *rhs)
     {
@@ -194,13 +162,6 @@ namespace slim
     {
         return make_value(b ? 1.0 : 0.0);
     }
-    std::shared_ptr<Number> String::to_f()
-    {
-        double d = 0;
-        try { d = std::stod(v.c_str()); }
-        catch (const std::exception &) {}
-        return make_value(d);
-    }
 
     //to_i
     std::shared_ptr<Number> Nil::to_i()
@@ -210,18 +171,6 @@ namespace slim
     std::shared_ptr<Number> Boolean::to_i()
     {
         return make_value(b ? 1.0 : 0.0);
-    }
-    std::shared_ptr<Number> String::to_i()
-    {
-        int i = 0;
-        try { i = std::stoi(v.c_str()); }
-        catch (const std::exception &) {}
-        return make_value((double)i);
-    }
-
-    std::shared_ptr<Symbol> String::to_sym()
-    {
-        return symbol(v);
     }
 
 

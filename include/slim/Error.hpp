@@ -70,8 +70,17 @@ namespace slim
     class InvalidArgument : public ScriptError
     {
     public:
+        InvalidArgument() : ScriptError("InvalidArgument") {}
         InvalidArgument(const std::string &method_name);
         InvalidArgument(const Object *obj, const std::string &method_name);
         InvalidArgument(const Object *obj, const std::string &method_name, const std::string &msg);
+    };
+
+    class InvalidArgumentCount : public ScriptError
+    {
+    public:
+        InvalidArgumentCount(size_t given, size_t min, size_t max);
+    protected:
+        static std::string make_message(size_t given, size_t min, size_t max);
     };
 }
