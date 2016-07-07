@@ -10,11 +10,11 @@ using namespace slim;
 using namespace slim::expr;
 BOOST_AUTO_TEST_SUITE(TestExprParser)
 
+auto f = [](const FunctionArgs &args) -> ObjectPtr { return nullptr; };
+FunctionTable functions = { { f, "f" } }; // keep in scope for tests, else invalidates returned ExpressionNodePtr
 ExpressionNodePtr parse(const std::string &str)
 {
-    auto f = [](const FunctionArgs &args) -> ObjectPtr { return nullptr; };
     Lexer lexer(str);
-    FunctionTable functions = {{f, "f"}};
     
     Parser parser(functions, lexer);
     return parser.parse_expression();
