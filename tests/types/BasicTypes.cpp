@@ -1,9 +1,25 @@
 #include <boost/test/unit_test.hpp>
 #include "Value.hpp"
 #include "types/Symbol.hpp"
+#include "expression/Parser.hpp"
+#include "expression/Ast.hpp"
+#include "expression/Lexer.hpp"
+#include "expression/Scope.hpp"
 
 using namespace slim;
+using namespace slim::expr;
 BOOST_AUTO_TEST_SUITE(TestBasicTypes)
+
+std::string eval(const std::string &str)
+{
+    FunctionTable functions;
+    Lexer lexer(str);
+    Parser parser(functions, lexer);
+    auto expr = parser.parse_expression();
+    Scope scope;
+    auto result = expr->eval(scope);
+    return result->inspect();
+}
 
 BOOST_AUTO_TEST_CASE(boolean)
 {
@@ -19,6 +35,11 @@ BOOST_AUTO_TEST_CASE(boolean)
     BOOST_CHECK_EQUAL("false", false_val->to_string());
     BOOST_CHECK_EQUAL(true, true_val->is_true());
     BOOST_CHECK_EQUAL(false, false_val->is_true());
+    
+    BOOST_CHECK_EQUAL("\"true\"", eval("true.to_s"));
+    BOOST_CHECK_EQUAL("\"true\"", eval("true.inspect"));
+    BOOST_CHECK_EQUAL("1", eval("true.to_i"));
+    BOOST_CHECK_EQUAL("0", eval("false.to_i"));
 }
 
 BOOST_AUTO_TEST_CASE(nil)
@@ -31,6 +52,9 @@ BOOST_AUTO_TEST_CASE(nil)
     BOOST_CHECK_EQUAL("Nil", nil_val->type_name());
     BOOST_CHECK_EQUAL("nil", nil_val->to_string());
     BOOST_CHECK_EQUAL(false, nil_val->is_true());
+    BOOST_CHECK_EQUAL("\"nil\"", eval("nil.to_s"));
+    BOOST_CHECK_EQUAL("\"nil\"", eval("nil.inspect"));
+    BOOST_CHECK_EQUAL("0", eval("nil.to_i"));
 }
 
 BOOST_AUTO_TEST_CASE(number)
@@ -47,6 +71,7 @@ BOOST_AUTO_TEST_CASE(number)
     BOOST_CHECK_EQUAL(true, a->is_true());
     BOOST_CHECK_EQUAL(false, b->is_true());
     BOOST_CHECK_EQUAL(true, c->is_true());
+    BOOST_CHECK_THROW(eval("5[0]"), NoSuchMethod);
 }
 
 BOOST_AUTO_TEST_CASE(string)
@@ -66,6 +91,7 @@ BOOST_AUTO_TEST_CASE(string)
     BOOST_CHECK_EQUAL(false, a->is_true());
     BOOST_CHECK_EQUAL(true, b->is_true());
     BOOST_CHECK_EQUAL(true, c->is_true());
+    BOOST_CHECK_EQUAL("\"t\"", eval("'test'[0]"));
 }
 
 BOOST_AUTO_TEST_CASE(symbol)

@@ -119,6 +119,11 @@ BOOST_AUTO_TEST_CASE(binary)
     BOOST_CHECK_EQUAL(10.0, to_d(a->mul(b.get())));
     BOOST_CHECK_THROW(a->mul(c.get()), TypeError);
     BOOST_CHECK_THROW(c->mul(d.get()), NoSuchMethod);
+    
+    //pow
+    BOOST_CHECK_EQUAL(32.0, to_d(a->pow(b.get())));
+    BOOST_CHECK_THROW(a->pow(c.get()), TypeError);
+    BOOST_CHECK_THROW(c->pow(d.get()), NoSuchMethod);
 
     //div
     BOOST_CHECK_EQUAL(2.0 / 5.0, to_d(a->div(b.get())));
@@ -144,6 +149,31 @@ BOOST_AUTO_TEST_CASE(binary)
     BOOST_CHECK_EQUAL(3.0, to_d(b->sub(a.get())));
     BOOST_CHECK_THROW(a->sub(c.get()), TypeError);
     BOOST_CHECK_THROW(c->sub(d.get()), NoSuchMethod);
+    
+    //lshift
+    BOOST_CHECK_EQUAL(2 << 5, to_d(a->bit_lshift(b.get())));
+    BOOST_CHECK_THROW(a->bit_lshift(c.get()), TypeError);
+    BOOST_CHECK_THROW(c->bit_lshift(d.get()), NoSuchMethod);
+    
+    //rshift
+    BOOST_CHECK_EQUAL(2 >> 5, to_d(a->bit_rshift(b.get())));
+    BOOST_CHECK_THROW(a->bit_rshift(c.get()), TypeError);
+    BOOST_CHECK_THROW(c->bit_rshift(d.get()), NoSuchMethod);
+    
+    //and
+    BOOST_CHECK_EQUAL(2 & 5, to_d(a->bit_and(b.get())));
+    BOOST_CHECK_THROW(a->bit_and(c.get()), TypeError);
+    BOOST_CHECK_THROW(c->bit_and(d.get()), NoSuchMethod);
+    
+    //or
+    BOOST_CHECK_EQUAL(2 | 5, to_d(a->bit_or(b.get())));
+    BOOST_CHECK_THROW(a->bit_or(c.get()), TypeError);
+    BOOST_CHECK_THROW(c->bit_or(d.get()), NoSuchMethod);
+    
+    //xor
+    BOOST_CHECK_EQUAL(2 ^ 5, to_d(a->bit_xor(b.get())));
+    BOOST_CHECK_THROW(a->bit_xor(c.get()), TypeError);
+    BOOST_CHECK_THROW(c->bit_xor(d.get()), NoSuchMethod);
 }
 BOOST_AUTO_TEST_CASE(unary)
 {
@@ -151,6 +181,10 @@ BOOST_AUTO_TEST_CASE(unary)
     auto b = make_value(0.0);
     auto c = make_value("55");
     auto d = make_value("");
+    
+    //bit not
+    BOOST_CHECK_EQUAL(double(~(int)2), to_d(a->bit_not()));
+    BOOST_CHECK_THROW(c->bit_not(), NoSuchMethod);
 
     //not
     BOOST_CHECK(!op_not(a.get())->is_true());

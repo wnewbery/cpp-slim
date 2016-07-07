@@ -20,11 +20,6 @@ namespace slim
         if (lhs_t == rhs_t) return lhs->cmp(rhs);
         else throw UnorderableTypeError(lhs, op, rhs);
     }
-    void eq_operands(const Object *lhs, const char *op, const Object *rhs)
-    {
-        if (typeid(*lhs) != typeid(*rhs))
-            throw UnsupportedOperandTypeError(lhs, op, rhs);
-    }
 
     bool eq(const Object *lhs, const Object *rhs)
     {

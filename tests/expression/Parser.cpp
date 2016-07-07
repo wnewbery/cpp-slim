@@ -12,8 +12,10 @@ BOOST_AUTO_TEST_SUITE(TestExprParser)
 
 ExpressionNodePtr parse(const std::string &str)
 {
+    auto f = [](const FunctionArgs &args) -> ObjectPtr { return nullptr; };
     Lexer lexer(str);
-    FunctionTable functions;
+    FunctionTable functions = {{f, "f"}};
+    
     Parser parser(functions, lexer);
     return parser.parse_expression();
 }
@@ -69,6 +71,7 @@ BOOST_AUTO_TEST_CASE(single_ops)
 
     BOOST_CHECK_EQUAL("(5 == 10)", parse("5 == 10")->to_string());
     BOOST_CHECK_EQUAL("(5 != 10)", parse("5 != 10")->to_string());
+    BOOST_CHECK_EQUAL("(5 <=> 10)", parse("5 <=> 10")->to_string());
     BOOST_CHECK_EQUAL("(5 < 10)", parse("5 < 10")->to_string());
     BOOST_CHECK_EQUAL("(5 <= 10)", parse("5 <= 10")->to_string());
     BOOST_CHECK_EQUAL("(5 > 10)", parse("5 > 10")->to_string());
@@ -85,6 +88,7 @@ BOOST_AUTO_TEST_CASE(single_ops)
     BOOST_CHECK_EQUAL("(5 - 10)", parse("5 - 10")->to_string());
 
     BOOST_CHECK_EQUAL("(5 * 10)", parse("5 * 10")->to_string());
+    BOOST_CHECK_EQUAL("(5 ** 2)", parse("5 ** 2")->to_string());
     BOOST_CHECK_EQUAL("(5 / 10)", parse("5 / 10")->to_string());
     BOOST_CHECK_EQUAL("(5 % 10)", parse("5 % 10")->to_string());
 
@@ -130,6 +134,10 @@ BOOST_AUTO_TEST_CASE(string_interp)
 
 BOOST_AUTO_TEST_CASE(method_call)
 {
+    BOOST_CHECK_EQUAL("f()", parse("f()")->to_string());
+    BOOST_CHECK_EQUAL("f(5)", parse("f(5)")->to_string());
+    BOOST_CHECK_EQUAL("f(5, true)", parse("f(5, true)")->to_string());
+    
     BOOST_CHECK_EQUAL("a.f()", parse("a.f")->to_string());
     BOOST_CHECK_EQUAL("a.f()", parse("a.f()")->to_string());
     BOOST_CHECK_EQUAL("a.f(5)", parse("a.f(5)")->to_string()); //because groups dont exist in the AST
@@ -211,6 +219,13 @@ BOOST_AUTO_TEST_CASE(basic_syntax_errors)
     BOOST_CHECK_THROW(parse("a[,a]"), SyntaxError);
     BOOST_CHECK_THROW(parse("a["), SyntaxError);
     BOOST_CHECK_THROW(parse("a[a"), SyntaxError);
+    
+    BOOST_CHECK_THROW(parse("a.f{"), SyntaxError);
+    BOOST_CHECK_THROW(parse("a.f{|"), SyntaxError);
+    BOOST_CHECK_THROW(parse("a.f{|x"), SyntaxError);
+    BOOST_CHECK_THROW(parse("a.f{||"), SyntaxError);
+    BOOST_CHECK_THROW(parse("a.f{||}"), SyntaxError);
+    BOOST_CHECK_THROW(parse("a.f{||x"), SyntaxError);
     //array
     BOOST_CHECK_THROW(parse("["), SyntaxError);
     BOOST_CHECK_THROW(parse("]"), SyntaxError);

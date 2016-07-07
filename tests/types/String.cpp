@@ -108,6 +108,17 @@ BOOST_AUTO_TEST_CASE(access)
     BOOST_CHECK_EQUAL("nil", eval("'hello world'.index 'll', 3"));
     BOOST_CHECK_EQUAL("9", eval("'hello world'.index 'l', 4"));
     BOOST_CHECK_EQUAL("nil", eval("'hello world'.index 'l', 10"));
+    
+    BOOST_CHECK_EQUAL("9", eval("'hello world'.rindex 'l'"));
+    BOOST_CHECK_EQUAL("nil", eval("'hello world'.rindex 'x'"));
+    BOOST_CHECK_EQUAL("nil", eval("'hello world'.rindex 'llx'"));
+    BOOST_CHECK_EQUAL("nil", eval("'hello world'.rindex 'l', 1"));
+    BOOST_CHECK_EQUAL("2", eval("'hello world'.rindex 'l', 2"));
+    BOOST_CHECK_EQUAL("2", eval("'hello world'.rindex 'll', 2"));
+    BOOST_CHECK_EQUAL("3", eval("'hello world'.rindex 'l', 3"));
+    BOOST_CHECK_EQUAL("2", eval("'hello world'.rindex 'll', 3"));
+    BOOST_CHECK_EQUAL("9", eval("'hello world'.rindex 'l', 9"));
+    BOOST_CHECK_EQUAL("9", eval("'hello world'.rindex 'l', 10"));
 
 
     BOOST_CHECK_EQUAL("[\"hello\", \" \", \"world\"]", eval("'hello world'.partition ' '"));

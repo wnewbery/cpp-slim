@@ -320,13 +320,14 @@ namespace slim
     {
         if (args.size() < 1 && args.size() > 2) throw InvalidArgument(this, "index");
         auto pattern = coerce<String>(args[0]);
-        int offset = 0;
+        int offset = (int)v.size();
         if (args.size() == 2)
         {
-            offset = (int)coerce<Number>(args[2])->get_value();
+            offset = (int)coerce<Number>(args[1])->get_value();
             if (offset < 0) offset = ((int)v.size()) + offset;
         }
-        if (offset < 0 || offset >= (int)v.size()) return NIL_VALUE;
+        if (offset < 0) return NIL_VALUE;
+        if (offset >= (int)v.size()) offset = (int)v.size();
         auto p = v.rfind(pattern->v, (size_t)offset);
         if (p == std::string::npos) return NIL_VALUE;
         else return make_value((double)p);

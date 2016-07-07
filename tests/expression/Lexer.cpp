@@ -1,7 +1,9 @@
 #include <boost/test/unit_test.hpp>
 #include "expression/Lexer.hpp"
 #include "expression/Token.hpp"
+#include "Error.hpp"
 
+using namespace slim;
 using namespace slim::expr;
 BOOST_AUTO_TEST_SUITE(TestExprLexer)
 
@@ -92,6 +94,11 @@ BOOST_AUTO_TEST_CASE(single_tokens)
     tok = single_token("test_func55:");
     BOOST_CHECK_EQUAL(Token::HASH_SYMBOL, tok.type);
     BOOST_CHECK_EQUAL("test_func55", tok.str);
+    
+    // invalid tokens
+    BOOST_CHECK_THROW(single_token("=+"), SyntaxError);
+    BOOST_CHECK_THROW(Lexer("\\g'").next_str_interp('\''), SyntaxError);
+    BOOST_CHECK_THROW(single_token("@"), SyntaxError);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

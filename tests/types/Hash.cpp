@@ -20,7 +20,7 @@ std::string eval(const std::string &str, Scope &scope)
     Parser parser(functions, lexer);
     auto expr = parser.parse_expression();
     auto result = expr->eval(scope);
-    return result->to_string();
+    return result->inspect();
 }
 std::string eval(const std::string &str)
 {
@@ -85,6 +85,8 @@ BOOST_AUTO_TEST_CASE(basic_access)
     BOOST_CHECK_EQUAL("5", eval("c['a']", scope));
     BOOST_CHECK_EQUAL("20", eval("c['10']", scope));
     BOOST_CHECK_EQUAL("nil", eval("c[10]", scope));
+    BOOST_CHECK_EQUAL("1", eval("{{a: 5} => 1, y: 2}[{a: 5}]"));
+    BOOST_CHECK_EQUAL("nil", eval("{{a: 4} => 1, y: 2}[{a: 5}]"));
     //fetch(index)
     BOOST_CHECK_EQUAL("5", eval("c.fetch('a')", scope));
     BOOST_CHECK_THROW(eval("c.fetch('x')", scope), KeyError);
@@ -93,6 +95,12 @@ BOOST_AUTO_TEST_CASE(basic_access)
     BOOST_CHECK_EQUAL("2", eval("a.fetch('a', 2)", scope));
     BOOST_CHECK_EQUAL("20", eval("c.fetch('10', 88)", scope));
     BOOST_CHECK_EQUAL("88", eval("c.fetch(10, 88)", scope));
+    
+    
+    //key
+    BOOST_CHECK_EQUAL(":a", eval("{b: 6, a: 4}.key 4"));
+    BOOST_CHECK_EQUAL(":a", eval("{b: 6, a: 4, c: 4}.key 4"));
+    BOOST_CHECK_EQUAL("nil", eval("{b: 6, a: 4, c: 4}.key 5"));
 
     //key?
     BOOST_CHECK_EQUAL("true", eval("c.key?('10')", scope));
@@ -118,9 +126,10 @@ BOOST_AUTO_TEST_CASE(flatten)
     BOOST_CHECK_EQUAL("[:a, 5, :b, 15, 20, -1, -2]", eval("{a: 5, b: [15, 20, [-1, -2]]}.flatten 3"));
 }
 
-BOOST_AUTO_TEST_CASE(to_a)
+BOOST_AUTO_TEST_CASE(convert)
 {
     BOOST_CHECK_EQUAL("[[:a, 5], [:b, 10]]", eval("{a: 5, b: 10}.to_a"));
+    BOOST_CHECK_EQUAL("{:a => 5, :b => 10}", eval("{a: 5, b: 10}.to_h"));
 }
 
 BOOST_AUTO_TEST_CASE(merge)
