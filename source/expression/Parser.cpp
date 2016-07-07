@@ -74,7 +74,7 @@ namespace slim
             auto lit = [this](ObjectPtr val) { return next(), slim::make_unique<Literal>(val); };
             switch (current_token.type)
             {
-            case Token::STRING: return lit(make_value(current_token.str));
+            case Token::STRING_DELIM: return interp_string();
             case Token::NUMBER: return lit(make_value(parse_num(current_token.str)));
             case Token::SYMBOL:
                 if (current_token.str == "true") return lit(TRUE_VALUE);
@@ -103,6 +103,58 @@ namespace slim
                 return lit(symbol(current_token.str));
             default: throw SyntaxError("Expected value");
             }
+        }
+
+        ExpressionNodePtr Parser::interp_string()
+        {
+            assert(current_token.type == Token::STRING_DELIM);
+            std::vector<ExpressionNodePtr> parts;
+            bool interp = false;
+            char delim = current_token.str[0];
+
+            do
+            {
+                current_token = lexer.next_str_interp(delim);
+                switch (current_token.type)
+                {
+                case Token::STRING_DELIM: break;
+                case Token::STRING_TEXT:
+                    parts.push_back(slim::make_unique<Literal>(make_value(current_token.str)));
+                    break;
+                case Token::STRING_INTERP_START:
+                {
+                    interp = true;
+                    next();
+                    auto expr = expression();
+                    if (current_token.type != Token::R_CURLY_BRACKET) throw SyntaxError("Expected '}'");
+                    parts.push_back(slim::make_unique<MemberFuncCall>(
+                        std::move(expr),
+                        symbol("to_s"),
+                        FuncCall::Args()));
+                    break;
+                }
+                default: throw SyntaxError("Unexpected token in interpolated string");
+                }
+            }
+            while (current_token.type != Token::STRING_DELIM);
+            next();
+
+            if (!interp)
+            {
+                //single string text
+                assert(parts.size() <= 1);
+                if (parts.size() == 1)
+                {
+                    return std::move(parts[0]);
+                }
+            }
+
+            ExpressionNodePtr lhs = slim::make_unique<Literal>(make_value(""));
+            for (size_t i = 0; i < parts.size(); ++i)
+            {
+                lhs = slim::make_unique<Add>(std::move(lhs), std::move(parts[i]));
+            }
+            return lhs;
         }
 
         ExpressionNodePtr Parser::array_literal()
@@ -171,7 +223,7 @@ namespace slim
         {
             switch (current_token.type)
             {
-            case Token::STRING:
+            case Token::STRING_DELIM:
             case Token::NUMBER:
             case Token::SYMBOL:
                 return true;

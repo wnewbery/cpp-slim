@@ -34,11 +34,7 @@ namespace slim
         Token Lexer::next()
         {
             skip_ws();
-            if (p == end)
-            {
-                ++p;
-                return Token::END;
-            }
+            if (p == end) return ++p, Token::END;
             else if (p > end) error("Unexpected end");
 
             char peek = *p;
@@ -61,7 +57,8 @@ namespace slim
             case '?': ++p; return Token::CONDITIONAL;
             case '\'':
             case '\"':
-                return quoted_string();
+                ++p;
+                return {Token::STRING_DELIM, { p - 1, 1 }};
             case '*':
                 if (p + 1 >= end) error("Unexpected end");
                 if (p[1] == '*') return p += 2, Token::POW;
@@ -110,25 +107,18 @@ namespace slim
                 else error(std::string("Unexpected: ") + peek);
             }
         }
-        void Lexer::skip_ws()
+        Token Lexer::next_str_interp(char delim)
         {
-            while (p < end && is_ws_chr(*p)) ++p;
-        }
-        Token Lexer::quoted_string()
-        {
-            assert(*p == '\'' || *p == '"');
-            char delim = *p;
+            if (p == end) return ++p, Token::END;
+            else if (p > end) error("Unexpected end");
+
+            if (*p == delim) return ++p, Token::STRING_DELIM;
+            if (p + 1 < end && p[0] == '#' && p[1] == '{') return p += 2, Token::STRING_INTERP_START;
+
             std::string str;
-            ++p;
-            while (true)
+            while (p < end)
             {
-                if (p >= end) error("Unexpected end in string");
-                else if (*p == delim)
-                {
-                    ++p;
-                    break;
-                }
-                else if (*p == '\\')
+                if (*p == '\\')
                 {
                     if (p + 1 >= end) error("Unexpected end in string");
                     switch (p[1])
@@ -139,9 +129,18 @@ namespace slim
                     case 't': str.push_back('\t'); break;
                     case 'r': str.push_back('\r'); break;
                     case 'n': str.push_back('\n'); break;
+                    case '#': str.push_back('#'); break;
                     default: error(std::string("Unknown string escape code ") + p[1]);
                     }
                     p += 2;
+                }
+                else if (*p == '#' && p + 1 < end && p[1] == '{')
+                {
+                    break; //next token will be STRING_INTERP_START
+                }
+                else if (*p == delim)
+                {
+                    break; //next token will be STRING_DELIM
                 }
                 else
                 {
@@ -149,8 +148,14 @@ namespace slim
                     ++p;
                 }
             }
-            return { Token::STRING, str };
+
+            return{ Token::STRING_TEXT, str };
         }
+        void Lexer::skip_ws()
+        {
+            while (p < end && is_ws_chr(*p)) ++p;
+        }
+        
         Token Lexer::symbol()
         {
             assert(is_symbol_start_chr(*p));

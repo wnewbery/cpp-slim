@@ -13,13 +13,14 @@ namespace slim
             Lexer(const std::string &str) : Lexer(str.data(), str.size()) {}
 
             Token next();
+            /**STRING_TEXT, STRING_INTERP_START, STRING_TERM*/
+            Token next_str_interp(char delim);
 
         private:
             const char *start, *p, *end;
 
             [[noreturn]] void error(const std::string &msg);
             void skip_ws();
-            Token quoted_string();
             Token symbol();
             Token number(bool negative);
         };

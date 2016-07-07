@@ -117,6 +117,17 @@ BOOST_AUTO_TEST_CASE(grouping)
     BOOST_CHECK_EQUAL("[2, (5 + 5), a.f()]", parse("[2,5+5,a.f]")->to_string());
 }
 
+BOOST_AUTO_TEST_CASE(string_interp)
+{
+    BOOST_CHECK_EQUAL("\"hello world\"", parse("'hello world'")->to_string());
+    BOOST_CHECK_EQUAL("((\"\" + \"hello \") + x.to_s())", parse("'hello #{x}'")->to_string());
+    BOOST_CHECK_EQUAL("((\"\" + \"hello \") + (x + y).to_s())", parse("'hello #{x + y}'")->to_string());
+    BOOST_CHECK_EQUAL("((\"\" + \"hello \") + \"nested\".to_s())", parse("'hello #{'nested'}'")->to_string());
+    BOOST_CHECK_EQUAL(
+        "((\"\" + \"hello \") + (((\"\" + \"nested \") + x.to_s()) + \" interp\").to_s())",
+        parse("'hello #{'nested #{x} interp'}'")->to_string());
+}
+
 BOOST_AUTO_TEST_CASE(method_call)
 {
     BOOST_CHECK_EQUAL("a.f()", parse("a.f")->to_string());

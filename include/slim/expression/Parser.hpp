@@ -33,6 +33,8 @@ namespace slim
             ExpressionNodePtr sub_expression();
             /** A literal value, variable, or global function call. */
             ExpressionNodePtr value();
+            /** An interpolated string literal. */
+            ExpressionNodePtr interp_string();
             /** Array [a, b, c] literal */
             ExpressionNodePtr array_literal();
             /** Hash {key: value, 'key2' => 5} literal */

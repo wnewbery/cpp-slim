@@ -12,8 +12,12 @@ namespace slim
             enum Type
             {
                 END = 0,
-                /**A string literal. Value stored in str.*/
-                STRING,
+                /**String start/terminator*/
+                STRING_DELIM,
+                /**Literal text in string.*/
+                STRING_TEXT,
+                /** #{ */
+                STRING_INTERP_START,
                 /**A non-negative number literal. Unparsed value stored in str.*/
                 NUMBER,
                 /**A symbol.
@@ -73,20 +77,6 @@ namespace slim
 
             Type type;
             std::string str;
-
-            bool value_start()const
-            {
-                switch(type)
-                {
-                case STRING:
-                case NUMBER:
-                case SYMBOL:
-                case LPAREN:
-                    return true;
-                default:
-                    return false;
-                }
-            }
         };
     }
 }

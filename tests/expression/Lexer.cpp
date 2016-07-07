@@ -54,9 +54,16 @@ BOOST_AUTO_TEST_CASE(single_tokens)
     BOOST_CHECK_EQUAL(Token::CMP_GE, single_token(">= ").type);
     BOOST_CHECK_EQUAL(Token::CMP, single_token("<=>").type);
 
-    auto tok = single_token("'string \\\\ \\' \\\" \\t \\n \\r end'");
-    BOOST_CHECK_EQUAL(Token::STRING, tok.type);
-    BOOST_CHECK_EQUAL("string \\ \' \" \t \n \r end", tok.str);
+    BOOST_CHECK_EQUAL(Token::STRING_DELIM, single_token("'").type);
+    BOOST_CHECK_EQUAL(Token::STRING_DELIM, single_token("\"").type);
+
+    auto tok = Lexer("string \\\\ \\' \\\" \\t \\n \\r # \\#{} end\"").next_str_interp('"');
+    BOOST_CHECK_EQUAL(Token::STRING_TEXT, tok.type);
+    BOOST_CHECK_EQUAL("string \\ \' \" \t \n \r # #{} end", tok.str);
+
+    BOOST_CHECK_EQUAL(Token::STRING_TEXT, Lexer("'").next_str_interp('"').type);
+    BOOST_CHECK_EQUAL(Token::STRING_DELIM, Lexer("'").next_str_interp('\'').type);
+    BOOST_CHECK_EQUAL(Token::STRING_INTERP_START, Lexer("#{").next_str_interp('"').type);
 
     tok = single_token("054335.2250");
     BOOST_CHECK_EQUAL(Token::NUMBER, tok.type);
