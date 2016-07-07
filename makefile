@@ -2,8 +2,8 @@ LIBS :=
 CFLAGS := -Wall -Wconversion -std=c++11
 LDFLAGS :=
 
-CFLAGS += -g
-LDFLAGS += -g
+CFLAGS += -g --coverage
+LDFLAGS += -g --coverage
 
 INC_DIRS := include/slim source
 OBJ_DIR := obj/lib
@@ -21,7 +21,7 @@ DEPS := $(OBJECTS:.o=.d) $(TEST_OBJECTS:.o=.d)
 
 all: build test
 clean:
-	rm -rf $(CLEAN_FILES)
+	rm -rf $(CLEAN_FILES) coverage
 
 build: bin/libslim.a
 
@@ -41,7 +41,12 @@ $(TEST_OBJ_DIR)/%.cpp.o: %.cpp
 	g++ $(CFLAGS) $(addprefix -I, $(INC_DIRS)) -c  -MMD -MP $< -o $@
 
 test: bin/test
+	@mkdir -p coverage
+	rm -f coverage/all.info coverage/coverage.info
 	bin/test
+	lcov --capture --directory obj --base-directory . --output-file coverage/all.info -q
+	lcov --extract coverage/all.info $(shell pwd)/include/\* $(shell pwd)/source/\* --output-file coverage/coverage.info -q
+	genhtml coverage/coverage.info --output-directory coverage/
 
 -include $(DEPS)
 

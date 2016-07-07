@@ -8,3 +8,6 @@
 /*.user
 /cpp-slim.VC.VC.opendb
 /cpp-slim.VC.db
+/coverage
+/obj
+/bin
