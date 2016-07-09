@@ -10,28 +10,31 @@ namespace slim
     }
     typedef expr::Scope ViewModel;
 
-    /**@brief A part of a template.
-     * This is essentially an abstract syntax tree with all the adjacent plain text nodes merged.
-     */
-    class TemplatePart
+    namespace tpl
     {
-    public:
-        virtual ~TemplatePart(){};
-
-        /**Converts the template part into a string representation, mainly for debugging.
-         * Because the origenal template structure has all ready been lost, as it was converted
-         * to plain HTML fragments with script blocks, the output will use the Ruby ERB syntax,
-         * without any whitespace formatting.
+        /**@brief A part of a template.
+         * This is essentially an abstract syntax tree with all the adjacent plain text nodes merged.
          */
-        virtual std::string to_string()const = 0;
-        /**Renders this part to the buffer, using the specified variable scope.*/
-        virtual void render(std::string &buffer, expr::Scope &scope)const = 0;
-    };
+        class TemplatePart
+        {
+        public:
+            virtual ~TemplatePart() {};
+
+            /**Converts the template part into a string representation, mainly for debugging.
+             * Because the origenal template structure has all ready been lost, as it was converted
+             * to plain HTML fragments with script blocks, the output will use the Ruby ERB syntax,
+             * without any whitespace formatting.
+             */
+            virtual std::string to_string()const = 0;
+            /**Renders this part to the buffer, using the specified variable scope.*/
+            virtual void render(std::string &buffer, expr::Scope &scope)const = 0;
+        };
+    }
     /**@brief A parsed template, ready to be rendered using variables in a ViewModel.*/
     class Template
     {
     public:
-        Template(std::unique_ptr<TemplatePart> &&root)
+        Template(std::unique_ptr<tpl::TemplatePart> &&root)
             : root(std::move(root))
         {}
 
@@ -48,6 +51,6 @@ namespace slim
         }
     private:
         /**The root TemplatePart part. Most likely a TemplatePartsList, but this is not garunteed.*/
-        std::unique_ptr<TemplatePart> root;
+        std::unique_ptr<tpl::TemplatePart> root;
     };
 }

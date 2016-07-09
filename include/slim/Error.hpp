@@ -26,11 +26,24 @@ namespace slim
     {
     public:
         using ScriptError::ScriptError;
+        //TODO: Be useful to add the source file and position
     };
-    class TypeError : public ScriptError
+    class TemplateSyntaxError : public SyntaxError
     {
     public:
-        TypeError(const std::string &msg) : ScriptError(msg) {}
+        using SyntaxError::SyntaxError;
+    };
+
+    class RuntimeError : public ScriptError
+    {
+    public:
+        using ScriptError::ScriptError;
+        //TODO: Be useful to add the script stack trace here
+    };
+    class TypeError : public RuntimeError
+    {
+    public:
+        TypeError(const std::string &msg) : RuntimeError(msg) {}
         TypeError(const Object *type, const std::string &type_name);
     };
     class IndexError : public ScriptError

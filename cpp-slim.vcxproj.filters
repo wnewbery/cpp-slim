@@ -22,7 +22,7 @@
     <Filter Include="include\template">
       <UniqueIdentifier>{bb95994d-0aef-43cb-bf3e-588b91b27ab3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\tremplate">
+    <Filter Include="source\template">
       <UniqueIdentifier>{92b95346-af60-4007-bdff-53163bf1f33f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -114,6 +114,12 @@
     <ClInclude Include="include\slim\template\TemplateParts.hpp">
       <Filter>include\template</Filter>
     </ClInclude>
+    <ClInclude Include="include\slim\template\Lexer.hpp">
+      <Filter>include\template</Filter>
+    </ClInclude>
+    <ClInclude Include="include\slim\template\Token.hpp">
+      <Filter>include\template</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\types\Object.cpp">
@@ -174,7 +180,10 @@
       <Filter>source\types</Filter>
     </ClCompile>
     <ClCompile Include="source\template\TemplateParts.cpp">
-      <Filter>source\tremplate</Filter>
+      <Filter>source\template</Filter>
+    </ClCompile>
+    <ClCompile Include="source\template\Lexer.cpp">
+      <Filter>source\template</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

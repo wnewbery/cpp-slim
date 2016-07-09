@@ -6,7 +6,7 @@
 namespace slim
 {
     TypeError::TypeError(const Object *type, const std::string &type_name)
-        : ScriptError(type->type_name() + " can not be converted to " + type_name)
+        : RuntimeError(type->type_name() + " can not be converted to " + type_name)
     {
     }
     UnorderableTypeError::UnorderableTypeError(const Object *lhs, const char *op, const Object *rhs)

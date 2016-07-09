@@ -15,6 +15,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)third_party\boost\stage-$(Platform)\lib\;$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
