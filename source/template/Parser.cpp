@@ -10,64 +10,94 @@ namespace slim
 {
     namespace tpl
     {
+        Parser::OutputFrame& Parser::OutputFrame::operator << (const std::string &text_content)
+        {
+            this->text_content += text_content;
+            return *this;
+        }
+        Parser::OutputFrame& Parser::OutputFrame::operator << (char txt_chr)
+        {
+            this->text_content += txt_chr;
+            return *this;
+        }
+
+        std::unique_ptr<TemplatePart> Parser::OutputFrame::make_tpl()
+        {
+            if (!text_content.empty())
+            {
+                contents.push_back(slim::make_unique<TemplateText>(std::move(text_content)));
+            }
+            if (contents.size() > 1)
+            {
+                return slim::make_unique<TemplatePartsList>(std::move(contents));
+            }
+            else if (contents.size() == 1)
+            {
+                return std::move(contents[0]);
+            }
+            else return slim::make_unique<TemplateText>(std::string());
+        }
+
         Parser::Parser(Lexer &lexer)
             : lexer(lexer)
         {}
         Parser::~Parser()
         {}
 
-
         Template Parser::parse()
         {
-            output_stack.push({-1});
-            parse_lines();
-            if (current_token.type != Token::END) throw TemplateSyntaxError("Expected end");
-            assert(input_stack.empty());
-            assert(output_stack.size() == 1);
-            
-            auto root = finish_output_frame();
-
-            return Template(std::move(root));
-        }
-
-        void Parser::parse_lines()
-        {
-            assert(!output_stack.empty());
-            assert(input_stack.empty() || input_stack.top().indent == output_stack.top().indent);
-            int base_indent = output_stack.top().indent;
-
+            OutputFrame root;
             current_token = lexer.next_indent();
-            while (current_token.type != Token::END && (int)current_token.str.size() > base_indent)
-            {
-                close_tags((int)current_token.str.size());
-                parse_line();
-                if (current_token.type == Token::END) break;
-                else current_token = lexer.next_indent();
-            }
-            close_tags(base_indent);
+            parse_lines(-1, root);
+            auto root_tpl = root.make_tpl();
+            return Template(std::move(root_tpl));
         }
-        void Parser::parse_line()
-        {
-            assert(current_token.type == Token::INDENT);
-            int my_indent = (int)current_token.str.size();
 
-            //Only support simple elements right now!
-            current_token = lexer.next_line_start();
+        void Parser::parse_lines(int base_indent, OutputFrame &output)
+        {
+            while (current_token.type != Token::END)
+            {
+                assert(current_token.type == Token::INDENT);
+                int my_indent = (int)current_token.str.size();
+                if (my_indent <= base_indent) return;
+
+                current_token = lexer.next_line_start();
+                switch (current_token.type)
+                {
+                case Token::TEXT_LINE:
+                    parse_text_line(my_indent, output);
+                    break;
+                case Token::TEXT_LINE_WITH_TRAILING_SPACE:
+                    parse_text_line(my_indent, output);
+                    output << ' ';
+                    break;
+                case Token::NAME:
+                    parse_tag(my_indent, output);
+                    break;
+                default: throw TemplateSyntaxError("Unexpected symbol");
+                }
+            }
+        }
+
+        void Parser::parse_text_line(int base_indent, OutputFrame & output)
+        {
+            current_token = lexer.next_text_content();
             switch (current_token.type)
             {
-            case Token::NAME: return parse_tag(my_indent);
-            case Token::TEXT_LINE:
-            case Token::TEXT_LINE_WITH_TRAILING_SPACE:
-                return parse_text_line();
-            default: throw TemplateSyntaxError("Unknown line start token");
+            case Token::END: return;
+            case Token::TEXT_CONTENT:
+                output << current_token.str;
+                current_token = lexer.next_indent();
+                break;
+            default: throw TemplateSyntaxError("Unexpected token");
             }
         }
 
-        void Parser::parse_tag(int indent)
+        void Parser::parse_tag(int base_indent, OutputFrame & output)
         {
             assert(current_token.type == Token::NAME);
             auto tagname = current_token.str;
-            auto &buf = txt_output_buf();
+
 
             current_token = lexer.next_tag_content();
 
@@ -90,59 +120,26 @@ namespace slim
             }
 
             //Create opening tag
-            if (leading_space) buf += " ";
-            buf += "<" + tagname + ">"; //TODO: attributes
-
+            if (leading_space) output << ' ';
+            output << '<' << tagname << '>'; //TODO: attributes, empty tag
+            
             //Contents
             if (current_token.type == Token::TEXT_CONTENT)
             {
-                buf += current_token.str;
-                buf += "</" + tagname + ">";
-                if (trailing_space) buf += " ";
+                output << current_token.str;
+                current_token = lexer.next_indent();
             }
-            else //no inline content, look for indented lines after this
+            else if (current_token.type == Token::EOL)
+            {   //no inline content, look for indented lines after this
+                current_token = lexer.next_indent();
+                parse_lines(base_indent, output);
+            }
+            else if (current_token.type != Token::END)
             {
-                input_stack.emplace(indent, trailing_space, tagname);
+                throw TemplateSyntaxError("Unexpected token after tag line");
             }
-        }
-
-        void Parser::parse_text_line()
-        {
-            bool trailing_space = current_token.type == Token::TEXT_LINE_WITH_TRAILING_SPACE;
-            auto &buf = txt_output_buf();
-            current_token = lexer.next_text_content();
-            buf += current_token.str;
-            if (trailing_space) buf += " ";
-        }
-
-        std::string& Parser::txt_output_buf()
-        {
-            //Only support text content right now
-            assert(!output_stack.empty());
-            assert(output_stack.top().contents.empty());
-            return output_stack.top().text_content;
-        }
-        
-        void Parser::close_tags(int indent)
-        {
-            auto &buf = txt_output_buf();
-            while (!input_stack.empty() && input_stack.top().indent >= indent)
-            {
-                auto &frame = input_stack.top();
-                buf += "</" + frame.tagname + ">";
-                if (frame.trailing_space) buf += " ";
-                input_stack.pop();
-            }
-        }
-
-        std::unique_ptr<TemplatePart> Parser::finish_output_frame()
-        {
-            assert(!output_stack.empty());
-            auto &frame = output_stack.top();
-            assert(frame.contents.empty()); //Not yet supported
-            auto ret = slim::make_unique<TemplateText>(std::move(frame.text_content));
-            output_stack.pop();
-            return std::move(ret);
+            output << "</" + tagname + ">";
+            if (trailing_space) output << ' ';
         }
     }
 }
