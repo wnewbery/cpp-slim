@@ -65,12 +65,21 @@ namespace slim
                 switch (current_token.type)
                 {
                 case Token::TEXT_LINE:
-                    parse_text_line(my_indent, output);
+                    output << parse_text_line(my_indent);
                     break;
                 case Token::TEXT_LINE_WITH_TRAILING_SPACE:
-                    parse_text_line(my_indent, output);
+                    output << parse_text_line(my_indent);
                     output << ' ';
-                     break;
+                    break;
+                case Token::HTML_LINE:
+                    output << '<' << parse_text_line(my_indent);
+                    break;
+                case Token::COMMENT_LINE:
+                    parse_text_line(my_indent);
+                    break;
+                case Token::HTML_COMMENT_LINE:
+                    output << "<!--" << parse_text_line(my_indent) << "-->";
+                    break;
                 case Token::NAME:
                     parse_tag(my_indent, output);
                     break;
@@ -79,20 +88,21 @@ namespace slim
             }
         }
 
-        void Parser::parse_text_line(int base_indent, OutputFrame & output)
+        std::string Parser::parse_text_line(int base_indent)
         {
+            std::string buf;
             int leading_spaces = 0;
             while (true)
             {
                 current_token = lexer.next_text_content();
                 switch (current_token.type)
                 {
-                case Token::END: return;
+                case Token::END: return buf;
                 case Token::TEXT_CONTENT:
-                    for (int i = 0; i < leading_spaces; ++i) output << ' ';
-                    output << current_token.str;
+                    for (int i = 0; i < leading_spaces; ++i) buf += ' ';
+                    buf += current_token.str;
                     current_token = lexer.next_indent();
-                    if (current_indent() <= base_indent) return;
+                    if (current_indent() <= base_indent) return buf;
                     leading_spaces = current_indent() - base_indent - 2;
                     break;
                 default: throw TemplateSyntaxError("Unexpected token");

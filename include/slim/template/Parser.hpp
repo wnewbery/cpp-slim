@@ -51,7 +51,7 @@ namespace slim
 
             void parse_lines(int base_indent, OutputFrame &output);
 
-            void parse_text_line(int base_indent, OutputFrame &output);
+            std::string parse_text_line(int base_indent);
             void parse_tag(int base_indent, OutputFrame &output);
         };
     }

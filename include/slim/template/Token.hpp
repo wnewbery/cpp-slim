@@ -30,7 +30,13 @@ namespace slim
                 /**'|' at start of line. */
                 TEXT_LINE,
                 /** '\'' at start of line. */
-                TEXT_LINE_WITH_TRAILING_SPACE
+                TEXT_LINE_WITH_TRAILING_SPACE,
+                /** '<' */
+                HTML_LINE,
+                /** '/' */
+                COMMENT_LINE,
+                /** '/!' */
+                HTML_COMMENT_LINE
             };
 
             Token() {}

@@ -81,6 +81,9 @@ BOOST_AUTO_TEST_CASE(next_line_start)
 {
     BOOST_CHECK_EQUAL(Token::TEXT_LINE, lexer("|").next_line_start().type);
     BOOST_CHECK_EQUAL(Token::TEXT_LINE_WITH_TRAILING_SPACE, lexer("'").next_line_start().type);
+    BOOST_CHECK_EQUAL(Token::HTML_LINE, lexer("<").next_line_start().type);
+    BOOST_CHECK_EQUAL(Token::COMMENT_LINE, lexer("/").next_line_start().type);
+    BOOST_CHECK_EQUAL(Token::HTML_COMMENT_LINE, lexer("/!").next_line_start().type);
     BOOST_CHECK_EQUAL(Token::NAME, lexer("div").next_line_start().type);
     BOOST_CHECK_THROW(lexer("").next_line_start(), TemplateSyntaxError);
 }

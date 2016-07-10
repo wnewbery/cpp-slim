@@ -58,6 +58,10 @@ namespace slim
             {
             case '|':  ++p; return Token::TEXT_LINE;
             case '\'': ++p; return Token::TEXT_LINE_WITH_TRAILING_SPACE;
+            case '<': ++p; return Token::HTML_LINE;
+            case '/':
+                if (p + 1 < end && p[1] == '!') return p += 2, Token::HTML_COMMENT_LINE;
+                else return ++p, Token::COMMENT_LINE;
             default:
                 if (is_name_chr(*p)) return next_name();
                 else error("Unexpected symbol at line start");

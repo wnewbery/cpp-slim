@@ -62,6 +62,16 @@ BOOST_AUTO_TEST_CASE(text_lines)
             "  | Hel\n"
             "    lo\n"
             "     World"));
+
+    BOOST_CHECK_EQUAL(
+        "<p></p>",
+        parse_str("p\n  / Hello\n     World"));
+    BOOST_CHECK_EQUAL(
+        "<p><!--Hello World--></p>",
+        parse_str("p\n  /! Hello\n     World"));
+    BOOST_CHECK_EQUAL(
+        "<p>Hello <strong>World</strong></p>",
+        parse_str("<p>Hello <strong>World</strong></p>"));
 }
 
 
