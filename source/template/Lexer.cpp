@@ -59,6 +59,8 @@ namespace slim
             case '|':  ++p; return Token::TEXT_LINE;
             case '\'': ++p; return Token::TEXT_LINE_WITH_TRAILING_SPACE;
             case '<': ++p; return Token::HTML_LINE;
+            case '#': ++p; return Token::TAG_ID;
+            case '.': ++p; return Token::TAG_CLASS;
             case '/':
                 if (p + 1 < end && p[1] == '!') return p += 2, Token::HTML_COMMENT_LINE;
                 else return ++p, Token::COMMENT_LINE;
@@ -72,16 +74,15 @@ namespace slim
         {
             if (p > end) error("Unexpected end");
             if (p == end) return ++p, Token::END;
-            if (*p == '<')
+            switch (*p)
             {
+            case '<':
                 if (p + 1 < end && p[1] == '>')
                     return p += 2, Token::ADD_LEADING_AND_TRAILING_WHITESPACE;
                 else return ++p, Token::ADD_LEADING_WHITESPACE;
-            }
-            else if (*p == '>')
-            {
-                ++p;
-                return Token::ADD_TRAILING_WHITESPACE;
+            case '>': ++p; return Token::ADD_TRAILING_WHITESPACE;
+            case '#': ++p; return Token::TAG_ID;
+            case '.': ++p; return Token::TAG_CLASS;
             }
 
             skip_spaces();

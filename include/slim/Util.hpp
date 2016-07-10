@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <string>
 #include <utility>
 
 namespace slim
@@ -10,5 +11,8 @@ namespace slim
     {
         return std::unique_ptr<T>(new T(std::forward<ARGS>(args)...));
     }
+
+    /**Encodes '&', '<', '>', '"' and '\'' to entities.*/
+    std::string html_encode(const std::string &str);
 }
 

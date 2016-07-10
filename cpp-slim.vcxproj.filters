@@ -123,6 +123,9 @@
     <ClInclude Include="include\slim\template\Parser.hpp">
       <Filter>include\template</Filter>
     </ClInclude>
+    <ClInclude Include="include\slim\Util.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\types\Object.cpp">
@@ -190,6 +193,9 @@
     </ClCompile>
     <ClCompile Include="source\template\Parser.cpp">
       <Filter>source\template</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Util.cpp">
+      <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

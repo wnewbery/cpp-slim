@@ -50,6 +50,7 @@
     <ClInclude Include="include\slim\types\String.hpp" />
     <ClInclude Include="include\slim\types\Object.hpp" />
     <ClInclude Include="include\slim\types\Symbol.hpp" />
+    <ClInclude Include="include\slim\Util.hpp" />
     <ClInclude Include="include\slim\Value.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -75,6 +76,7 @@
     <ClCompile Include="source\types\Number.cpp" />
     <ClCompile Include="source\types\Object.cpp" />
     <ClCompile Include="source\types\Proc.cpp" />
+    <ClCompile Include="source\Util.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1DD2F697-0EE9-43B0-BEAB-4FCEE1B35CD3}</ProjectGuid>

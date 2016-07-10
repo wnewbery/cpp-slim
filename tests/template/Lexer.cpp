@@ -85,6 +85,8 @@ BOOST_AUTO_TEST_CASE(next_line_start)
     BOOST_CHECK_EQUAL(Token::COMMENT_LINE, lexer("/").next_line_start().type);
     BOOST_CHECK_EQUAL(Token::HTML_COMMENT_LINE, lexer("/!").next_line_start().type);
     BOOST_CHECK_EQUAL(Token::NAME, lexer("div").next_line_start().type);
+    BOOST_CHECK_EQUAL(Token::TAG_ID, lexer("#").next_line_start().type);
+    BOOST_CHECK_EQUAL(Token::TAG_CLASS, lexer(".").next_line_start().type);
     BOOST_CHECK_THROW(lexer("").next_line_start(), TemplateSyntaxError);
 }
 
@@ -96,6 +98,8 @@ BOOST_AUTO_TEST_CASE(next_tag_content)
     BOOST_CHECK_EQUAL(lexer(">").next_tag_content().type, Token::ADD_TRAILING_WHITESPACE);
     BOOST_CHECK_EQUAL(lexer("<").next_tag_content().type, Token::ADD_LEADING_WHITESPACE);
     BOOST_CHECK_EQUAL(lexer("<>").next_tag_content().type, Token::ADD_LEADING_AND_TRAILING_WHITESPACE);
+    BOOST_CHECK_EQUAL(lexer("#").next_tag_content().type, Token::TAG_ID);
+    BOOST_CHECK_EQUAL(lexer(".").next_tag_content().type, Token::TAG_CLASS);
     
     tok = lexer("text").next_tag_content();
     BOOST_CHECK_EQUAL(Token::TEXT_CONTENT, tok.type);

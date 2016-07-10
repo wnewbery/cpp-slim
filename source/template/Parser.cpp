@@ -18,6 +18,7 @@ namespace slim
                 "area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen",
                 "link", "meta", "param", "source", "track", "wbr"
             };
+            const std::string DEF_TAG = "div";
         }
 
         Parser::OutputFrame& Parser::OutputFrame::operator << (const std::string &text_content)
@@ -101,6 +102,8 @@ namespace slim
                     output << "<!--" << parse_text_line(my_indent) << "-->";
                     break;
                 case Token::NAME:
+                case Token::TAG_ID:
+                case Token::TAG_CLASS:
                     parse_tag(my_indent, output);
                     break;
                 default: throw TemplateSyntaxError("Unexpected symbol");
@@ -132,11 +135,28 @@ namespace slim
 
         void Parser::parse_tag(int base_indent, OutputFrame & output)
         {
-            assert(current_token.type == Token::NAME);
-            auto tagname = current_token.str;
-
-
-            current_token = lexer.next_tag_content();
+            //name, id and class
+            std::string tag_name;
+            std::string id;
+            std::vector<std::string> class_names;
+            if (current_token.type == Token::NAME)
+            {
+                tag_name = current_token.str;
+                current_token = lexer.next_tag_content();
+            }
+            else tag_name = DEF_TAG;
+            if (current_token.type == Token::TAG_ID)
+            {
+                current_token = lexer.next_name();
+                id = current_token.str;
+                current_token = lexer.next_tag_content();
+            }
+            while (current_token.type == Token::TAG_CLASS)
+            {
+                current_token = lexer.next_name();
+                class_names.push_back(current_token.str);
+                current_token = lexer.next_tag_content();
+            }
 
             //Whitespace control
             bool leading_space = false, trailing_space = false;
@@ -158,10 +178,23 @@ namespace slim
 
             //Create opening tag
             if (leading_space) output << ' ';
-            output << '<' << tagname; //TODO: attributes, empty tag
-            output.set_in_tag();
+            output << '<' << tag_name; //TODO: attributes, empty tag
+
+            //attributes
+            if (!id.empty()) output << " id=\"" << id << '"';
+            if (!class_names.empty())
+            {
+                output << " class=\"";
+                for (size_t i = 0; i < class_names.size(); ++i)
+                {
+                    if (i > 0) output << ' ';
+                    output << class_names[i];
+                }
+                output << '"';
+            }
             
             //Contents
+            output.set_in_tag();
             if (current_token.type == Token::TEXT_CONTENT)
             {
                 output << current_token.str;
@@ -177,13 +210,13 @@ namespace slim
                 throw TemplateSyntaxError("Unexpected token after tag line");
             }
 
-            bool void_el = VOID_ELEMENTS.count(tagname) > 0;
+            bool void_el = VOID_ELEMENTS.count(tag_name) > 0;
             if (output.in_tag() && void_el)
             {
                 output.set_in_tag(false);
                 output << "/>";
             }
-            else if (!void_el) output << "</" + tagname + ">";
+            else if (!void_el) output << "</" + tag_name + ">";
             else throw TemplateSyntaxError("HTML void elements can not have content");
             if (trailing_space) output << ' ';
         }

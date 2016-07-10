@@ -168,6 +168,7 @@
     <ClCompile Include="tests\types\Hash.cpp" />
     <ClCompile Include="tests\types\Number.cpp" />
     <ClCompile Include="tests\types\String.cpp" />
+    <ClCompile Include="tests\Util.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

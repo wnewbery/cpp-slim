@@ -26,7 +26,17 @@ namespace slim
              * already.
              */
             Token next_line();
-            /**Start of a line after indent.*/
+            /**Start of a line after indent.
+             * 
+             *    - TEXT_LINE
+             *    - TEXT_LINE_WITH_TRAILING_SPACE
+             *    - HTML_LINE
+             *    - COMMENT_LINE
+             *    - HTML_COMMENT_LINE
+             *    - NAME (tag)
+             *    - TAG_ID
+             *    - TAG_CLASS
+             */
             Token next_line_start();
             /**Next part of a tag content after a tag name.
              * May return:
@@ -35,9 +45,9 @@ namespace slim
              *    - NAME
              *    - ADD_*_WHITESPACE
              *    - TEXT_CONTENT
+             *    - TAG_ID
+             *    - TAG_CLASS
              * Will later include:
-             *    - tag id
-             *    - class name
              *    - attribute name ("{NAME}=")
              *    - text content
              *    - dynamic content ("= ...")
