@@ -62,18 +62,42 @@ namespace slim
             assert(current_token.type == Token::NAME);
             auto tagname = current_token.str;
             auto &buf = txt_output_buf();
-            bool trailing_space = false;
+
             current_token = lexer.next_tag_content();
-            if (current_token.type == Token::ADD_LEADING_WHITESPACE || current_token.type == Token::ADD_LEADING_AND_TRAILING_WHITESPACE)
-                buf += " ";
-            buf += "<" + tagname + ">";
-            if (current_token.type == Token::ADD_TRAILING_WHITESPACE || current_token.type == Token::ADD_LEADING_AND_TRAILING_WHITESPACE)
-                trailing_space = " ";
 
-            if (current_token.type != Token::END && current_token.type != Token::EOL)
-                current_token = lexer.next_line();
+            //Whitespace control
+            bool leading_space = false, trailing_space = false;
+            switch (current_token.type)
+            {
+            case Token::ADD_LEADING_WHITESPACE:
+                leading_space = true;
+                current_token = lexer.next_tag_content();
+                break;
+            case Token::ADD_TRAILING_WHITESPACE:
+                trailing_space = true;
+                current_token = lexer.next_tag_content();
+                break;
+            case Token::ADD_LEADING_AND_TRAILING_WHITESPACE:
+                leading_space = trailing_space = true;
+                current_token = lexer.next_tag_content();
+                break;
+            }
 
-            input_stack.emplace(indent, trailing_space, tagname);
+            //Create opening tag
+            if (leading_space) buf += " ";
+            buf += "<" + tagname + ">"; //TODO: attributes
+
+            //Contents
+            if (current_token.type == Token::TEXT_CONTENT)
+            {
+                buf += current_token.str;
+                buf += "</" + tagname + ">";
+                if (trailing_space) buf += " ";
+            }
+            else //no inline content, look for indented lines after this
+            {
+                input_stack.emplace(indent, trailing_space, tagname);
+            }
         }
 
         std::string& Parser::txt_output_buf()

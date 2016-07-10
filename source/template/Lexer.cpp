@@ -1,6 +1,7 @@
 #include "template/Lexer.hpp"
 #include "template/Token.hpp"
 #include "Error.hpp"
+#include <cassert>
 namespace slim
 {
     namespace tpl
@@ -54,15 +55,41 @@ namespace slim
         {
             if (p > end) error("Unexpected end");
             if (p == end) return ++p, Token::END;
-            if (try_newline()) return { Token::EOL };
-            switch (*p)
+            if (*p == '<')
             {
-            case '<':
-                if (p + 1 < end && p[1] == '>') return p += 2, Token::ADD_LEADING_AND_TRAILING_WHITESPACE;
+                if (p + 1 < end && p[1] == '>')
+                    return p += 2, Token::ADD_LEADING_AND_TRAILING_WHITESPACE;
                 else return ++p, Token::ADD_LEADING_WHITESPACE;
-            case '>': ++p; return Token::ADD_TRAILING_WHITESPACE;
-            default: error("Unexpected content in tag");
             }
+            else if (*p == '>')
+            {
+                ++p;
+                return Token::ADD_TRAILING_WHITESPACE;
+            }
+
+            skip_spaces();
+            //if reached end of line
+            if (p == end) return ++p, Token::END;
+            if (try_newline()) return{ Token::EOL };
+
+            //attributes, text content, or dynamic content
+            //dynamic content starts with a '=', attribute names have a '=' after,
+            //otherwise is just text
+            if (*p == '=') error("Dynamic element content not implemented");
+
+            auto start = p;
+            //try to find attribute first
+            while (p < end && is_name_chr(*p)) ++p;
+            if (p < end && *p == '=')
+            {
+                assert(p > start);
+                error("Element attributes not implemented");
+            }
+            //just text, go to end of line
+            auto p2 = p; //p gets updated by try_newline
+            while (p < end && !try_newline()) ++p, ++p2;
+
+            return{ Token::TEXT_CONTENT, std::string(start, p2 - start) };
         }
 
         bool Lexer::try_newline()
@@ -89,6 +116,11 @@ namespace slim
                 }
             }
             return false;
+        }
+
+        void Lexer::skip_spaces()
+        {
+            while (p < end && (*p == ' ' ||  *p == '\t')) ++p;
         }
 
         void Lexer::error(const std::string &msg)

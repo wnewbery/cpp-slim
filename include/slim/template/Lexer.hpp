@@ -27,7 +27,13 @@ namespace slim
              */
             Token next_line();
             /**Next part of a tag content after a tag name.
-             * Currently only END, EOL, or whitespace controls, but will later include:
+             * May return:
+             *    - END
+             *    - EOL
+             *    - NAME
+             *    - ADD_*_WHITESPACE
+             *    - TEXT_CONTENT
+             * Will later include:
              *    - tag id
              *    - class name
              *    - attribute name ("{NAME}=")
@@ -43,6 +49,9 @@ namespace slim
 
             /**If next is a newline (\r, \n, or \r\n), consume it and return true.*/
             bool try_newline();
+            /**Skip any ' ' or '\t'.*/
+            void skip_spaces();
+
             [[noreturn]] void error(const std::string &msg);
         };
     }

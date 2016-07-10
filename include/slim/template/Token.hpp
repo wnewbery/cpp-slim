@@ -24,7 +24,9 @@ namespace slim
                 /**'<' symbol after an element name.*/
                 ADD_LEADING_WHITESPACE,
                 /**'<>' symbol after an element name.*/
-                ADD_LEADING_AND_TRAILING_WHITESPACE
+                ADD_LEADING_AND_TRAILING_WHITESPACE,
+                /**Text content, either a '`' or '|' line, or text at the end of a tag line.*/
+                TEXT_CONTENT
             };
 
             Token() {}

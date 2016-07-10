@@ -22,9 +22,16 @@ BOOST_AUTO_TEST_CASE(simple_elements)
     BOOST_CHECK_EQUAL("<p><span></span><span></span></p>", parse_str("p\n  span\n  span\n"));
     BOOST_CHECK_EQUAL("<p><span><span></span></span><span></span></p>", parse_str("p\n  span\n    span\n  span\n"));
 
+    //whitespace
     BOOST_CHECK_EQUAL(" <p></p>", parse_str("p<"));
     BOOST_CHECK_EQUAL("<p></p> ", parse_str("p>"));
     BOOST_CHECK_EQUAL(" <p></p> ", parse_str("p<>"));
+
+    //text content
+    BOOST_CHECK_EQUAL("<p>Hello World</p>", parse_str("p Hello World"));
+    BOOST_CHECK_EQUAL(" <p>Hello World</p>", parse_str("p< Hello World"));
+    BOOST_CHECK_EQUAL("<p>Hello World</p> ", parse_str("p> Hello World"));
+    BOOST_CHECK_EQUAL(" <p>Hello World</p> ", parse_str("p<> Hello World"));
 }
 
 
