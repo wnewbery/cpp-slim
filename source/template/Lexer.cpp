@@ -26,7 +26,7 @@ namespace slim
                 auto start = p;
                 while (p < end && *p == ' ') ++p;
 
-                if (p == end) return { Token::END };
+                if (p == end) return ++p, Token::END;
                 else if (*p == '\t') error("Tabs are not allowed for indentation, only spaces");
                 else if (try_newline()) continue;
                 else return { Token::INDENT, std::string(start, p - start) };
@@ -42,9 +42,27 @@ namespace slim
             return { Token::NAME, std::string(start, p - start) };
         }
 
-        void Lexer::next_line()
+        Token Lexer::next_line()
         {
+            if (p > end) error("Unexpected end");
+            if (p == end) return ++p, Token::END;
             if (!try_newline()) error("Expected newline");
+            return Token::EOL;
+        }
+
+        Token Lexer::next_tag_content()
+        {
+            if (p > end) error("Unexpected end");
+            if (p == end) return ++p, Token::END;
+            if (try_newline()) return { Token::EOL };
+            switch (*p)
+            {
+            case '<':
+                if (p + 1 < end && p[1] == '>') return p += 2, Token::ADD_LEADING_AND_TRAILING_WHITESPACE;
+                else return ++p, Token::ADD_LEADING_WHITESPACE;
+            case '>': ++p; return Token::ADD_TRAILING_WHITESPACE;
+            default: error("Unexpected content in tag");
+            }
         }
 
         bool Lexer::try_newline()

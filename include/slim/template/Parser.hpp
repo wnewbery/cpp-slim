@@ -22,6 +22,8 @@ namespace slim
             /**Stack frame to track input tags and indent levels. This is because there is no
              * explicit, and named element terminator like in HTML/XML, instead closing tags
              * need to be created when the input reduces its indentation.
+             * 
+             * Frames are created by parse_tag and destroyed by close_tags.
              */
             struct InputFrame
             {
@@ -29,12 +31,19 @@ namespace slim
                  * when indentation is reduced.
                  */
                 int indent;
+                /**If this element has a trialing space after it. Leading spaces are add
+                 * immediately to output when the frame is created, but trailing spaces
+                 * must be added later after the closing tag.
+                 */
+                bool trailing_space;
                 /**Name of the element tag that created this frame, to use when creating the
                  * closing tag.
                  */
                 std::string tagname;
 
-                InputFrame(int indent, const std::string &tagname) : indent(indent), tagname(tagname) {}
+                InputFrame(int indent, bool trailing_space, const std::string &tagname)
+                    : indent(indent), trailing_space(trailing_space), tagname(tagname)
+                {}
             };
             //TODO: output_stack is not actually used as a stack yet, since control blocks are not
             //implemented. This is a placeholder ready for them, and currently all output is simply
@@ -77,6 +86,11 @@ namespace slim
              * Thus this forms the main parser "loop" body.
              */
             void parse_line();
+            /**Parse a tag found by parse_line.
+             * current_token should still be on the tag start token.
+             * Parse tag completes the line (ends with END or EOL).
+             */
+            void parse_tag(int indent);
             /**Get buffer to write text content to top of output stack.*/
             std::string& txt_output_buf();
             /**Close tags in input_stack with equal or greater indent.*/

@@ -25,7 +25,17 @@ namespace slim
             /**Go to next line. Error if not at the end of a line, or the end of the document
              * already.
              */
-            void next_line();
+            Token next_line();
+            /**Next part of a tag content after a tag name.
+             * Currently only END, EOL, or whitespace controls, but will later include:
+             *    - tag id
+             *    - class name
+             *    - attribute name ("{NAME}=")
+             *    - text content
+             *    - dynamic content ("= ...")
+             *    - close tag ("/")
+             */
+            Token next_tag_content();
 
         private:
             const char *begin, *p, *end;

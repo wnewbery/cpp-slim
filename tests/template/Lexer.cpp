@@ -64,16 +64,27 @@ BOOST_AUTO_TEST_CASE(next_name)
 
 BOOST_AUTO_TEST_CASE(next_line)
 {
-    BOOST_CHECK_NO_THROW(lexer("\r").next_line());
-    BOOST_CHECK_NO_THROW(lexer("\n").next_line());
-    BOOST_CHECK_NO_THROW(lexer("\r\n").next_line());
+    BOOST_CHECK_EQUAL(lexer("\r").next_line().type, Token::EOL);
+    BOOST_CHECK_EQUAL(lexer("\n").next_line().type, Token::EOL);
+    BOOST_CHECK_EQUAL(lexer("\r\n").next_line().type, Token::EOL);
     BOOST_CHECK_THROW(lexer("a\n").next_line(), TemplateSyntaxError);
 
     auto a = lexer("\n\r\r\n");
-    BOOST_CHECK_NO_THROW(a.next_line());
-    BOOST_CHECK_NO_THROW(a.next_line());
-    BOOST_CHECK_NO_THROW(a.next_line());
+    BOOST_CHECK_EQUAL(a.next_line().type, Token::EOL);
+    BOOST_CHECK_EQUAL(a.next_line().type, Token::EOL);
+    BOOST_CHECK_EQUAL(a.next_line().type, Token::EOL);
+    BOOST_CHECK_EQUAL(a.next_line().type, Token::END);
     BOOST_CHECK_THROW(a.next_line(), TemplateSyntaxError);
+}
+
+BOOST_AUTO_TEST_CASE(next_tag_content)
+{
+    BOOST_CHECK_EQUAL(lexer("").next_tag_content().type, Token::END);
+    BOOST_CHECK_EQUAL(lexer("\r\n").next_tag_content().type, Token::EOL);
+    BOOST_CHECK_EQUAL(lexer(">").next_tag_content().type, Token::ADD_TRAILING_WHITESPACE);
+    BOOST_CHECK_EQUAL(lexer("<").next_tag_content().type, Token::ADD_LEADING_WHITESPACE);
+    BOOST_CHECK_EQUAL(lexer("<>").next_tag_content().type, Token::ADD_LEADING_AND_TRAILING_WHITESPACE);
+    BOOST_CHECK_THROW(lexer("x").next_tag_content().type, TemplateSyntaxError);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

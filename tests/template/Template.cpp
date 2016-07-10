@@ -32,6 +32,19 @@ BOOST_AUTO_TEST_CASE(simple_elements)
         "<!DOCTYPE html>\n"
         "<html><p><span></span></p><p></p></html>",
         render_tpl("html\n  p\n    span\n  p\n"));
+
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<html> <p></p></html>",
+        render_tpl("html\n  p<"));
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<html><p></p> </html>",
+        render_tpl("html\n  p>"));
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<html> <p></p> </html>",
+        render_tpl("html\n  p<>"));
 }
 
 

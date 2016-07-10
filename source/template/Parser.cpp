@@ -54,9 +54,26 @@ namespace slim
             //Only support simple elements right now!
             current_token = lexer.next_name();
             assert(current_token.type == Token::NAME);
+            parse_tag(my_indent);
+        }
+
+        void Parser::parse_tag(int indent)
+        {
+            assert(current_token.type == Token::NAME);
+            auto tagname = current_token.str;
             auto &buf = txt_output_buf();
-            buf += "<" + current_token.str + ">";
-            input_stack.emplace(my_indent, current_token.str);
+            bool trailing_space = false;
+            current_token = lexer.next_tag_content();
+            if (current_token.type == Token::ADD_LEADING_WHITESPACE || current_token.type == Token::ADD_LEADING_AND_TRAILING_WHITESPACE)
+                buf += " ";
+            buf += "<" + tagname + ">";
+            if (current_token.type == Token::ADD_TRAILING_WHITESPACE || current_token.type == Token::ADD_LEADING_AND_TRAILING_WHITESPACE)
+                trailing_space = " ";
+
+            if (current_token.type != Token::END && current_token.type != Token::EOL)
+                current_token = lexer.next_line();
+
+            input_stack.emplace(indent, trailing_space, tagname);
         }
 
         std::string& Parser::txt_output_buf()
@@ -72,7 +89,9 @@ namespace slim
             auto &buf = txt_output_buf();
             while (!input_stack.empty() && input_stack.top().indent >= indent)
             {
-                buf += "</" + input_stack.top().tagname + ">";
+                auto &frame = input_stack.top();
+                buf += "</" + frame.tagname + ">";
+                if (frame.trailing_space) buf += " ";
                 input_stack.pop();
             }
         }

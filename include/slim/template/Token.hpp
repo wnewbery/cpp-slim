@@ -18,7 +18,13 @@ namespace slim
                 /**An element, atttribute, id or class name.
                  * Allows numbers, letters, underscores and hyphens.
                  */
-                NAME
+                NAME,
+                /**'>' symbol after an element name.*/
+                ADD_TRAILING_WHITESPACE,
+                /**'<' symbol after an element name.*/
+                ADD_LEADING_WHITESPACE,
+                /**'<>' symbol after an element name.*/
+                ADD_LEADING_AND_TRAILING_WHITESPACE
             };
 
             Token() {}
