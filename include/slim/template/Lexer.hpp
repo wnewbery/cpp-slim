@@ -26,6 +26,8 @@ namespace slim
              * already.
              */
             Token next_line();
+            /**Start of a line after indent.*/
+            Token next_line_start();
             /**Next part of a tag content after a tag name.
              * May return:
              *    - END
@@ -42,6 +44,8 @@ namespace slim
              *    - close tag ("/")
              */
             Token next_tag_content();
+            /**Rest of line as text.*/
+            Token next_text_content();
 
         private:
             const char *begin, *p, *end;

@@ -17,7 +17,7 @@ std::string render_tpl(const char *str)
     return parser.parse().render(model);
 }
 
-BOOST_AUTO_TEST_CASE(simple_elements)
+BOOST_AUTO_TEST_CASE(text)
 {
     BOOST_CHECK_EQUAL("<!DOCTYPE html>\n", render_tpl(""));
     BOOST_CHECK_EQUAL(

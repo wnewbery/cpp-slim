@@ -34,5 +34,27 @@ BOOST_AUTO_TEST_CASE(simple_elements)
     BOOST_CHECK_EQUAL(" <p>Hello World</p> ", parse_str("p<> Hello World"));
 }
 
+BOOST_AUTO_TEST_CASE(text_lines)
+{
+    BOOST_CHECK_EQUAL(
+        "<p></p>",
+        parse_str("p"));
+    BOOST_CHECK_EQUAL(
+        "<p>Hello World</p>",
+        parse_str("p\n  | Hello World"));
+    BOOST_CHECK_EQUAL(
+        "<p>  Hello World</p>",
+        parse_str("p\n  |   Hello World"));
+    BOOST_CHECK_EQUAL(
+        "<p>Hello World  </p>",
+        parse_str("p\n  | Hello World  "));
+    BOOST_CHECK_EQUAL(
+        "<p>Hello World </p>",
+        parse_str("p\n  ' Hello World"));
+    BOOST_CHECK_EQUAL(
+        "<p>Hello World</p>",
+        parse_str("p\n  ' Hello\n  | World"));
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()

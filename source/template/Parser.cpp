@@ -52,9 +52,15 @@ namespace slim
             int my_indent = (int)current_token.str.size();
 
             //Only support simple elements right now!
-            current_token = lexer.next_name();
-            assert(current_token.type == Token::NAME);
-            parse_tag(my_indent);
+            current_token = lexer.next_line_start();
+            switch (current_token.type)
+            {
+            case Token::NAME: return parse_tag(my_indent);
+            case Token::TEXT_LINE:
+            case Token::TEXT_LINE_WITH_TRAILING_SPACE:
+                return parse_text_line();
+            default: throw TemplateSyntaxError("Unknown line start token");
+            }
         }
 
         void Parser::parse_tag(int indent)
@@ -98,6 +104,15 @@ namespace slim
             {
                 input_stack.emplace(indent, trailing_space, tagname);
             }
+        }
+
+        void Parser::parse_text_line()
+        {
+            bool trailing_space = current_token.type == Token::TEXT_LINE_WITH_TRAILING_SPACE;
+            auto &buf = txt_output_buf();
+            current_token = lexer.next_text_content();
+            buf += current_token.str;
+            if (trailing_space) buf += " ";
         }
 
         std::string& Parser::txt_output_buf()

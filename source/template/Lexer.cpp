@@ -51,6 +51,19 @@ namespace slim
             return Token::EOL;
         }
 
+        Token Lexer::next_line_start()
+        {
+            if (p >= end) error("Unexpected end");
+            switch (*p)
+            {
+            case '|':  ++p; return Token::TEXT_LINE;
+            case '\'': ++p; return Token::TEXT_LINE_WITH_TRAILING_SPACE;
+            default:
+                if (is_name_chr(*p)) return next_name();
+                else error("Unexpected symbol at line start");
+            }
+        }
+
         Token Lexer::next_tag_content()
         {
             if (p > end) error("Unexpected end");
@@ -89,6 +102,17 @@ namespace slim
             auto p2 = p; //p gets updated by try_newline
             while (p < end && !try_newline()) ++p, ++p2;
 
+            return{ Token::TEXT_CONTENT, std::string(start, p2 - start) };
+        }
+
+        Token Lexer::next_text_content()
+        {
+            if (p > end) error("Unexpected end");
+            if (p == end) return ++p, Token::END;
+            if (*p == ' ') ++p; //ignore single leading space
+            auto start = p;
+            auto p2 = p; //p gets updated by try_newline
+            while (p < end && !try_newline()) ++p, ++p2;
             return{ Token::TEXT_CONTENT, std::string(start, p2 - start) };
         }
 

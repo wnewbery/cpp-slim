@@ -77,6 +77,14 @@ BOOST_AUTO_TEST_CASE(next_line)
     BOOST_CHECK_THROW(a.next_line(), TemplateSyntaxError);
 }
 
+BOOST_AUTO_TEST_CASE(next_line_start)
+{
+    BOOST_CHECK_EQUAL(Token::TEXT_LINE, lexer("|").next_line_start().type);
+    BOOST_CHECK_EQUAL(Token::TEXT_LINE_WITH_TRAILING_SPACE, lexer("'").next_line_start().type);
+    BOOST_CHECK_EQUAL(Token::NAME, lexer("div").next_line_start().type);
+    BOOST_CHECK_THROW(lexer("").next_line_start(), TemplateSyntaxError);
+}
+
 BOOST_AUTO_TEST_CASE(next_tag_content)
 {
     Token tok;
@@ -103,8 +111,32 @@ BOOST_AUTO_TEST_CASE(next_tag_content)
     BOOST_CHECK_EQUAL("text  <content> = symbols", tok.str);
 
 
-    BOOST_CHECK_THROW(lexer("value=x").next_line(), TemplateSyntaxError);
-    BOOST_CHECK_THROW(lexer("=expr").next_line(), TemplateSyntaxError);
+    BOOST_CHECK_THROW(lexer("value=x").next_tag_content(), TemplateSyntaxError);
+    BOOST_CHECK_THROW(lexer("=expr").next_tag_content(), TemplateSyntaxError);
+
+    auto a = lexer("Text");
+    BOOST_CHECK_EQUAL(a.next_tag_content().type, Token::TEXT_CONTENT);
+    BOOST_CHECK_EQUAL(a.next_tag_content().type, Token::END);
+    BOOST_CHECK_THROW(a.next_tag_content(), TemplateSyntaxError);
+}
+
+BOOST_AUTO_TEST_CASE(next_text_content)
+{
+    auto a = lexer("Text");
+    BOOST_CHECK_EQUAL(a.next_text_content().type, Token::TEXT_CONTENT);
+    BOOST_CHECK_EQUAL(a.next_text_content().type, Token::END);
+    BOOST_CHECK_THROW(a.next_text_content(), TemplateSyntaxError);
+
+    Token tok;
+    BOOST_CHECK_EQUAL(lexer("").next_text_content().type, Token::END);
+    
+    tok = lexer("text content").next_text_content();
+    BOOST_CHECK_EQUAL(Token::TEXT_CONTENT, tok.type);
+    BOOST_CHECK_EQUAL("text content", tok.str);
+
+    tok = lexer("   \t  text content\n").next_text_content();
+    BOOST_CHECK_EQUAL(Token::TEXT_CONTENT, tok.type);
+    BOOST_CHECK_EQUAL("  \t  text content", tok.str);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

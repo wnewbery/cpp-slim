@@ -91,6 +91,8 @@ namespace slim
              * Parse tag completes the line (ends with END or EOL).
              */
             void parse_tag(int indent);
+            /**Parse a ' or | text line.*/
+            void parse_text_line();
             /**Get buffer to write text content to top of output stack.*/
             std::string& txt_output_buf();
             /**Close tags in input_stack with equal or greater indent.*/
