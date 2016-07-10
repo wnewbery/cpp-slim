@@ -88,6 +88,7 @@ BOOST_AUTO_TEST_CASE(next_line_start)
     BOOST_CHECK_EQUAL(Token::TAG_ID, lexer("#").next_line_start().type);
     BOOST_CHECK_EQUAL(Token::TAG_CLASS, lexer(".").next_line_start().type);
     BOOST_CHECK_THROW(lexer("").next_line_start(), TemplateSyntaxError);
+    BOOST_CHECK_THROW(lexer("@").next_line_start(), TemplateSyntaxError);
 }
 
 BOOST_AUTO_TEST_CASE(next_tag_content)

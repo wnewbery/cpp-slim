@@ -1,8 +1,9 @@
 #pragma once
 #include "Function.hpp"
-#include "types/Number.hpp"
 namespace slim
 {
+    class Number;
+    class Array;
     std::shared_ptr<Number> acos(const Number *n);
     std::shared_ptr<Number> asin(const Number *n);
     std::shared_ptr<Number> atan(const Number *n);
@@ -33,5 +34,5 @@ namespace slim
     std::shared_ptr<Number> gamma(const Number *n);
     std::shared_ptr<Number> hypot(const Number *x, const Number *y);
     std::shared_ptr<Number> ldexp(const Number *x, const Number *exp);
-    std::shared_ptr<Number> lgamma(const Number *n);
+    std::shared_ptr<Array> lgamma(const Number *n);
 }

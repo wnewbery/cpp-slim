@@ -36,9 +36,9 @@ BOOST_AUTO_TEST_CASE(simple_elements)
 
 BOOST_AUTO_TEST_CASE(text_lines)
 {
-    BOOST_CHECK_EQUAL(
-        "<p></p>",
-        parse_str("p"));
+    BOOST_CHECK_EQUAL("<p></p>", parse_str("p"));
+    BOOST_CHECK_EQUAL("<p></p>", parse_str("p\n  |\n"));
+    BOOST_CHECK_EQUAL("<p></p>", parse_str("p\n  |"));
     BOOST_CHECK_EQUAL(
         "<p>Hello World</p>",
         parse_str("p\n  | Hello World"));

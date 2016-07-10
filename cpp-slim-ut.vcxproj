@@ -158,7 +158,9 @@
     <ClCompile Include="tests\expression\Expression.cpp" />
     <ClCompile Include="tests\expression\Lexer.cpp" />
     <ClCompile Include="tests\expression\Parser.cpp" />
+    <ClCompile Include="tests\FunctionHelpers.cpp" />
     <ClCompile Include="tests\Main.cpp" />
+    <ClCompile Include="tests\Maths.cpp" />
     <ClCompile Include="tests\Operators.cpp" />
     <ClCompile Include="tests\template\Lexer.cpp" />
     <ClCompile Include="tests\template\Parser.cpp" />

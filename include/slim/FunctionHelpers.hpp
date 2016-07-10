@@ -1,8 +1,9 @@
 #pragma once
 #include "Function.hpp"
 #include "Error.hpp"
-#include "types/String.hpp"
+#include "types/Boolean.hpp"
 #include "types/Number.hpp"
+#include "types/String.hpp"
 #include <cassert>
 
 namespace slim
@@ -37,12 +38,27 @@ namespace slim
         }
         else return false;
     }
+    inline bool try_unpack_arg(const ObjectPtr &arg, bool *out)
+    {
+        auto n = dynamic_cast<Boolean*>(arg.get());
+        if (n)
+        {
+            *out = n->is_true();
+            return true;
+        }
+        else return false;
+    }
     
     template<class T>
-    bool try_unpack_arg(const ObjectPtr &arg, T **ptr)
+    bool try_unpack_arg(const ObjectPtr &arg, T **out)
     {
-        *ptr = dynamic_cast<T*>(arg.get());
-        return *ptr ? true : false;
+        auto ptr = dynamic_cast<T*>(arg.get());
+        if (ptr)
+        {
+            *out = ptr;
+            return true;
+        }
+        else return false;
     }
 
     inline bool try_unpack_inner(FunctionArgs::const_iterator begin, FunctionArgs::const_iterator end)
@@ -59,15 +75,9 @@ namespace slim
         if (begin == end) return true;
         NEXT tmp; //dont overwrite *out until sure of success
         if (!try_unpack_arg(*begin, &tmp)) return false;
-        if (!try_unpack_inner(begin + 1, end, std::forward<ARGS...>(args)...)) return false;
+        if (!try_unpack_inner(begin + 1, end, std::forward<ARGS>(args)...)) return false;
         *out = std::move(tmp);
         return true;
-    }
-
-    inline void check_arg_count(const FunctionArgs &args, size_t min, size_t max)
-    {
-        if (args.size() < min || args.size() > max)
-            throw InvalidArgumentCount(args.size(), min, max);
     }
 
     template<size_t required, class... ARGS>

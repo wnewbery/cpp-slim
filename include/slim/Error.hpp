@@ -61,24 +61,12 @@ namespace slim
     public:
         UnorderableTypeError(const Object *lhs, const char *op, const Object *rhs);
     };
-    class UnsupportedOperandTypeError : public TypeError
-    {
-    public:
-        UnsupportedOperandTypeError(const Object *lhs, const char *op, const Object *rhs);
-        UnsupportedOperandTypeError(const char *op, const Object *rhs);
-    };
     class NoSuchMethod : public ScriptError
     {
     public:
         NoSuchMethod(const Object *obj, const std::string &method_name);
         NoSuchMethod(const Object *obj, const Symbol *method_name);
         explicit NoSuchMethod(const Symbol *method_name);
-    };
-    class DuplicateMethod : public ScriptError
-    {
-    public:
-        DuplicateMethod(const Object *obj, const std::string &method_name);
-        explicit DuplicateMethod(const std::string &method_name);
     };
     class InvalidArgument : public ScriptError
     {

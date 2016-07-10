@@ -1,4 +1,6 @@
 #include "BuiltinFunctions.hpp"
+#include "types/Array.hpp"
+#include "types/Number.hpp"
 #include "Maths.hpp"
 namespace slim
 {
@@ -6,7 +8,7 @@ namespace slim
     {
         //Maths
         { acos, "acos" }, { asin, "asin" }, { atan, "atan" }, { atan2, "atan2" },
-        { acos, "acosh" }, { acos, "asinh" }, { acos, "atanh" },
+        { acosh, "acosh" }, { asinh, "asinh" }, { atanh, "atanh" },
         { cos, "cos" }, { sin, "sin" }, { tan, "tan" },
         { cosh, "cosh" }, { sinh, "sinh" }, { tanh, "tanh" },
         { cbrt, "cbrt" }, { sqrt, "sqrt" }, { exp, "exp" }, { log, "log" }, { log2, "log2" }, { log10, "log10" },

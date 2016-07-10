@@ -60,5 +60,11 @@
     <ClCompile Include="tests\Util.cpp">
       <Filter>tests</Filter>
     </ClCompile>
+    <ClCompile Include="tests\FunctionHelpers.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Maths.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

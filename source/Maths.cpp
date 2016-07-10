@@ -1,4 +1,5 @@
 #include "Maths.hpp"
+#include "types/Array.hpp"
 #include "types/Number.hpp"
 #include "Error.hpp"
 #include <cmath>
@@ -111,8 +112,10 @@ namespace slim
     {
         return make_value(std::ldexp(x->get_value(), (int)exp->get_value()));
     }
-    std::shared_ptr<Number> lgamma(const Number *n)
+    std::shared_ptr<Array> lgamma(const Number *n)
     {
-        return make_value(std::lgamma(n->get_value()));
+        double a = std::lgamma(n->get_value());
+        double b = std::tgamma(n->get_value());
+        return make_array({make_value(a), make_value(b < 0 ? -1.0 : 1.0)});
     }
 }
