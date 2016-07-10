@@ -47,6 +47,8 @@ namespace slim
             Lexer &lexer;
             Token current_token;
 
+            int current_indent();
+
             void parse_lines(int base_indent, OutputFrame &output);
 
             void parse_text_line(int base_indent, OutputFrame &output);

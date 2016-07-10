@@ -70,7 +70,7 @@ namespace slim
                 case Token::TEXT_LINE_WITH_TRAILING_SPACE:
                     parse_text_line(my_indent, output);
                     output << ' ';
-                    break;
+                     break;
                 case Token::NAME:
                     parse_tag(my_indent, output);
                     break;
@@ -81,15 +81,22 @@ namespace slim
 
         void Parser::parse_text_line(int base_indent, OutputFrame & output)
         {
-            current_token = lexer.next_text_content();
-            switch (current_token.type)
+            int leading_spaces = 0;
+            while (true)
             {
-            case Token::END: return;
-            case Token::TEXT_CONTENT:
-                output << current_token.str;
-                current_token = lexer.next_indent();
-                break;
-            default: throw TemplateSyntaxError("Unexpected token");
+                current_token = lexer.next_text_content();
+                switch (current_token.type)
+                {
+                case Token::END: return;
+                case Token::TEXT_CONTENT:
+                    for (int i = 0; i < leading_spaces; ++i) output << ' ';
+                    output << current_token.str;
+                    current_token = lexer.next_indent();
+                    if (current_indent() <= base_indent) return;
+                    leading_spaces = current_indent() - base_indent - 2;
+                    break;
+                default: throw TemplateSyntaxError("Unexpected token");
+                }
             }
         }
 
@@ -141,5 +148,13 @@ namespace slim
             output << "</" + tagname + ">";
             if (trailing_space) output << ' ';
         }
+
+        int Parser::current_indent()
+        {
+            if (current_token.type == Token::END) return -1;
+            assert(current_token.type == Token::INDENT);
+            return (int)current_token.str.size();
+        }
+
     }
 }
