@@ -174,6 +174,7 @@ namespace slim
                 leading_space = trailing_space = true;
                 current_token = lexer.next_tag_content();
                 break;
+            default: break;
             }
 
             //Create opening tag
