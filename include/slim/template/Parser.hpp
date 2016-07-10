@@ -29,10 +29,14 @@ namespace slim
             class OutputFrame
             {
             public:
+                OutputFrame() : contents(), text_content(), _in_tag(false) {}
                 OutputFrame& operator << (const std::string &text_content);
                 OutputFrame& operator << (char txt_chr);
                 
                 std::unique_ptr<TemplatePart> make_tpl();
+
+                bool in_tag()const { return _in_tag; }
+                void set_in_tag(bool b = true) { _in_tag = b; }
             private:
                 /**The sequence of completed template parts reading to add to the template or
                  * parent frame control block.
@@ -42,6 +46,10 @@ namespace slim
                  * this buffer is first converted to a TemplateText part.
                  */
                 std::string text_content;
+                /**Currently in a start tag. This will need top be closed with a '<' before other
+                 * output.
+                 */
+                bool _in_tag;
             };
 
             Lexer &lexer;

@@ -75,4 +75,12 @@ BOOST_AUTO_TEST_CASE(text_lines)
 }
 
 
+BOOST_AUTO_TEST_CASE(void_tags)
+{
+    BOOST_CHECK_EQUAL("<br/>", parse_str("br"));
+    BOOST_CHECK_EQUAL("<br/><p></p>", parse_str("br\np"));
+    BOOST_CHECK_THROW(parse_str("br\n  p"), TemplateSyntaxError);
+}
+
+
 BOOST_AUTO_TEST_SUITE_END()

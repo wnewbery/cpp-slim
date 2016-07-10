@@ -5,18 +5,38 @@
 #include "Error.hpp"
 #include "Util.hpp"
 #include <cassert>
+#include <unordered_set>
 
 namespace slim
 {
     namespace tpl
     {
+        namespace
+        {
+            const std::unordered_set<std::string> VOID_ELEMENTS =
+            {
+                "area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen",
+                "link", "meta", "param", "source", "track", "wbr"
+            };
+        }
+
         Parser::OutputFrame& Parser::OutputFrame::operator << (const std::string &text_content)
         {
+            if (in_tag())
+            {
+                set_in_tag(false);
+                this->text_content += '>';
+            }
             this->text_content += text_content;
             return *this;
         }
         Parser::OutputFrame& Parser::OutputFrame::operator << (char txt_chr)
         {
+            if (in_tag())
+            {
+                set_in_tag(false);
+                this->text_content += '>';
+            }
             this->text_content += txt_chr;
             return *this;
         }
@@ -138,7 +158,8 @@ namespace slim
 
             //Create opening tag
             if (leading_space) output << ' ';
-            output << '<' << tagname << '>'; //TODO: attributes, empty tag
+            output << '<' << tagname; //TODO: attributes, empty tag
+            output.set_in_tag();
             
             //Contents
             if (current_token.type == Token::TEXT_CONTENT)
@@ -155,7 +176,15 @@ namespace slim
             {
                 throw TemplateSyntaxError("Unexpected token after tag line");
             }
-            output << "</" + tagname + ">";
+
+            bool void_el = VOID_ELEMENTS.count(tagname) > 0;
+            if (output.in_tag() && void_el)
+            {
+                output.set_in_tag(false);
+                output << "/>";
+            }
+            else if (!void_el) output << "</" + tagname + ">";
+            else throw TemplateSyntaxError("HTML void elements can not have content");
             if (trailing_space) output << ' ';
         }
 
