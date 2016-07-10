@@ -43,6 +43,7 @@ $(TEST_OBJ_DIR)/%.cpp.o: %.cpp
 test: bin/test
 	@mkdir -p coverage
 	rm -f coverage/all.info coverage/coverage.info
+	rm -f $(shell find $(OBJ_DIR)/ -name "*.gcda")
 	bin/test
 	lcov --capture --directory obj --base-directory . --output-file coverage/all.info -q
 	lcov --extract coverage/all.info $(shell pwd)/include/\* $(shell pwd)/source/\* --output-file coverage/coverage.info -q
