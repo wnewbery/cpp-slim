@@ -127,7 +127,7 @@ namespace slim
             assert(frame.contents.empty()); //Not yet supported
             auto ret = slim::make_unique<TemplateText>(std::move(frame.text_content));
             output_stack.pop();
-            return ret;
+            return std::move(ret);
         }
     }
 }
