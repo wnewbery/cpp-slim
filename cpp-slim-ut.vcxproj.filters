@@ -10,6 +10,9 @@
     <Filter Include="tests\expression">
       <UniqueIdentifier>{dcb13253-1b3f-4447-b353-d4d4b71bba85}</UniqueIdentifier>
     </Filter>
+    <Filter Include="tests\template">
+      <UniqueIdentifier>{da6b44e5-79a0-4715-9fa4-b34c34e7bd26}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tests\Main.cpp">
@@ -46,7 +49,13 @@
       <Filter>tests\types</Filter>
     </ClCompile>
     <ClCompile Include="tests\template\Lexer.cpp">
-      <Filter>tests</Filter>
+      <Filter>tests\template</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\template\Parser.cpp">
+      <Filter>tests\template</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\template\Template.cpp">
+      <Filter>tests\template</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -36,6 +36,7 @@
     <ClInclude Include="include\slim\Maths.hpp" />
     <ClInclude Include="include\slim\Operators.hpp" />
     <ClInclude Include="include\slim\template\Lexer.hpp" />
+    <ClInclude Include="include\slim\template\Parser.hpp" />
     <ClInclude Include="include\slim\template\Template.hpp" />
     <ClInclude Include="include\slim\template\TemplateParts.hpp" />
     <ClInclude Include="include\slim\template\Token.hpp" />
@@ -64,6 +65,7 @@
     <ClCompile Include="source\Maths.cpp" />
     <ClCompile Include="source\Operators.cpp" />
     <ClCompile Include="source\template\Lexer.cpp" />
+    <ClCompile Include="source\template\Parser.cpp" />
     <ClCompile Include="source\template\TemplateParts.cpp" />
     <ClCompile Include="source\types\Array.cpp" />
     <ClCompile Include="source\types\String.cpp" />

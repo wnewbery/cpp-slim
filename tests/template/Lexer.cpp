@@ -62,4 +62,18 @@ BOOST_AUTO_TEST_CASE(next_name)
 
 }
 
+BOOST_AUTO_TEST_CASE(next_line)
+{
+    BOOST_CHECK_NO_THROW(lexer("\r").next_line());
+    BOOST_CHECK_NO_THROW(lexer("\n").next_line());
+    BOOST_CHECK_NO_THROW(lexer("\r\n").next_line());
+    BOOST_CHECK_THROW(lexer("a\n").next_line(), TemplateSyntaxError);
+
+    auto a = lexer("\n\r\r\n");
+    BOOST_CHECK_NO_THROW(a.next_line());
+    BOOST_CHECK_NO_THROW(a.next_line());
+    BOOST_CHECK_NO_THROW(a.next_line());
+    BOOST_CHECK_THROW(a.next_line(), TemplateSyntaxError);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

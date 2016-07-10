@@ -42,6 +42,11 @@ namespace slim
             return { Token::NAME, std::string(start, p - start) };
         }
 
+        void Lexer::next_line()
+        {
+            if (!try_newline()) error("Expected newline");
+        }
+
         bool Lexer::try_newline()
         {
             if (*p == '\n')

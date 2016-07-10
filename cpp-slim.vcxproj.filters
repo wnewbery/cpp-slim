@@ -120,6 +120,9 @@
     <ClInclude Include="include\slim\template\Token.hpp">
       <Filter>include\template</Filter>
     </ClInclude>
+    <ClInclude Include="include\slim\template\Parser.hpp">
+      <Filter>include\template</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\types\Object.cpp">
@@ -183,6 +186,9 @@
       <Filter>source\template</Filter>
     </ClCompile>
     <ClCompile Include="source\template\Lexer.cpp">
+      <Filter>source\template</Filter>
+    </ClCompile>
+    <ClCompile Include="source\template\Parser.cpp">
       <Filter>source\template</Filter>
     </ClCompile>
   </ItemGroup>

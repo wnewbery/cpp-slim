@@ -22,13 +22,17 @@ namespace slim
             Token next_indent();
             /**Reads a Token::NAME, else error.*/
             Token next_name();
-            /**If next is a newline (\r, \n, or \r\n), consume it and return true.*/
-            bool try_newline();
+            /**Go to next line. Error if not at the end of a line, or the end of the document
+             * already.
+             */
+            void next_line();
 
         private:
             const char *begin, *p, *end;
             int line;
 
+            /**If next is a newline (\r, \n, or \r\n), consume it and return true.*/
+            bool try_newline();
             [[noreturn]] void error(const std::string &msg);
         };
     }
