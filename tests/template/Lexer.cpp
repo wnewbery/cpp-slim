@@ -102,6 +102,8 @@ BOOST_AUTO_TEST_CASE(next_tag_content)
     BOOST_CHECK_EQUAL(lexer("<>").next_tag_content().type, Token::ADD_LEADING_AND_TRAILING_WHITESPACE);
     BOOST_CHECK_EQUAL(lexer("#").next_tag_content().type, Token::TAG_ID);
     BOOST_CHECK_EQUAL(lexer(".").next_tag_content().type, Token::TAG_CLASS);
+    BOOST_CHECK_EQUAL(lexer("=").next_tag_content().type, Token::OUTPUT_LINE);
+    BOOST_CHECK_EQUAL(lexer("   =").next_tag_content().type, Token::OUTPUT_LINE);
     
     tok = lexer("text").next_tag_content();
     BOOST_CHECK_EQUAL(Token::TEXT_CONTENT, tok.type);
@@ -121,7 +123,6 @@ BOOST_AUTO_TEST_CASE(next_tag_content)
 
 
     BOOST_CHECK_THROW(lexer("value=x").next_tag_content(), TemplateSyntaxError);
-    BOOST_CHECK_THROW(lexer("=expr").next_tag_content(), TemplateSyntaxError);
 
     auto a = lexer("Text");
     BOOST_CHECK_EQUAL(a.next_tag_content().type, Token::TEXT_CONTENT);

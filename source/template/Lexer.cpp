@@ -94,7 +94,8 @@ namespace slim
             //attributes, text content, or dynamic content
             //dynamic content starts with a '=', attribute names have a '=' after,
             //otherwise is just text
-            if (*p == '=') error("Dynamic element content not implemented");
+            if (*p == '=') return ++p, Token::OUTPUT_LINE;
+
 
             auto start = p;
             //try to find attribute first

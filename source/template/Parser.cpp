@@ -225,6 +225,10 @@ namespace slim
                 current_token = lexer.next_indent();
                 parse_lines(base_indent, output);
             }
+            else if (current_token.type == Token::OUTPUT_LINE)
+            {
+                parse_code_line_inner(output);
+            }
             else if (current_token.type != Token::END)
             {
                 throw TemplateSyntaxError("Unexpected token after tag line");
@@ -258,21 +262,23 @@ namespace slim
             default: break;
             }
 
-            current_token = lexer.next_text_content();
-            if (current_token.type == Token::END) return;
-
             if (leading_space) output << ' ';
+            parse_code_line_inner(output);
+            if (trailing_space) output << ' ';
+        }
+
+        void Parser::parse_code_line_inner(OutputFrame &output)
+        {
+            current_token = lexer.next_text_content();
+            if (current_token.str.empty()) throw TemplateSyntaxError("Expected expression");
 
             expr::Lexer expr_lexer(current_token.str);
             expr::Parser expr_parser(BUILTIN_FUNCTIONS, expr_lexer); //TODO: Allow custom functions
             auto expr = expr_parser.parse_expression();
             output << std::move(expr);
 
-            if (trailing_space) output << ' ';
-
             current_token = lexer.next_indent(); //TODO: multi-line code block
         }
-
 
         int Parser::current_indent()
         {
