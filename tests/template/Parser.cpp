@@ -74,6 +74,16 @@ BOOST_AUTO_TEST_CASE(text_lines)
         parse_str("<p>Hello <strong>World</strong></p>"));
 }
 
+BOOST_AUTO_TEST_CASE(code_lines)
+{
+    BOOST_CHECK_EQUAL("<p></p>", parse_str("p"));
+    BOOST_CHECK_EQUAL("<p><%= 5 %></p>", parse_str("p\n  =5\n"));
+    BOOST_CHECK_EQUAL("<p> <%= 5 %></p>", parse_str("p\n  =<5\n"));
+    BOOST_CHECK_EQUAL("<p><%= 5 %> </p>", parse_str("p\n  =>5\n"));
+    BOOST_CHECK_EQUAL("<p> <%= 5 %> </p>", parse_str("p\n  =<>5\n"));
+    BOOST_CHECK_EQUAL("<p><%= (5 + (2 * a)) %></p>", parse_str("p\n  =5 + 2 * a\n"));
+}
+
 BOOST_AUTO_TEST_CASE(void_tags)
 {
     BOOST_CHECK_EQUAL("<br/>", parse_str("br"));

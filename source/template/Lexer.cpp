@@ -61,6 +61,7 @@ namespace slim
             case '<': ++p; return Token::HTML_LINE;
             case '#': ++p; return Token::TAG_ID;
             case '.': ++p; return Token::TAG_CLASS;
+            case '=': ++p; return Token::OUTPUT_LINE;
             case '/':
                 if (p + 1 < end && p[1] == '!') return p += 2, Token::HTML_COMMENT_LINE;
                 else return ++p, Token::COMMENT_LINE;
@@ -119,6 +120,21 @@ namespace slim
             auto p2 = p; //p gets updated by try_newline
             while (p < end && !try_newline()) ++p, ++p2;
             return{ Token::TEXT_CONTENT, std::string(start, p2 - start) };
+        }
+
+        Token Lexer::next_whitespace_control()
+        {
+            if (p > end) error("Unexpected end");
+            if (p == end) return Token::END;
+            switch (*p)
+            {
+            case '<':
+                if (p + 1 < end && p[1] == '>')
+                    return p += 2, Token::ADD_LEADING_AND_TRAILING_WHITESPACE;
+                else return ++p, Token::ADD_LEADING_WHITESPACE;
+            case '>': ++p; return Token::ADD_TRAILING_WHITESPACE;
+            default: return Token::END;
+            }
         }
 
         bool Lexer::try_newline()

@@ -3,6 +3,7 @@
 #include "types/Enumerator.hpp"
 #include "types/Symbol.hpp"
 #include "types/Proc.hpp"
+#include "Util.hpp"
 namespace slim
 {
     namespace tpl
@@ -18,7 +19,8 @@ namespace slim
         }
         void TemplateOutputExpr::render(std::string & buffer, expr::Scope &scope) const
         {
-            buffer += expression->eval(scope)->to_string();
+            auto val = expression->eval(scope);
+            buffer += html_encode(val->to_string());
         }
 
         TemplateForExpr::TemplateForExpr(

@@ -87,6 +87,7 @@ BOOST_AUTO_TEST_CASE(next_line_start)
     BOOST_CHECK_EQUAL(Token::NAME, lexer("div").next_line_start().type);
     BOOST_CHECK_EQUAL(Token::TAG_ID, lexer("#").next_line_start().type);
     BOOST_CHECK_EQUAL(Token::TAG_CLASS, lexer(".").next_line_start().type);
+    BOOST_CHECK_EQUAL(Token::OUTPUT_LINE, lexer("=").next_line_start().type);
     BOOST_CHECK_THROW(lexer("").next_line_start(), TemplateSyntaxError);
     BOOST_CHECK_THROW(lexer("@").next_line_start(), TemplateSyntaxError);
 }
@@ -145,6 +146,16 @@ BOOST_AUTO_TEST_CASE(next_text_content)
     tok = lexer("   \t  text content\n").next_text_content();
     BOOST_CHECK_EQUAL(Token::TEXT_CONTENT, tok.type);
     BOOST_CHECK_EQUAL("  \t  text content", tok.str);
+}
+
+BOOST_AUTO_TEST_CASE(next_whitespace_control)
+{
+    BOOST_CHECK_EQUAL(lexer("").next_whitespace_control().type, Token::END);
+    BOOST_CHECK_EQUAL(lexer("\r\n").next_whitespace_control().type, Token::END);
+    BOOST_CHECK_EQUAL(lexer("x").next_whitespace_control().type, Token::END);
+    BOOST_CHECK_EQUAL(lexer(">").next_whitespace_control().type, Token::ADD_TRAILING_WHITESPACE);
+    BOOST_CHECK_EQUAL(lexer("<").next_whitespace_control().type, Token::ADD_LEADING_WHITESPACE);
+    BOOST_CHECK_EQUAL(lexer("<>").next_whitespace_control().type, Token::ADD_LEADING_AND_TRAILING_WHITESPACE);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

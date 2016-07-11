@@ -2,6 +2,9 @@
 #include "template/Lexer.hpp"
 #include "template/Token.hpp"
 #include "template/TemplateParts.hpp"
+#include "expression/Lexer.hpp"
+#include "expression/Parser.hpp"
+#include "BuiltinFunctions.hpp"
 #include "Error.hpp"
 #include "Util.hpp"
 #include <cassert>
@@ -23,23 +26,36 @@ namespace slim
 
         Parser::OutputFrame& Parser::OutputFrame::operator << (const std::string &text_content)
         {
-            if (in_tag())
-            {
-                set_in_tag(false);
-                this->text_content += '>';
-            }
+            handle_in_tag();
             this->text_content += text_content;
             return *this;
         }
         Parser::OutputFrame& Parser::OutputFrame::operator << (char txt_chr)
+        {
+            handle_in_tag();
+            this->text_content += txt_chr;
+            return *this;
+        }
+
+        Parser::OutputFrame& Parser::OutputFrame::operator << (std::unique_ptr<expr::ExpressionNode> &&expr)
+        {
+            handle_in_tag();
+            if (text_content.size())
+            {
+                contents.push_back(slim::make_unique<TemplateText>(std::move(text_content)));
+                text_content.clear();
+            }
+            contents.push_back(slim::make_unique<TemplateOutputExpr>(std::move(expr)));
+            return *this;
+        }
+        
+        void Parser::OutputFrame::handle_in_tag()
         {
             if (in_tag())
             {
                 set_in_tag(false);
                 this->text_content += '>';
             }
-            this->text_content += txt_chr;
-            return *this;
         }
 
         std::unique_ptr<TemplatePart> Parser::OutputFrame::make_tpl()
@@ -105,6 +121,9 @@ namespace slim
                 case Token::TAG_ID:
                 case Token::TAG_CLASS:
                     parse_tag(my_indent, output);
+                    break;
+                case Token::OUTPUT_LINE:
+                    parse_code_line(output);
                     break;
                 default: throw TemplateSyntaxError("Unexpected symbol");
                 }
@@ -221,6 +240,39 @@ namespace slim
             else throw TemplateSyntaxError("HTML void elements can not have content");
             if (trailing_space) output << ' ';
         }
+
+        void Parser::parse_code_line(OutputFrame &output)
+        {
+            assert(current_token.type == Token::OUTPUT_LINE);
+            current_token = lexer.next_whitespace_control();
+
+            bool leading_space = false, trailing_space = false;
+            switch (current_token.type)
+            {
+            case Token::ADD_LEADING_WHITESPACE:
+                leading_space = true; break;
+            case Token::ADD_TRAILING_WHITESPACE:
+                trailing_space = true;  break;
+            case Token::ADD_LEADING_AND_TRAILING_WHITESPACE:
+                leading_space = trailing_space = true; break;
+            default: break;
+            }
+
+            current_token = lexer.next_text_content();
+            if (current_token.type == Token::END) return;
+
+            if (leading_space) output << ' ';
+
+            expr::Lexer expr_lexer(current_token.str);
+            expr::Parser expr_parser(BUILTIN_FUNCTIONS, expr_lexer); //TODO: Allow custom functions
+            auto expr = expr_parser.parse_expression();
+            output << std::move(expr);
+
+            if (trailing_space) output << ' ';
+
+            current_token = lexer.next_indent(); //TODO: multi-line code block
+        }
+
 
         int Parser::current_indent()
         {

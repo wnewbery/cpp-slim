@@ -7,6 +7,10 @@
 namespace slim
 {
     class Template;
+    namespace expr
+    {
+        class ExpressionNode;
+    }
     namespace tpl
     {
         class Lexer;
@@ -32,6 +36,7 @@ namespace slim
                 OutputFrame() : contents(), text_content(), _in_tag(false) {}
                 OutputFrame& operator << (const std::string &text_content);
                 OutputFrame& operator << (char txt_chr);
+                OutputFrame& operator << (std::unique_ptr<expr::ExpressionNode> &&expr);
                 
                 std::unique_ptr<TemplatePart> make_tpl();
 
@@ -50,6 +55,8 @@ namespace slim
                  * output.
                  */
                 bool _in_tag;
+
+                void handle_in_tag();
             };
 
             Lexer &lexer;
@@ -61,6 +68,7 @@ namespace slim
 
             std::string parse_text_line(int base_indent);
             void parse_tag(int base_indent, OutputFrame &output);
+            void parse_code_line(OutputFrame &output);
         };
     }
 }

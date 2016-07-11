@@ -29,7 +29,9 @@ namespace slim
                 ADD_LEADING_WHITESPACE,
                 /**'<>' symbol after an element name.*/
                 ADD_LEADING_AND_TRAILING_WHITESPACE,
-                /**Text content, either a '`' or '|' line, or text at the end of a tag line.*/
+                /**Text content, either a '`' or '|' line, or text at the end of a tag line,
+                 * or code after a '='.
+                 */
                 TEXT_CONTENT,
                 /**'|' at start of line. */
                 TEXT_LINE,
@@ -40,7 +42,9 @@ namespace slim
                 /** '/' */
                 COMMENT_LINE,
                 /** '/!' */
-                HTML_COMMENT_LINE
+                HTML_COMMENT_LINE,
+                /** '=' */
+                OUTPUT_LINE
             };
 
             Token() {}
