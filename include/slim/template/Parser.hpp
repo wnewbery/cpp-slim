@@ -69,8 +69,6 @@ namespace slim
             std::string parse_text_line(int base_indent);
             void parse_tag(int base_indent, OutputFrame &output);
             void parse_code_line(OutputFrame &output);
-            /**Part after =, and any whitespace control.*/
-            void parse_code_line_inner(OutputFrame &output);
         };
     }
 }

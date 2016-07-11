@@ -85,9 +85,18 @@ BOOST_AUTO_TEST_CASE(code_lines)
     BOOST_CHECK_THROW(parse_str("="), TemplateSyntaxError);
     BOOST_CHECK_THROW(parse_str("=\n"), TemplateSyntaxError);
 
+    //inline with element, same but same line
     BOOST_CHECK_EQUAL("<p><%= 5 %></p>", parse_str("p = 5\n"));
+    BOOST_CHECK_EQUAL("<p><%= 5 %> </p>", parse_str("p => 5\n"));
     BOOST_CHECK_THROW(parse_str("p ="), TemplateSyntaxError);
     BOOST_CHECK_THROW(parse_str("p =\n"), TemplateSyntaxError);
+
+    //multi-line
+    BOOST_CHECK_EQUAL("<%= (5 + 2) %>", parse_str("= 5\\\n  + 2"));
+    BOOST_CHECK_EQUAL("<p><%= (5 + 2) %></p>", parse_str("p= 5\\\n  + 2"));
+
+    BOOST_CHECK_EQUAL("<%= a.f(5, 2) %>", parse_str("= a.f 5,\n  2"));
+    BOOST_CHECK_EQUAL("<p><%= a.f(5, 2) %></p>", parse_str("p= a.f 5,\n  2"));
 }
 
 BOOST_AUTO_TEST_CASE(void_tags)

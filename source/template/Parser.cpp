@@ -227,7 +227,7 @@ namespace slim
             }
             else if (current_token.type == Token::OUTPUT_LINE)
             {
-                parse_code_line_inner(output);
+                parse_code_line(output);
             }
             else if (current_token.type != Token::END)
             {
@@ -263,21 +263,34 @@ namespace slim
             }
 
             if (leading_space) output << ' ';
-            parse_code_line_inner(output);
-            if (trailing_space) output << ' ';
-        }
 
-        void Parser::parse_code_line_inner(OutputFrame &output)
-        {
-            current_token = lexer.next_text_content();
-            if (current_token.str.empty()) throw TemplateSyntaxError("Expected expression");
+            std::string script_src;
+            while (true)
+            {
+                current_token = lexer.next_text_content();
+                if (current_token.str.empty()) throw TemplateSyntaxError("Expected expression");
+                script_src += current_token.str;
 
-            expr::Lexer expr_lexer(current_token.str);
+                if (script_src.back() == ',')
+                {
+                    continue;
+                }
+                else if (script_src.back() == '\\')
+                {
+                    script_src.pop_back();
+                    continue;
+                }
+                else break;
+            }
+
+            expr::Lexer expr_lexer(script_src);
             expr::Parser expr_parser(BUILTIN_FUNCTIONS, expr_lexer); //TODO: Allow custom functions
             auto expr = expr_parser.parse_expression();
             output << std::move(expr);
 
-            current_token = lexer.next_indent(); //TODO: multi-line code block
+            if (trailing_space) output << ' ';
+
+            current_token = lexer.next_indent();
         }
 
         int Parser::current_indent()
