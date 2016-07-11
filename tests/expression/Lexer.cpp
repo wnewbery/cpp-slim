@@ -96,9 +96,10 @@ BOOST_AUTO_TEST_CASE(single_tokens)
     BOOST_CHECK_EQUAL("test_func55", tok.str);
     
     // invalid tokens
-    BOOST_CHECK_THROW(single_token("=+"), SyntaxError);
+    BOOST_CHECK_EQUAL(Token::UNKNOWN, single_token("= ").type);
+    BOOST_CHECK_EQUAL(Token::UNKNOWN, single_token("=+").type);
+    BOOST_CHECK_EQUAL(Token::UNKNOWN, single_token("@").type);
     BOOST_CHECK_THROW(Lexer("\\g'").next_str_interp('\''), SyntaxError);
-    BOOST_CHECK_THROW(single_token("@"), SyntaxError);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

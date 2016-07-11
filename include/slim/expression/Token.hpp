@@ -69,12 +69,21 @@ namespace slim
 
                 LOGICAL_NOT,
                 LOGICAL_AND,
-                LOGICAL_OR
+                LOGICAL_OR,
+
+                /**Empty token for unknown content.*/
+                UNKNOWN
             };
 
-            Token(Type type) : type(type), str() {}
-            Token(Type type, const std::string &str) : type(type), str(str) {}
+            Token(const char *pos, Type type)
+                : pos(pos), type(type), str()
+            {}
+            Token(const char *pos, Type type, const std::string &str)
+                : pos(pos), type(type), str(str)
+            {}
 
+            /**Position in source.*/
+            const char *pos;
             Type type;
             std::string str;
         };

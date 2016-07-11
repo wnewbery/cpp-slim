@@ -17,8 +17,22 @@ namespace slim
         public:
             Parser(const FunctionTable &global_functions, Lexer &lexer);
 
-            /**Parse the entire source as a complete expression. */
-            ExpressionNodePtr parse_expression();
+            /**Parse the entire source as a complete expression.
+             * Same as expression, but anything other than Token::END raises an error.
+             */
+            ExpressionNodePtr full_expression();
+
+            /**Parses a complete expression, stopping at as logic point.
+             *   - end of file.
+             *   - Unmatched ')'.
+             *   - Unexpected ','.
+             *   - Unexpected operator or value.
+             *   - Unknown token.
+             */
+            ExpressionNodePtr expression();
+
+            /**Gets the last token read from lexer.*/
+            const Token& get_last_token()const { return current_token; }
         private:
             const FunctionTable &global_functions;
             Lexer &lexer;
@@ -26,9 +40,6 @@ namespace slim
 
             /**Advance to the next token.*/
             void next();
-
-            /**Parses a complete expression, stopping on a ',', ')', or end of file.*/
-            ExpressionNodePtr expression();
             /** '(' expression ')' */
             ExpressionNodePtr sub_expression();
             /** A literal value, variable, or global function call. */

@@ -11,6 +11,7 @@ namespace slim
         public:
             Lexer(const char *str, size_t len) : start(str), p(str), end(str + len) {}
             Lexer(const std::string &str) : Lexer(str.data(), str.size()) {}
+            Lexer(const char *str, const char *end) : start(str), p(str), end(end) {}
 
             Token next();
             /**STRING_TEXT, STRING_INTERP_START, STRING_TERM*/
@@ -21,8 +22,8 @@ namespace slim
 
             [[noreturn]] void error(const std::string &msg);
             void skip_ws();
-            Token symbol();
-            Token number(bool negative);
+            Token symbol(const char *start);
+            Token number(const char *start, bool negative);
         };
     }
 }

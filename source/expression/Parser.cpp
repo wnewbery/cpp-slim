@@ -40,14 +40,13 @@ namespace slim
             }
         }
         Parser::Parser(const FunctionTable &global_functions, Lexer &lexer)
-            : global_functions(global_functions), lexer(lexer), current_token(Token::END)
-        {
-            
-        }
-
-        ExpressionNodePtr Parser::parse_expression()
+            : global_functions(global_functions), lexer(lexer), current_token(nullptr, Token::END)
         {
             next();
+        }
+
+        ExpressionNodePtr Parser::full_expression()
+        {
             auto ret = expression();
             if (current_token.type != Token::END) throw SyntaxError("Expected end");
             return ret;

@@ -121,8 +121,9 @@ BOOST_AUTO_TEST_CASE(next_tag_content)
     BOOST_CHECK_EQUAL(Token::TEXT_CONTENT, tok.type);
     BOOST_CHECK_EQUAL("text  <content> = symbols", tok.str);
 
-
-    BOOST_CHECK_THROW(lexer("value=x").next_tag_content(), TemplateSyntaxError);
+    tok = lexer("value=x").next_tag_content();
+    BOOST_CHECK_EQUAL(Token::ATTR_NAME, tok.type);
+    BOOST_CHECK_EQUAL("value", tok.str);
 
     auto a = lexer("Text");
     BOOST_CHECK_EQUAL(a.next_tag_content().type, Token::TEXT_CONTENT);

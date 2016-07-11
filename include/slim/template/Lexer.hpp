@@ -41,17 +41,16 @@ namespace slim
             Token next_line_start();
             /**Next part of a tag content after a tag name.
              * May return:
+             *    - ADD_*_WHITESPACE
+             *    - ATTR_NAME
              *    - END
              *    - EOL
              *    - NAME
-             *    - ADD_*_WHITESPACE
-             *    - TEXT_CONTENT
-             *    - TAG_ID
+             *    - OUTPUT_LINE
              *    - TAG_CLASS
+             *    - TAG_ID
+             *    - TEXT_CONTENT
              * Will later include:
-             *    - attribute name ("{NAME}=")
-             *    - text content
-             *    - dynamic content ("= ...")
              *    - close tag ("/")
              */
             Token next_tag_content();
@@ -60,6 +59,17 @@ namespace slim
             /**Reads '<', '>', or '<>', else 'END' even if not actually end of source.*/
             Token next_whitespace_control();
 
+            /**Get the current position in the source input.
+             * Used so that another lexer, such as expr::Lexer can be used to parse a block.
+             */
+            const char *get_pos()const { return p; }
+            /**Get the end of the source, to go with get_pos.*/
+            const char *get_end()const { return end; }
+            /**Set the current position in the source input.
+             * Used after some source was consumed by an expression, as this Lexer can not handle
+             * that syntax.
+             */
+            void set_pos(const char *p);
         private:
             const char *begin, *p, *end;
             int line;

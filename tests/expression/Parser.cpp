@@ -15,9 +15,16 @@ FunctionTable functions = { { f, "f" } }; // keep in scope for tests, else inval
 ExpressionNodePtr parse(const std::string &str)
 {
     Lexer lexer(str);
-    
+
     Parser parser(functions, lexer);
-    return parser.parse_expression();
+    return parser.full_expression();
+}
+std::string parse_part(const std::string &str)
+{
+    Lexer lexer(str);
+
+    Parser parser(functions, lexer);
+    return parser.expression()->to_string();
 }
 
 template<class T> bool is_node_type(ExpressionNodePtr ptr)
@@ -242,6 +249,14 @@ BOOST_AUTO_TEST_CASE(basic_syntax_errors)
     BOOST_CHECK_THROW(parse("{5 => 6"), SyntaxError);
     BOOST_CHECK_THROW(parse("{5 => 6,"), SyntaxError);
     BOOST_CHECK_THROW(parse("{5 => 6,}"), SyntaxError);
+}
+
+BOOST_AUTO_TEST_CASE(partial_expression)
+{
+    BOOST_CHECK_EQUAL("(5 - 5)", parse_part("5 - 5"));
+    BOOST_CHECK_EQUAL("(5 - 5)", parse_part("5 - 5 unexpected"));
+    BOOST_CHECK_EQUAL("(5 - 5)", parse_part("5 - 5 =unexpected"));
+    BOOST_CHECK_EQUAL("\"str\"", parse_part("\"str\" unexpected"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

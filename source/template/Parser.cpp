@@ -4,6 +4,9 @@
 #include "template/TemplateParts.hpp"
 #include "expression/Lexer.hpp"
 #include "expression/Parser.hpp"
+#include "expression/AstOp.hpp"
+#include "types/Boolean.hpp"
+#include "types/Nil.hpp"
 #include "BuiltinFunctions.hpp"
 #include "Error.hpp"
 #include "Util.hpp"
@@ -201,6 +204,38 @@ namespace slim
             output << '<' << tag_name; //TODO: attributes, empty tag
 
             //attributes
+            while (current_token.type == Token::ATTR_NAME)
+            {
+
+                expr::Lexer expr_lexer(lexer.get_pos(), lexer.get_end());
+                expr::Parser expr_parser(BUILTIN_FUNCTIONS, expr_lexer); //TODO: Allow custom functions
+                auto expr = expr_parser.expression();
+
+                lexer.set_pos(expr_parser.get_last_token().pos);
+
+                if (auto lit = dynamic_cast<expr::Literal*>(expr.get()))
+                {
+                    if (lit->value == TRUE_VALUE)
+                    {
+                        output << ' ' << current_token.str;
+                    }
+                    else if (lit->value == FALSE_VALUE || lit->value == NIL_VALUE)
+                    {
+                        //skip attribute
+                    }
+                    else
+                    {
+                        output << ' ' << current_token.str << "=\"" << lit->value->to_string() << '"';
+                    }
+                }
+                else
+                {
+                    output << ' ' << current_token.str << "=\"" << std::move(expr) << '"';
+                }
+
+                current_token = lexer.next_tag_content();
+            }
+
             if (!id.empty()) output << " id=\"" << id << '"';
             if (!class_names.empty())
             {
@@ -285,7 +320,7 @@ namespace slim
 
             expr::Lexer expr_lexer(script_src);
             expr::Parser expr_parser(BUILTIN_FUNCTIONS, expr_lexer); //TODO: Allow custom functions
-            auto expr = expr_parser.parse_expression();
+            auto expr = expr_parser.full_expression();
             output << std::move(expr);
 
             if (trailing_space) output << ' ';

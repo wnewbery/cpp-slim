@@ -103,7 +103,8 @@ namespace slim
             if (p < end && *p == '=')
             {
                 assert(p > start);
-                error("Element attributes not implemented");
+                ++p;
+                return{ Token::ATTR_NAME, std::string(start, p - start - 1) };
             }
             //just text, go to end of line
             auto p2 = p; //p gets updated by try_newline
@@ -136,6 +137,12 @@ namespace slim
             case '>': ++p; return Token::ADD_TRAILING_WHITESPACE;
             default: return Token::END;
             }
+        }
+
+        void Lexer::set_pos(const char *p)
+        {
+            assert(p >= this->p && p <= this->end);
+            this->p = p;
         }
 
         bool Lexer::try_newline()

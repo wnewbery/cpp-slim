@@ -44,7 +44,9 @@ namespace slim
                 /** '/!' */
                 HTML_COMMENT_LINE,
                 /** '=' */
-                OUTPUT_LINE
+                OUTPUT_LINE,
+                /** name=. '=' is not included in str. */
+                ATTR_NAME
             };
 
             Token() {}
