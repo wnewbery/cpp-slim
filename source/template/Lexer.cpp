@@ -2,6 +2,7 @@
 #include "template/Token.hpp"
 #include "Error.hpp"
 #include <cassert>
+#include <cstring>
 namespace slim
 {
     namespace tpl
