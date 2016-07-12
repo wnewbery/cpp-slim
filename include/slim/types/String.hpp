@@ -9,7 +9,8 @@ namespace slim
     {
     public:
         static const std::string TYPE_NAME;
-        explicit String(std::string v) : v(v) {}
+        explicit String(std::string &&v) : v(std::move(v)) {}
+        explicit String(const std::string &v) : v(v) {}
 
         virtual const std::string& type_name()const override { return TYPE_NAME; }
         virtual std::string to_string()const override { return v; }
@@ -126,6 +127,10 @@ namespace slim
         std::vector<std::string> split_lines(const std::string &sep)const;
     };
 
+    inline std::shared_ptr<String> make_value(std::string &&v)
+    {
+        return create_object<String>(std::move(v));
+    }
     inline std::shared_ptr<String> make_value(const std::string &v)
     {
         return create_object<String>(v);

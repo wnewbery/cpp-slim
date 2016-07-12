@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(attributes)
     BOOST_CHECK_EQUAL("<div<%=attr('id', x)%>></div>", parse_str("div id=x"));
     BOOST_CHECK_EQUAL("<div id=\"x\"></div>", parse_str("div id=\"x\""));
     BOOST_CHECK_EQUAL("<div<%=attr('id', (x + \"-name\"))%>></div>", parse_str("div id=x + \"-name\""));
-    BOOST_CHECK_EQUAL("<div<%=attr('id', ((\"\" + \"x-\") + name.to_s()))%>></div>", parse_str("div id=\"x-#{name}\""));
+    BOOST_CHECK_EQUAL("<div<%=attr('id', \"x-#{name}\")%>></div>", parse_str("div id=\"x-#{name}\""));
     BOOST_CHECK_EQUAL("<div disabled></div>", parse_str("div disabled=true"));
     BOOST_CHECK_EQUAL("<div></div>", parse_str("div disabled=false"));
     BOOST_CHECK_EQUAL("<div></div>", parse_str("div disabled=nil"));

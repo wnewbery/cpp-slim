@@ -146,5 +146,27 @@ namespace slim
                 return false_expr->eval(scope);
             }
         }
-    }
+
+        std::string InterpolatedString::to_string() const
+        {
+            std::string buf = "\"";
+            for (auto &node : nodes)
+            {
+                if (node.expr) buf += "#{" + node.expr->to_string() + "}";
+                else buf += node.literal_text;
+            }
+            buf += "\"";
+            return buf;
+        }
+        ObjectPtr InterpolatedString::eval(Scope & scope) const
+        {
+            std::string buf;
+            for (auto &node : nodes)
+            {
+                if (node.expr) buf += node.expr->eval(scope)->to_string();
+                else buf += node.literal_text;
+            }
+            return make_value(std::move(buf));
+        }
+}
 }

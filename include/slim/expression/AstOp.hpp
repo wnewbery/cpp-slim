@@ -122,5 +122,38 @@ namespace slim
             std::unique_ptr<ExpressionNode> true_expr;
             std::unique_ptr<ExpressionNode> false_expr;
         };
+        /**Interpolated string. This is effectively the same as a series of strong concatenations,
+         * using expr::Add, but is kept seperate to allow better rebuilding of the source
+         * (to_string), and for identification by other components (e.g. templates that wish to
+         * add HTML escaping).
+         */
+        class InterpolatedString : public ExpressionNode
+        {
+        public:
+            struct Node
+            {
+                std::unique_ptr<ExpressionNode> expr;
+                std::string literal_text;
+
+                Node(std::unique_ptr<ExpressionNode> &&expr)
+                    : expr(std::move(expr)), literal_text()
+                {}
+                Node(std::string &&str)
+                    : expr(nullptr), literal_text(std::move(str))
+                {}
+                Node(const std::string &str)
+                    : expr(nullptr), literal_text(str)
+                {}
+                Node(Node &&) = default;
+                Node & operator = (Node &&) = default;
+            };
+            typedef std::vector<Node> Nodes;
+
+            InterpolatedString(Nodes &&nodes) : nodes(std::move(nodes)) {}
+            virtual std::string to_string()const override;
+            virtual ObjectPtr eval(Scope &scope)const override;
+        private:
+            Nodes nodes;
+        };
     }
 }

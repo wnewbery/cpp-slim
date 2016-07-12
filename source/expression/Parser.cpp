@@ -107,7 +107,7 @@ namespace slim
         ExpressionNodePtr Parser::interp_string()
         {
             assert(current_token.type == Token::STRING_DELIM);
-            std::vector<ExpressionNodePtr> parts;
+            InterpolatedString::Nodes parts;
             bool interp = false;
             char delim = current_token.str[0];
 
@@ -118,7 +118,7 @@ namespace slim
                 {
                 case Token::STRING_DELIM: break;
                 case Token::STRING_TEXT:
-                    parts.push_back(slim::make_unique<Literal>(make_value(current_token.str)));
+                    parts.emplace_back(current_token.str);
                     break;
                 case Token::STRING_INTERP_START:
                 {
@@ -126,10 +126,7 @@ namespace slim
                     next();
                     auto expr = expression();
                     if (current_token.type != Token::R_CURLY_BRACKET) throw SyntaxError("Expected '}'");
-                    parts.push_back(slim::make_unique<MemberFuncCall>(
-                        std::move(expr),
-                        symbol("to_s"),
-                        FuncCall::Args()));
+                    parts.emplace_back(std::move(expr));
                     break;
                 }
                 default: throw SyntaxError("Unexpected token in interpolated string");
@@ -138,22 +135,17 @@ namespace slim
             while (current_token.type != Token::STRING_DELIM);
             next();
 
+            if (parts.empty()) return slim::make_unique<Literal>(make_value(""));
+
             if (!interp)
             {
                 //single string text
                 assert(parts.size() <= 1);
-                if (parts.size() == 1)
-                {
-                    return std::move(parts[0]);
-                }
+                assert(!parts[0].expr);
+                return slim::make_unique<Literal>(make_value(parts[0].literal_text));
             }
 
-            ExpressionNodePtr lhs = slim::make_unique<Literal>(make_value(""));
-            for (size_t i = 0; i < parts.size(); ++i)
-            {
-                lhs = slim::make_unique<Add>(std::move(lhs), std::move(parts[i]));
-            }
-            return lhs;
+            return slim::make_unique<InterpolatedString>(std::move(parts));
         }
 
         ExpressionNodePtr Parser::array_literal()
