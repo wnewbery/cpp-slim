@@ -69,7 +69,7 @@ namespace slim
 
             std::string parse_text_line(int base_indent);
             void parse_tag(int base_indent, OutputFrame &output);
-            void parse_code_line(OutputFrame &output);
+            void parse_code_output(OutputFrame &output);
             void parse_control_code(int base_indent, OutputFrame &output);
 
             /**Parse code starting with '-', '=', etc. and handling '\' and ',' line continuation.*/

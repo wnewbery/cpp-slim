@@ -229,6 +229,11 @@ BOOST_AUTO_TEST_CASE(cond)
             "-if false\n"
             "  br\n"
         ));
+
+
+    BOOST_CHECK_THROW(parse_str("-elsif true"), TemplateSyntaxError);
+    BOOST_CHECK_THROW(parse_str("-else"), TemplateSyntaxError);
+    BOOST_CHECK_THROW(parse_str("-if true\n  p\n-else x\n  p\n"), TemplateSyntaxError);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

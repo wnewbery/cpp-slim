@@ -131,7 +131,7 @@ namespace slim
                     parse_tag(my_indent, output);
                     break;
                 case Token::OUTPUT_LINE:
-                    parse_code_line(output);
+                    parse_code_output(output);
                     break;
                 case Token::CONTROL_LINE:
                     parse_control_code(my_indent, output);
@@ -270,7 +270,7 @@ namespace slim
             }
             else if (current_token.type == Token::OUTPUT_LINE)
             {
-                parse_code_line(output);
+                parse_code_output(output);
             }
             else if (current_token.type != Token::END)
             {
@@ -288,7 +288,7 @@ namespace slim
             if (trailing_space) output << ' ';
         }
 
-        void Parser::parse_code_line(OutputFrame &output)
+        void Parser::parse_code_output(OutputFrame &output)
         {
             assert(current_token.type == Token::OUTPUT_LINE);
             current_token = lexer.next_whitespace_control();

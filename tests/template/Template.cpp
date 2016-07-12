@@ -78,4 +78,78 @@ BOOST_AUTO_TEST_CASE(code_lines)
         render_tpl("p\n  =b\n", model));
 }
 
+BOOST_AUTO_TEST_CASE(cond_if)
+{
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p>True</p>",
+        render_tpl("-if true\n  p True"));
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n",
+        render_tpl("-if false\n  p True"));
+
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p>If</p>",
+        render_tpl(
+            "-if true\n"
+            "  p If\n"
+            "-else\n"
+            "  p Else\n"
+        ));
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p>Else</p>",
+        render_tpl(
+            "-if false\n"
+            "  p If\n"
+            "-else\n"
+            "  p Else\n"
+        ));
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p>If</p>",
+        render_tpl(
+            "-if true\n"
+            "  p If\n"
+            "-elsif true\n"
+            "  p Elsif\n"
+            "-else\n"
+            "  p Else\n"
+        ));
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p>Elsif</p>",
+        render_tpl(
+            "-if false\n"
+            "  p If\n"
+            "-elsif true\n"
+            "  p Elsif\n"
+            "-else\n"
+            "  p Else\n"
+        ));
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p>Elsif</p>",
+        render_tpl(
+            "-if false\n"
+            "  p If\n"
+            "-elsif true\n"
+            "  p Elsif\n"
+            "-elsif true\n"
+            "  p Elsif2\n"
+        ));
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p>Elsif2</p>",
+        render_tpl(
+            "-if false\n"
+            "  p If\n"
+            "-elsif false\n"
+            "  p Elsif\n"
+            "-elsif true\n"
+            "  p Elsif2\n"
+        ));
+}
+
 BOOST_AUTO_TEST_SUITE_END()
