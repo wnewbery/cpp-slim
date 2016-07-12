@@ -217,6 +217,7 @@ namespace slim
 
                 expr::Lexer expr_lexer(lexer.get_pos(), lexer.get_end());
                 expr::Parser expr_parser(BUILTIN_FUNCTIONS, expr_lexer); //TODO: Allow custom functions
+                auto attr = current_token.str;
                 auto expr = expr_parser.expression();
 
                 lexer.set_pos(expr_parser.get_last_token().pos);
@@ -225,7 +226,7 @@ namespace slim
                 {
                     if (lit->value == TRUE_VALUE)
                     {
-                        output << ' ' << current_token.str;
+                        output << ' ' << attr;
                     }
                     else if (lit->value == FALSE_VALUE || lit->value == NIL_VALUE)
                     {
@@ -233,12 +234,12 @@ namespace slim
                     }
                     else
                     {
-                        output << ' ' << current_token.str << "=\"" << lit->value->to_string() << '"';
+                        output << ' ' << attr << "=\"" << lit->value->to_string() << '"';
                     }
                 }
                 else
                 {
-                    output << ' ' << current_token.str << "=\"" << std::move(expr) << '"';
+                    output << slim::make_unique<TemplateTagAttr>(attr, std::move(expr));
                 }
 
                 current_token = lexer.next_tag_content();

@@ -54,6 +54,21 @@ namespace slim
         protected:
             std::unique_ptr<Expression> expression;
         };
+        /**@brief Attribute with dynamic value.
+         * Handles boolean as well as string attributes.
+         */
+        class TemplateTagAttr : public TemplatePart
+        {
+        public:
+            TemplateTagAttr(const std::string &attr, std::unique_ptr<Expression> &&expression);
+            ~TemplateTagAttr();
+
+            virtual std::string to_string()const override;
+            virtual void render(std::string &buffer, expr::Scope &scope)const override;
+        protected:
+            std::string attr;
+            std::unique_ptr<Expression> expression;
+        };
         /**@brief A script for loop, containing a template body.*/
         class TemplateForExpr : public TemplatePart
         {

@@ -78,6 +78,32 @@ BOOST_AUTO_TEST_CASE(code_lines)
         render_tpl("p\n  =b\n", model));
 }
 
+BOOST_AUTO_TEST_CASE(attributes)
+{
+    ViewModel model;
+    model.set("a", make_value("Test"));
+    model.set("b", TRUE_VALUE);
+    model.set("c", FALSE_VALUE);
+    model.set("d", NIL_VALUE);
+
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p disabled=\"Test\"></p>",
+        render_tpl("p disabled=a", model));
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p disabled></p>",
+        render_tpl("p disabled=b", model));
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p></p>",
+        render_tpl("p disabled=c", model));
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p></p>",
+        render_tpl("p disabled=d", model));
+}
+
 BOOST_AUTO_TEST_CASE(cond_if)
 {
     BOOST_CHECK_EQUAL(

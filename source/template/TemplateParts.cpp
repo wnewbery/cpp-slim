@@ -1,5 +1,7 @@
 #include "template/TemplateParts.hpp"
 #include "expression/Expression.hpp"
+#include "types/Boolean.hpp"
+#include "types/Nil.hpp"
 #include "types/Enumerator.hpp"
 #include "types/Symbol.hpp"
 #include "types/Proc.hpp"
@@ -21,6 +23,36 @@ namespace slim
         {
             auto val = expression->eval(scope);
             buffer += html_encode(val->to_string());
+        }
+
+
+        TemplateTagAttr::TemplateTagAttr(const std::string &attr, std::unique_ptr<Expression> &&expression)
+            : attr(attr), expression(std::move(expression))
+        {}
+        TemplateTagAttr::~TemplateTagAttr()
+        {}
+
+        std::string TemplateTagAttr::to_string()const
+        {
+            return "<%=attr('" + attr + "', " + expression->to_string() + ")%>";
+        }
+        void TemplateTagAttr::render(std::string &buffer, expr::Scope &scope)const
+        {
+            auto value = expression->eval(scope);
+            if (value == TRUE_VALUE)
+            {
+                buffer += ' ';
+                buffer += attr;
+            }
+            else if (value != FALSE_VALUE && value != NIL_VALUE)
+            {
+                buffer += ' ';
+                buffer += attr;
+                buffer += '=';
+                buffer += '"';
+                buffer += value->to_string();
+                buffer += '"';
+            }
         }
 
         TemplateForExpr::TemplateForExpr(
