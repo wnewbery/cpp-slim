@@ -126,6 +126,9 @@
     <ClInclude Include="include\slim\Util.hpp">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\slim\template\Attributes.hpp">
+      <Filter>include\template</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\types\Object.cpp">

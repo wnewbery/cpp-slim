@@ -2,6 +2,7 @@
 #include "template/Lexer.hpp"
 #include "template/Token.hpp"
 #include "template/TemplateParts.hpp"
+#include "template/Attributes.hpp"
 #include "expression/Lexer.hpp"
 #include "expression/Parser.hpp"
 #include "expression/AstOp.hpp"
@@ -166,9 +167,14 @@ namespace slim
         void Parser::parse_tag(int base_indent, OutputFrame & output)
         {
             //name, id and class
+            struct Attr
+            {
+                std::vector<std::string> static_values;
+                std::vector<expr::ExpressionNodePtr> dynamic_values;
+            };
+            std::unordered_map<std::string, Attr> attributes;
+
             std::string tag_name;
-            std::string id;
-            std::vector<std::string> class_names;
             if (current_token.type == Token::NAME)
             {
                 tag_name = current_token.str;
@@ -178,13 +184,13 @@ namespace slim
             if (current_token.type == Token::TAG_ID)
             {
                 current_token = lexer.next_name();
-                id = current_token.str;
+                attributes["id"].static_values.push_back(current_token.str);
                 current_token = lexer.next_tag_content();
             }
             while (current_token.type == Token::TAG_CLASS)
             {
                 current_token = lexer.next_name();
-                class_names.push_back(current_token.str);
+                attributes["class"].static_values.push_back(current_token.str);
                 current_token = lexer.next_tag_content();
             }
 
@@ -217,6 +223,8 @@ namespace slim
 
                 expr::Lexer expr_lexer(lexer.get_pos(), lexer.get_end());
                 expr::Parser expr_parser(BUILTIN_FUNCTIONS, expr_lexer); //TODO: Allow custom functions
+
+
                 auto attr = current_token.str;
                 auto expr = expr_parser.expression();
 
@@ -234,29 +242,38 @@ namespace slim
                     }
                     else
                     {
-                        output << ' ' << attr << "=\"" << lit->value->to_string() << '"';
+                        attributes[attr].static_values.push_back(lit->value->to_string());
                     }
                 }
                 else
                 {
-                    output << slim::make_unique<TemplateTagAttr>(attr, std::move(expr));
+                    attributes[attr].dynamic_values.push_back(std::move(expr));
                 }
 
                 current_token = lexer.next_tag_content();
             }
 
-            if (!id.empty()) output << " id=\"" << id << '"';
-            if (!class_names.empty())
+            for (auto &attr : attributes)
             {
-                output << " class=\"";
-                for (size_t i = 0; i < class_names.size(); ++i)
+                if (attr.second.dynamic_values.empty())
                 {
-                    if (i > 0) output << ' ';
-                    output << class_names[i];
+                    assert(attr.second.static_values.size() > 0);
+                    output << attr_str(attr.first, attr.second.static_values);
                 }
-                output << '"';
             }
-            
+            for (auto &attr : attributes)
+            {
+                if (!attr.second.dynamic_values.empty())
+                {
+                    output << slim::make_unique<TemplateTagAttr>(
+                        attr.first,
+                        std::move(attr.second.static_values),
+                        std::move(attr.second.dynamic_values));
+                }
+            }
+
+
+
             //Contents
             output.set_in_tag();
             if (current_token.type == Token::TEXT_CONTENT)

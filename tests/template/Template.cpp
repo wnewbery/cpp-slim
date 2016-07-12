@@ -102,6 +102,14 @@ BOOST_AUTO_TEST_CASE(attributes)
         "<!DOCTYPE html>\n"
         "<p></p>",
         render_tpl("p disabled=d", model));
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p class=\"a b e\"></p>",
+        render_tpl("p.a.b class='e'", model));
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p class=\"a b Test e f\"></p>",
+        render_tpl("p.a.b class=[a, 'e', 'f']", model));
 }
 
 BOOST_AUTO_TEST_CASE(cond_if)

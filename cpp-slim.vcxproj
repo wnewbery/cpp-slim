@@ -35,6 +35,7 @@
     <ClInclude Include="include\slim\FunctionHelpers.hpp" />
     <ClInclude Include="include\slim\Maths.hpp" />
     <ClInclude Include="include\slim\Operators.hpp" />
+    <ClInclude Include="include\slim\template\Attributes.hpp" />
     <ClInclude Include="include\slim\template\Lexer.hpp" />
     <ClInclude Include="include\slim\template\Parser.hpp" />
     <ClInclude Include="include\slim\template\Template.hpp" />

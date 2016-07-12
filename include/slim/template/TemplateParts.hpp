@@ -60,14 +60,18 @@ namespace slim
         class TemplateTagAttr : public TemplatePart
         {
         public:
-            TemplateTagAttr(const std::string &attr, std::unique_ptr<Expression> &&expression);
+            TemplateTagAttr(
+                const std::string &attr,
+                std::vector<std::string> &&static_values,
+                std::vector<std::unique_ptr<Expression>> &&dynamic_values);
             ~TemplateTagAttr();
 
             virtual std::string to_string()const override;
             virtual void render(std::string &buffer, expr::Scope &scope)const override;
         protected:
             std::string attr;
-            std::unique_ptr<Expression> expression;
+            std::vector<std::string> static_values;
+            std::vector<std::unique_ptr<Expression>> dynamic_values;
         };
         /**@brief A script for loop, containing a template body.*/
         class TemplateForExpr : public TemplatePart

@@ -1,5 +1,7 @@
 #include "template/TemplateParts.hpp"
+#include "template/Attributes.hpp"
 #include "expression/Expression.hpp"
+#include "types/Array.hpp"
 #include "types/Boolean.hpp"
 #include "types/Nil.hpp"
 #include "types/Enumerator.hpp"
@@ -26,33 +28,54 @@ namespace slim
         }
 
 
-        TemplateTagAttr::TemplateTagAttr(const std::string &attr, std::unique_ptr<Expression> &&expression)
-            : attr(attr), expression(std::move(expression))
+        TemplateTagAttr::TemplateTagAttr(
+            const std::string &attr,
+            std::vector<std::string> &&static_values,
+            std::vector<std::unique_ptr<Expression>> &&dynamic_values)
+            : attr(attr)
+            , static_values(std::move(static_values))
+            , dynamic_values(std::move(dynamic_values))
         {}
         TemplateTagAttr::~TemplateTagAttr()
         {}
 
         std::string TemplateTagAttr::to_string()const
         {
-            return "<%=attr('" + attr + "', " + expression->to_string() + ")%>";
+            std::string buf = "<%=attr('" + attr + "'";
+            for (auto &x : static_values) buf += ", '" + x + "'";
+            for (auto &x : dynamic_values) buf += ", " + x->to_string();
+            buf += ")%>";
+            return buf;
         }
         void TemplateTagAttr::render(std::string &buffer, expr::Scope &scope)const
         {
-            auto value = expression->eval(scope);
-            if (value == TRUE_VALUE)
+            std::vector<ObjectPtr> values;
+            for (auto &expr : dynamic_values)
             {
-                buffer += ' ';
-                buffer += attr;
+                auto val = expr->eval(scope);
+                if (auto arr = dynamic_cast<Array*>(val.get()))
+                {
+                    for (auto val2 : arr->get_value()) values.push_back(val2);
+                }
+                else values.push_back(val);
             }
-            else if (value != FALSE_VALUE && value != NIL_VALUE)
+
+            if (static_values.empty() && values.empty()) return;
+
+            if (static_values.empty() && values.size() == 1)
             {
-                buffer += ' ';
-                buffer += attr;
-                buffer += '=';
-                buffer += '"';
-                buffer += value->to_string();
-                buffer += '"';
+                if (values[0] == TRUE_VALUE)
+                {
+                    buffer += ' ' + attr;
+                    return;
+                }
+                else if (values[0] == FALSE_VALUE || values[0] == NIL_VALUE) return;
             }
+
+            std::vector<std::string> strings = static_values;
+            for (auto &v : values) strings.push_back(v->to_string());
+
+            buffer += attr_str(attr, strings);
         }
 
         TemplateForExpr::TemplateForExpr(
