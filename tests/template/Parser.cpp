@@ -135,4 +135,100 @@ BOOST_AUTO_TEST_CASE(attributes)
     BOOST_CHECK_EQUAL("<div></div>", parse_str("div disabled=nil"));
 }
 
+BOOST_AUTO_TEST_CASE(cond)
+{
+    //if
+    BOOST_CHECK_EQUAL(
+        "<% if true %>"
+        "<img/>"
+        "<% end %>",
+        parse_str(
+            "-if true\n"
+            "  img\n"
+        ));
+
+    //if else
+    BOOST_CHECK_EQUAL(
+        "<% if true %>"
+        "<img/>"
+        "<% else %>"
+        "<hr/>"
+        "<% end %>",
+        parse_str(
+            "-if true\n"
+            "  img\n"
+            "-else\n"
+            "  hr\n"
+        ));
+
+    //if elsif
+    BOOST_CHECK_EQUAL(
+        "<% if true %>"
+        "<img/>"
+        "<% elsif false %>"
+        "<br/>"
+        "<% end %>",
+        parse_str(
+            "-if true\n"
+            "  img\n"
+            "-elsif false\n"
+            "  br\n"
+        ));
+
+    //if elsif else
+    BOOST_CHECK_EQUAL(
+        "<% if true %>"
+        "<img/>"
+        "<% elsif false %>"
+        "<br/>"
+        "<% else %>"
+        "<hr/>"
+        "<% end %>",
+        parse_str(
+            "-if true\n"
+            "  img\n"
+            "-elsif false\n"
+            "  br\n"
+            "-else\n"
+            "  hr\n"
+        ));
+
+    //if elsif elsif else
+    BOOST_CHECK_EQUAL(
+        "<% if true %>"
+        "<img/>"
+        "<% elsif false %>"
+        "<br/>"
+        "<% elsif nil %>"
+        "<br/>"
+        "<% else %>"
+        "<hr/>"
+        "<% end %>",
+        parse_str(
+            "-if true\n"
+            "  img\n"
+            "-elsif false\n"
+            "  br\n"
+            "-elsif nil\n"
+            "  br\n"
+            "-else\n"
+            "  hr\n"
+        ));
+
+    //if if
+    BOOST_CHECK_EQUAL(
+        "<% if true %>"
+        "<img/>"
+        "<% end %>"
+        "<% if false %>"
+        "<br/>"
+        "<% end %>",
+        parse_str(
+            "-if true\n"
+            "  img\n"
+            "-if false\n"
+            "  br\n"
+        ));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

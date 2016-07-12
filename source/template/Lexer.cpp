@@ -62,6 +62,7 @@ namespace slim
             case '#': ++p; return Token::TAG_ID;
             case '.': ++p; return Token::TAG_CLASS;
             case '=': ++p; return Token::OUTPUT_LINE;
+            case '-': ++p; return Token::CONTROL_LINE;
             case '/':
                 if (p + 1 < end && p[1] == '!') return p += 2, Token::HTML_COMMENT_LINE;
                 else return ++p, Token::COMMENT_LINE;
@@ -139,6 +140,28 @@ namespace slim
             }
         }
 
+        Token Lexer::control_code_start()
+        {
+            skip_spaces();
+            if (p >= end) error("Unexpected end");
+            
+            if (starts_with("if ")) return Token::IF;
+            if (starts_with("elsif ")) return Token::ELSIF;
+            if (starts_with("else")) return Token::ELSE;
+            if (starts_with("unless ")) return Token::UNLESS;
+            return Token::EACH_START;
+        }
+
+        bool Lexer::try_control_line()
+        {
+            if (p < end && *p == '-')
+            {
+                ++p;
+                return true;
+            }
+            else return false;
+        }
+
         void Lexer::set_pos(const char *p)
         {
             assert(p >= this->p && p <= this->end);
@@ -169,6 +192,16 @@ namespace slim
                 }
             }
             return false;
+        }
+
+        bool Lexer::starts_with(const std::string &str)
+        {
+            if (p + str.size() <= end && memcmp(p, str.data(), str.size()) == 0)
+            {
+                p += str.size();
+                return true;
+            }
+            else return false;
         }
 
         void Lexer::skip_spaces()

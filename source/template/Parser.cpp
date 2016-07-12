@@ -42,13 +42,18 @@ namespace slim
 
         Parser::OutputFrame& Parser::OutputFrame::operator << (std::unique_ptr<expr::ExpressionNode> &&expr)
         {
+            return *this << slim::make_unique<TemplateOutputExpr>(std::move(expr));
+        }
+
+        Parser::OutputFrame& Parser::OutputFrame::operator << (std::unique_ptr<TemplatePart> &&part)
+        {
             handle_in_tag();
             if (text_content.size())
             {
                 contents.push_back(slim::make_unique<TemplateText>(std::move(text_content)));
                 text_content.clear();
             }
-            contents.push_back(slim::make_unique<TemplateOutputExpr>(std::move(expr)));
+            contents.push_back(std::move(part));
             return *this;
         }
         
@@ -127,6 +132,9 @@ namespace slim
                     break;
                 case Token::OUTPUT_LINE:
                     parse_code_line(output);
+                    break;
+                case Token::CONTROL_LINE:
+                    parse_control_code(my_indent, output);
                     break;
                 default: throw TemplateSyntaxError("Unexpected symbol");
                 }
@@ -297,8 +305,83 @@ namespace slim
             default: break;
             }
 
-            if (leading_space) output << ' ';
+            auto expr = parse_code_lines();
 
+            if (leading_space) output << ' ';
+            output << std::move(expr);
+            if (trailing_space) output << ' ';
+
+            current_token = lexer.next_indent();
+        }
+
+        void Parser::parse_control_code(int base_indent, OutputFrame &output)
+        {
+            assert(current_token.type == Token::CONTROL_LINE);
+
+            current_token = lexer.control_code_start();
+            bool have_control_line = true;
+            while (have_control_line)
+            {
+                have_control_line = false;
+                if (current_token.type == Token::IF)
+                {
+                    auto if_expr = parse_code_lines();
+                    OutputFrame if_body;
+                    std::vector<TemplateCondExpr> elsif;
+                    std::unique_ptr<TemplatePart> else_body;
+
+                    current_token = lexer.next_indent();
+                    parse_lines(base_indent, if_body);
+
+                    while (current_indent() == base_indent && lexer.try_control_line())
+                    {
+                        current_token = lexer.control_code_start();
+                        if (current_token.type == Token::ELSIF)
+                        {
+                            auto expr = parse_code_lines();
+                            OutputFrame frame;
+
+                            current_token = lexer.next_indent();
+                            parse_lines(base_indent, frame);
+
+                            elsif.emplace_back(std::move(expr), frame.make_tpl());
+                        }
+                        else if (current_token.type == Token::ELSE)
+                        {
+                            current_token = lexer.next_text_content();
+                            if (!current_token.str.empty())
+                                throw TemplateSyntaxError("Unexpected content after 'else'");
+
+                            OutputFrame frame;
+
+                            current_token = lexer.next_indent();
+                            parse_lines(base_indent, frame);
+                            else_body = frame.make_tpl();
+
+                            break; //'else' is last in chain
+                        }
+                        else //if, each, unless, etc. start a new control block in outer loop
+                        {
+                            have_control_line = true;
+                            break;
+                        }
+                    }
+
+                    output << slim::make_unique<TemplateIfExpr>(
+                        TemplateCondExpr{std::move(if_expr), if_body.make_tpl()},
+                        std::move(elsif),
+                        std::move(else_body)
+                        );
+                }
+                else
+                {
+                    throw TemplateSyntaxError("Unexpected control code start");
+                }
+            }
+        }
+
+        std::unique_ptr<expr::ExpressionNode> Parser::parse_code_lines()
+        {
             std::string script_src;
             while (true)
             {
@@ -321,11 +404,8 @@ namespace slim
             expr::Lexer expr_lexer(script_src);
             expr::Parser expr_parser(BUILTIN_FUNCTIONS, expr_lexer); //TODO: Allow custom functions
             auto expr = expr_parser.full_expression();
-            output << std::move(expr);
 
-            if (trailing_space) output << ' ';
-
-            current_token = lexer.next_indent();
+            return expr;
         }
 
         int Parser::current_indent()

@@ -37,6 +37,7 @@ namespace slim
              *    - TAG_ID
              *    - TAG_CLASS
              *    - OUTPUT_LINE
+             *    - CONTROL_LINE
              */
             Token next_line_start();
             /**Next part of a tag content after a tag name.
@@ -58,6 +59,12 @@ namespace slim
             Token next_text_content();
             /**Reads '<', '>', or '<>', else 'END' even if not actually end of source.*/
             Token next_whitespace_control();
+            /**Reads the first token from a control code line.
+             * IF, UNLESS or EACH_START.
+             */
+            Token control_code_start();
+            /**See if the next token is a '-', if so return true and advance.*/
+            bool try_control_line();
 
             /**Get the current position in the source input.
              * Used so that another lexer, such as expr::Lexer can be used to parse a block.
@@ -76,6 +83,8 @@ namespace slim
 
             /**If next is a newline (\r, \n, or \r\n), consume it and return true.*/
             bool try_newline();
+            /**If next matches str, return true and advance p by strlen(str).*/
+            bool starts_with(const std::string &str);
             /**Skip any ' ' or '\t'.*/
             void skip_spaces();
 

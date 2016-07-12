@@ -76,6 +76,9 @@ namespace slim
             std::unique_ptr<Expression> expr;
             std::unique_ptr<TemplatePart> body;
 
+            TemplateCondExpr(std::unique_ptr<Expression> &&expr, std::unique_ptr<TemplatePart> &&body)
+                : expr(std::move(expr)), body(std::move(body))
+            {}
             TemplateCondExpr(TemplateCondExpr &&) = default;
             TemplateCondExpr& operator =(TemplateCondExpr &&) = default;
         };

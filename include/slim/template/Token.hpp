@@ -46,7 +46,20 @@ namespace slim
                 /** '=' */
                 OUTPUT_LINE,
                 /** name=. '=' is not included in str. */
-                ATTR_NAME
+                ATTR_NAME,
+
+                /** '-' control line.*/
+                CONTROL_LINE,
+                /** 'if' */
+                IF,
+                /** 'unless' */
+                UNLESS,
+                /** 'elsif' */
+                ELSIF,
+                /** 'else' */
+                ELSE,
+                /** '' */
+                EACH_START
             };
 
             Token() {}

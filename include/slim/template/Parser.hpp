@@ -37,6 +37,7 @@ namespace slim
                 OutputFrame& operator << (const std::string &text_content);
                 OutputFrame& operator << (char txt_chr);
                 OutputFrame& operator << (std::unique_ptr<expr::ExpressionNode> &&expr);
+                OutputFrame& operator << (std::unique_ptr<TemplatePart> &&part);
                 
                 std::unique_ptr<TemplatePart> make_tpl();
 
@@ -69,6 +70,10 @@ namespace slim
             std::string parse_text_line(int base_indent);
             void parse_tag(int base_indent, OutputFrame &output);
             void parse_code_line(OutputFrame &output);
+            void parse_control_code(int base_indent, OutputFrame &output);
+
+            /**Parse code starting with '-', '=', etc. and handling '\' and ',' line continuation.*/
+            std::unique_ptr<expr::ExpressionNode> parse_code_lines();
         };
     }
 }

@@ -88,6 +88,7 @@ BOOST_AUTO_TEST_CASE(next_line_start)
     BOOST_CHECK_EQUAL(Token::TAG_ID, lexer("#").next_line_start().type);
     BOOST_CHECK_EQUAL(Token::TAG_CLASS, lexer(".").next_line_start().type);
     BOOST_CHECK_EQUAL(Token::OUTPUT_LINE, lexer("=").next_line_start().type);
+    BOOST_CHECK_EQUAL(Token::CONTROL_LINE, lexer("-").next_line_start().type);
     BOOST_CHECK_THROW(lexer("").next_line_start(), TemplateSyntaxError);
     BOOST_CHECK_THROW(lexer("@").next_line_start(), TemplateSyntaxError);
 }
@@ -158,6 +159,19 @@ BOOST_AUTO_TEST_CASE(next_whitespace_control)
     BOOST_CHECK_EQUAL(lexer(">").next_whitespace_control().type, Token::ADD_TRAILING_WHITESPACE);
     BOOST_CHECK_EQUAL(lexer("<").next_whitespace_control().type, Token::ADD_LEADING_WHITESPACE);
     BOOST_CHECK_EQUAL(lexer("<>").next_whitespace_control().type, Token::ADD_LEADING_AND_TRAILING_WHITESPACE);
+}
+
+BOOST_AUTO_TEST_CASE(control_code_start)
+{
+    BOOST_CHECK_EQUAL(lexer("if ").control_code_start().type, Token::IF);
+    BOOST_CHECK_EQUAL(lexer("  if ").control_code_start().type, Token::IF);
+    BOOST_CHECK_EQUAL(lexer("unless ").control_code_start().type, Token::UNLESS);
+    BOOST_CHECK_EQUAL(lexer("\tunless ").control_code_start().type, Token::UNLESS);
+    BOOST_CHECK_EQUAL(lexer("elsif ").control_code_start().type, Token::ELSIF);
+    BOOST_CHECK_EQUAL(lexer("else ").control_code_start().type, Token::ELSE);
+    BOOST_CHECK_EQUAL(lexer("x").control_code_start().type, Token::EACH_START);
+    BOOST_CHECK_THROW(lexer("").control_code_start(), TemplateSyntaxError);
+    BOOST_CHECK_THROW(lexer("  \t ").control_code_start(), TemplateSyntaxError);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
