@@ -169,10 +169,17 @@ namespace slim
             //name, id and class
             struct Attr
             {
+                std::string name;
                 std::vector<std::string> static_values;
                 std::vector<expr::ExpressionNodePtr> dynamic_values;
             };
-            std::unordered_map<std::string, Attr> attributes;
+            std::vector<Attr> attributes;
+            auto get_attr = [&attributes](const std::string &name) -> Attr&
+            {
+                for (auto &attr : attributes) if (attr.name == name) return attr;
+                attributes.push_back({ name,{},{} });
+                return attributes.back();
+            };
 
             std::string tag_name;
             if (current_token.type == Token::NAME)
@@ -184,13 +191,13 @@ namespace slim
             if (current_token.type == Token::TAG_ID)
             {
                 current_token = lexer.next_name();
-                attributes["id"].static_values.push_back(current_token.str);
+                get_attr("id").static_values.push_back(current_token.str);
                 current_token = lexer.next_tag_content();
             }
             while (current_token.type == Token::TAG_CLASS)
             {
                 current_token = lexer.next_name();
-                attributes["class"].static_values.push_back(current_token.str);
+                get_attr("class").static_values.push_back(current_token.str);
                 current_token = lexer.next_tag_content();
             }
 
@@ -242,12 +249,12 @@ namespace slim
                     }
                     else
                     {
-                        attributes[attr].static_values.push_back(lit->value->to_string());
+                        get_attr(attr).static_values.push_back(lit->value->to_string());
                     }
                 }
                 else
                 {
-                    attributes[attr].dynamic_values.push_back(std::move(expr));
+                    get_attr(attr).dynamic_values.push_back(std::move(expr));
                 }
 
                 current_token = lexer.next_tag_content();
@@ -255,20 +262,20 @@ namespace slim
 
             for (auto &attr : attributes)
             {
-                if (attr.second.dynamic_values.empty())
+                if (attr.dynamic_values.empty())
                 {
-                    assert(attr.second.static_values.size() > 0);
-                    output << attr_str(attr.first, attr.second.static_values);
+                    assert(attr.static_values.size() > 0);
+                    output << attr_str(attr.name, attr.static_values);
                 }
             }
             for (auto &attr : attributes)
             {
-                if (!attr.second.dynamic_values.empty())
+                if (!attr.dynamic_values.empty())
                 {
                     output << slim::make_unique<TemplateTagAttr>(
-                        attr.first,
-                        std::move(attr.second.static_values),
-                        std::move(attr.second.dynamic_values));
+                        attr.name,
+                        std::move(attr.static_values),
+                        std::move(attr.dynamic_values));
                 }
             }
 
