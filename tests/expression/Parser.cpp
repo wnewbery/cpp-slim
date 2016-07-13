@@ -68,6 +68,9 @@ BOOST_AUTO_TEST_CASE(single_values)
 
     BOOST_CHECK(is_node_type<Variable>(parse("myvar")));
     BOOST_CHECK_EQUAL("myvar", parse("myvar")->to_string());
+
+    BOOST_CHECK(is_node_type<Attribute>(parse("@myvar")));
+    BOOST_CHECK_EQUAL("@myvar", parse("@myvar")->to_string());
 }
 
 
@@ -104,6 +107,8 @@ BOOST_AUTO_TEST_CASE(single_ops)
     BOOST_CHECK_EQUAL("10", parse("+10")->to_string());
 
     BOOST_CHECK_EQUAL("(5 ? a : b)", parse("5 ? a : b")->to_string());
+    BOOST_CHECK_EQUAL("(5 ? :a : :b)", parse("5 ? :a : :b")->to_string());
+    BOOST_CHECK_THROW(parse("true ? a.f :x :y"), SyntaxError);
 }
 
 BOOST_AUTO_TEST_CASE(associativity_single)

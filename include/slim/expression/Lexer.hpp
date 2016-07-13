@@ -23,6 +23,7 @@ namespace slim
             [[noreturn]] void error(const std::string &msg);
             void skip_ws();
             Token symbol(const char *start);
+            std::string symbol_str();
             Token number(const char *start, bool negative);
         };
     }

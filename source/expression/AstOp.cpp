@@ -24,6 +24,11 @@ namespace slim
             return scope.get(name);
         }
 
+        ObjectPtr Attribute::eval(Scope & scope) const
+        {
+            return scope.get(name);
+        }
+
         std::string FuncCall::to_string() const
         {
             std::stringstream ss;

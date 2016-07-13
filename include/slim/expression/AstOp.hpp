@@ -22,6 +22,14 @@ namespace slim
             virtual ObjectPtr eval(Scope &scope)const override;
             SymPtr name;
         };
+        class Attribute : public ExpressionNode
+        {
+        public:
+            Attribute(const SymPtr &name) : name(name) {}
+            virtual std::string to_string()const override { return "@" + name->str(); }
+            virtual ObjectPtr eval(Scope &scope)const override;
+            SymPtr name;
+        };
         class FuncCall : public ExpressionNode
         {
         public:

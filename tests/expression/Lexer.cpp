@@ -94,11 +94,15 @@ BOOST_AUTO_TEST_CASE(single_tokens)
     tok = single_token("test_func55:");
     BOOST_CHECK_EQUAL(Token::HASH_SYMBOL, tok.type);
     BOOST_CHECK_EQUAL("test_func55", tok.str);
+
+    tok = single_token("@my_attr");
+    BOOST_CHECK_EQUAL(Token::ATTR_NAME, tok.type);
+    BOOST_CHECK_EQUAL("my_attr", tok.str);
     
     // invalid tokens
     BOOST_CHECK_EQUAL(Token::UNKNOWN, single_token("= ").type);
     BOOST_CHECK_EQUAL(Token::UNKNOWN, single_token("=+").type);
-    BOOST_CHECK_EQUAL(Token::UNKNOWN, single_token("@").type);
+    BOOST_CHECK_THROW(single_token("@").type, SyntaxError);
     BOOST_CHECK_THROW(Lexer("\\g'").next_str_interp('\''), SyntaxError);
 }
 

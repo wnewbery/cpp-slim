@@ -107,6 +107,9 @@ namespace slim
                 if (p[1] == '>') return p += 2, Token(start, Token::RSHIFT);
                 if (p[1] == '=') return p += 2, Token(start, Token::CMP_GE);
                 else return make_tok(Token::CMP_GT);
+            case '@':
+                ++p;
+                return Token(start, Token::ATTR_NAME, symbol_str());
             default:
                 if (is_symbol_start_chr(peek)) return symbol(start);
                 else if (is_digit(peek)) return number(start, false);
@@ -170,9 +173,7 @@ namespace slim
         Token Lexer::symbol(const char *start)
         {
             assert(is_symbol_start_chr(*p));
-            auto sym_start = p;
-            while (p < end && is_symbol_chr(*p)) ++p;
-            auto sym_end = p;
+            auto name = symbol_str();
             auto type = Token::SYMBOL;
 
             if (p < end)
@@ -184,10 +185,19 @@ namespace slim
                 }
                 else if(*p == '?') //trailing '?' is part of method symbols
                 {
-                    sym_end = ++p;
+                    name += '?';
+                    ++p;
                 }
             }
-            return { start, type, std::string(sym_start, sym_end - sym_start) };
+            return { start, type, name };
+        }
+        std::string Lexer::symbol_str()
+        {
+            auto sym_start = p;
+            while (p < end && is_symbol_chr(*p)) ++p;
+            auto sym_end = p;
+            if (sym_start == sym_end) error("Expected symbol name");
+            return {sym_start, sym_end};
         }
         Token Lexer::number(const char *tok_start, bool negative)
         {

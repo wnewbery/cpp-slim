@@ -93,6 +93,12 @@ namespace slim
                     }
                     else return slim::make_unique<Variable>(symbol(name));
                 }
+            case Token::ATTR_NAME:
+            {
+                auto name = current_token.str;
+                next();
+                return slim::make_unique<Attribute>(symbol(name));
+            }
             case Token::LPAREN: return sub_expression();
             case Token::L_SQ_BRACKET: return array_literal();
             case Token::L_CURLY_BRACKET: return hash_literal();
