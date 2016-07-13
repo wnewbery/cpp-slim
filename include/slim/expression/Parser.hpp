@@ -42,8 +42,13 @@ namespace slim
             void next();
             /** '(' expression ')' */
             ExpressionNodePtr sub_expression();
-            /** A literal value, variable, or global function call. */
-            ExpressionNodePtr value();
+            /**A literal value, variable, or global function call.
+             * Value does not need to worry about in_cond_op for symbols as "? :" and ": :"
+             * would be invalid anyway, so is always safe to parse ":symbol".
+             * But it is needed to avoid parsing "a :x" as a function with 1 argument.
+             * See conditional_op.
+             */
+            ExpressionNodePtr value(bool in_cond_op);
             /** An interpolated string literal. */
             ExpressionNodePtr interp_string();
             /** Array [a, b, c] literal */
@@ -53,11 +58,13 @@ namespace slim
 
             bool is_func_arg_start()const;
             /** '(' expression, expression ')' */
-            std::vector<ExpressionNodePtr> func_args();
+            std::vector<ExpressionNodePtr> func_args(bool in_cond_op);
             /** expression, expression
              * Used for function calls, and element references [args].
              */
             std::vector<ExpressionNodePtr> func_args_inner();
+            /** Hash literal without {}, used for named parameters for functions. */
+            ExpressionNodePtr func_hash_args_inner(ExpressionNodePtr &&first_key);
             /**Parses a "{|args| expr}" block limited to a single expression.*/
             ExpressionNodePtr block();
 
@@ -71,34 +78,51 @@ namespace slim
              * @param get_rhs The member function pointer to parse the right side of the operator.
              */
             template<class T, class U>
-            void next_binary_op(ExpressionNodePtr &lhs, U get_rhs);
+            void next_binary_op(bool in_cond_op, ExpressionNodePtr &lhs, U get_rhs);
 
-            /** cond ? true : false */
+            /** cond ? true : false
+             * 
+             * The "in_cond_op" boolean passed to all lower precedence functions is to ban them
+             * from consuming a ':' without first having brackets.
+             * 
+             * "cond ? :x : :y"
+             * This is fine because "? :" and ": ", is not valid anyway, so x and y are definately symbols.
+             * "cond ? x :b"
+             * This however would break, since it would consider :b as an argument to a function x,
+             * and then conditional_op would not find its ':' or false expression.
+             * Banning ':' with in_cond_op makes this "cond ? (x) : (b)".
+             * 
+             * "cond ? f :x :b"
+             * This would also be ambiguous even with an intelligent look-ahead.
+             * "f(:x) : b" or "f : x(:b)"
+             * Instead with in_cond_op, parsed as "cond ? (f) : (x)", then the ":b" will cause a
+             * syntax error as an unexpected symbol.
+             */
             ExpressionNodePtr conditional_op();
             /** || */
-            ExpressionNodePtr logical_or_op();
+            ExpressionNodePtr logical_or_op(bool in_cond_op);
             /** && */
-            ExpressionNodePtr logical_and_op();
+            ExpressionNodePtr logical_and_op(bool in_cond_op);
             /** == != */
-            ExpressionNodePtr equality_op();
+            ExpressionNodePtr equality_op(bool in_cond_op);
             /** < <= > >= */
-            ExpressionNodePtr cmp_op();
+            ExpressionNodePtr cmp_op(bool in_cond_op);
             /** | ^ */
-            ExpressionNodePtr bitor_op();
+            ExpressionNodePtr bitor_op(bool in_cond_op);
             /** & */
-            ExpressionNodePtr bitand_op();
+            ExpressionNodePtr bitand_op(bool in_cond_op);
             /** << >> */
-            ExpressionNodePtr bitshift_op();
+            ExpressionNodePtr bitshift_op(bool in_cond_op);
             /** + -*/
-            ExpressionNodePtr add_op();
+            ExpressionNodePtr add_op(bool in_cond_op);
             /** * / % */
-            ExpressionNodePtr mul_op();
+            ExpressionNodePtr mul_op(bool in_cond_op);
             /** ! + - ~ */
-            ExpressionNodePtr unary_op();
+            ExpressionNodePtr unary_op(bool in_cond_op);
             /** ** */
-            ExpressionNodePtr pow_op();
+            ExpressionNodePtr pow_op(bool in_cond_op);
             /** .func(args) */
-            ExpressionNodePtr member_func();
+            ExpressionNodePtr member_func(bool in_cond_op);
 
         };
     }

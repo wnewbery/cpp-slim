@@ -144,6 +144,11 @@ BOOST_AUTO_TEST_CASE(method_call)
     BOOST_CHECK_EQUAL("f()", parse("f()")->to_string());
     BOOST_CHECK_EQUAL("f(5)", parse("f(5)")->to_string());
     BOOST_CHECK_EQUAL("f(5, true)", parse("f(5, true)")->to_string());
+    BOOST_CHECK_EQUAL("f(5, true)", parse("f 5, true")->to_string());
+
+    BOOST_CHECK_EQUAL("f({:a => 5, :b => 6})", parse("f({a: 5, b: 6})")->to_string());
+    BOOST_CHECK_EQUAL("f({:a => 5, :b => 6})", parse("f a: 5, b: 6")->to_string());
+    BOOST_CHECK_EQUAL("f({:a => 5, :b => 6})", parse("f :a => 5, :b => 6")->to_string());
     
     BOOST_CHECK_EQUAL("a.f()", parse("a.f")->to_string());
     BOOST_CHECK_EQUAL("a.f()", parse("a.f()")->to_string());

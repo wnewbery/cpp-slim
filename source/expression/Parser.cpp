@@ -68,7 +68,7 @@ namespace slim
             next();
             return ret;
         }
-        ExpressionNodePtr Parser::value()
+        ExpressionNodePtr Parser::value(bool in_cond_op)
         {
             auto lit = [this](ObjectPtr val) { return next(), slim::make_unique<Literal>(val); };
             switch (current_token.type)
@@ -85,10 +85,10 @@ namespace slim
                     next();
                     if (current_token.type == Token::LPAREN ||
                         current_token.type == Token::L_CURLY_BRACKET ||
-                        is_func_arg_start())
+                        (!in_cond_op && is_func_arg_start()))
                     {
                         auto &f = global_functions.get(symbol(name));
-                        FuncCall::Args args = func_args();
+                        FuncCall::Args args = func_args(false);
                         return slim::make_unique<GlobalFuncCall>(f, std::move(args));
                     }
                     else return slim::make_unique<Variable>(symbol(name));
@@ -214,15 +214,17 @@ namespace slim
         {
             switch (current_token.type)
             {
-            case Token::STRING_DELIM:
+            case Token::COLON: // assuming :symbol
+            case Token::HASH_SYMBOL:
             case Token::NUMBER:
+            case Token::STRING_DELIM:
             case Token::SYMBOL:
                 return true;
             default:
                 return false;
             }
         }
-        std::vector<ExpressionNodePtr> Parser::func_args()
+        std::vector<ExpressionNodePtr> Parser::func_args(bool in_cond_op)
         {
             bool parens;
             if (current_token.type == Token::LPAREN)
@@ -234,6 +236,12 @@ namespace slim
                     next();
                     return {};
                 }
+            }
+            else if (in_cond_op)
+            {
+                throw SyntaxError(
+                    "Function calls within a conditional operators right side "
+                    "expression must use parenthesis");
             }
             else parens = false;
 
@@ -259,10 +267,53 @@ namespace slim
             std::vector<ExpressionNodePtr> args;
             while (true)
             {
-                args.push_back(expression());
+                if (current_token.type == Token::HASH_SYMBOL)
+                {
+                    auto key = slim::make_unique<Literal>(symbol(current_token.str));
+                    next();
+                    args.push_back(func_hash_args_inner(std::move(key)));
+                    return args;
+                }
+                auto expr = expression();
+                if (current_token.type == Token::HASH_KEY_VALUE_SEP)
+                {
+                    next();
+                    args.push_back(func_hash_args_inner(std::move(expr)));
+                    return args;
+                }
+
+                args.push_back(std::move(expr));
                 if (current_token.type == Token::COMMA) next();
                 else return args;
             }
+        }
+        ExpressionNodePtr Parser::func_hash_args_inner(ExpressionNodePtr &&first_key)
+        {
+            FuncCall::Args args;
+            assert(first_key);
+            
+            args.push_back(std::move(first_key));
+            args.push_back(expression());
+
+            while (current_token.type == Token::COMMA)
+            {
+                next();
+                //key_symbol: or key_expr =>
+                if (current_token.type == Token::HASH_SYMBOL)
+                {
+                    args.push_back(slim::make_unique<Literal>(symbol(current_token.str)));
+                    next();
+                }
+                else
+                {
+                    args.push_back(expression());
+                    if (current_token.type != Token::HASH_KEY_VALUE_SEP) throw SyntaxError("Expected =>");
+                    next();
+                }
+                //value
+                args.push_back(expression());
+            }
+            return slim::make_unique<HashLiteral>(std::move(args));
         }
 
         ExpressionNodePtr Parser::block()
@@ -308,20 +359,20 @@ namespace slim
         }
 
         template<class T, class U>
-        void Parser::next_binary_op(ExpressionNodePtr &lhs, U get_rhs)
+        void Parser::next_binary_op(bool in_cond_op, ExpressionNodePtr &lhs, U get_rhs)
         {
             next();
-            auto rhs = (this->*get_rhs)();
+            auto rhs = (this->*get_rhs)(in_cond_op);
             lhs = slim::make_unique<T>(std::move(lhs), std::move(rhs));
         }
 
         ExpressionNodePtr Parser::conditional_op()
         {
-            auto lhs = logical_or_op();
+            auto lhs = logical_or_op(false);
             if (current_token.type == Token::CONDITIONAL)
             {
                 next();
-                auto true_expr = logical_or_op();
+                auto true_expr = logical_or_op(true);
 
                 if (current_token.type != Token::COLON) throw SyntaxError("Expected ':'");
                 next();
@@ -333,132 +384,132 @@ namespace slim
             return lhs;
         }
 
-        ExpressionNodePtr Parser::logical_or_op()
+        ExpressionNodePtr Parser::logical_or_op(bool in_cond_op)
         {
-            auto lhs = logical_and_op();
+            auto lhs = logical_and_op(in_cond_op);
             while (true)
             {
                 switch (current_token.type)
                 {
-                case Token::LOGICAL_OR: next_binary_op<LogicalOr>(lhs, &Parser::logical_and_op); break;
+                case Token::LOGICAL_OR: next_binary_op<LogicalOr>(in_cond_op, lhs, &Parser::logical_and_op); break;
                 default: return lhs;
                 }
             }
         }
 
-        ExpressionNodePtr Parser::logical_and_op()
+        ExpressionNodePtr Parser::logical_and_op(bool in_cond_op)
         {
-            auto lhs = equality_op();
+            auto lhs = equality_op(in_cond_op);
             while (true)
             {
                 switch (current_token.type)
                 {
-                case Token::LOGICAL_AND: next_binary_op<LogicalAnd>(lhs, &Parser::equality_op); break;
+                case Token::LOGICAL_AND: next_binary_op<LogicalAnd>(in_cond_op, lhs, &Parser::equality_op); break;
                 default: return lhs;
                 }
             }
         }
 
-        ExpressionNodePtr Parser::equality_op()
+        ExpressionNodePtr Parser::equality_op(bool in_cond_op)
         {
-            auto lhs = cmp_op();
+            auto lhs = cmp_op(in_cond_op);
             while (true)
             {
                 switch (current_token.type)
                 {
-                case Token::CMP: next_binary_op<Cmp>(lhs, &Parser::cmp_op); break;
-                case Token::CMP_EQ: next_binary_op<Eq>(lhs, &Parser::cmp_op); break;
-                case Token::CMP_NE: next_binary_op<Ne>(lhs, &Parser::cmp_op); break;
+                case Token::CMP: next_binary_op<Cmp>(in_cond_op, lhs, &Parser::cmp_op); break;
+                case Token::CMP_EQ: next_binary_op<Eq>(in_cond_op, lhs, &Parser::cmp_op); break;
+                case Token::CMP_NE: next_binary_op<Ne>(in_cond_op, lhs, &Parser::cmp_op); break;
                 default: return lhs;
                 }
             }
         }
 
-        ExpressionNodePtr Parser::cmp_op()
+        ExpressionNodePtr Parser::cmp_op(bool in_cond_op)
         {
-            auto lhs = bitor_op();
+            auto lhs = bitor_op(in_cond_op);
             while (true)
             {
                 switch (current_token.type)
                 {
-                case Token::CMP_LT: next_binary_op<Lt>(lhs, &Parser::bitor_op); break;
-                case Token::CMP_LE: next_binary_op<Le>(lhs, &Parser::bitor_op); break;
-                case Token::CMP_GT: next_binary_op<Gt>(lhs, &Parser::bitor_op); break;
-                case Token::CMP_GE: next_binary_op<Ge>(lhs, &Parser::bitor_op); break;
+                case Token::CMP_LT: next_binary_op<Lt>(in_cond_op, lhs, &Parser::bitor_op); break;
+                case Token::CMP_LE: next_binary_op<Le>(in_cond_op, lhs, &Parser::bitor_op); break;
+                case Token::CMP_GT: next_binary_op<Gt>(in_cond_op, lhs, &Parser::bitor_op); break;
+                case Token::CMP_GE: next_binary_op<Ge>(in_cond_op, lhs, &Parser::bitor_op); break;
                 default: return lhs;
                 }
             }
         }
 
-        ExpressionNodePtr Parser::bitor_op()
+        ExpressionNodePtr Parser::bitor_op(bool in_cond_op)
         {
-            auto lhs = bitand_op();
+            auto lhs = bitand_op(in_cond_op);
             while (true)
             {
                 switch (current_token.type)
                 {
-                case Token::XOR: next_binary_op<Xor>(lhs, &Parser::bitand_op); break;
-                case Token::OR: next_binary_op<Or>(lhs, &Parser::bitand_op); break;
+                case Token::XOR: next_binary_op<Xor>(in_cond_op, lhs, &Parser::bitand_op); break;
+                case Token::OR: next_binary_op<Or>(in_cond_op, lhs, &Parser::bitand_op); break;
                 default: return lhs;
                 }
             }
         }
-        ExpressionNodePtr Parser::bitand_op()
+        ExpressionNodePtr Parser::bitand_op(bool in_cond_op)
         {
-            auto lhs = bitshift_op();
+            auto lhs = bitshift_op(in_cond_op);
             while (true)
             {
                 switch (current_token.type)
                 {
-                case Token::AND: next_binary_op<And>(lhs, &Parser::bitshift_op); break;
+                case Token::AND: next_binary_op<And>(in_cond_op, lhs, &Parser::bitshift_op); break;
                 default: return lhs;
                 }
             }
         }
-        ExpressionNodePtr Parser::bitshift_op()
+        ExpressionNodePtr Parser::bitshift_op(bool in_cond_op)
         {
-            auto lhs = add_op();
+            auto lhs = add_op(in_cond_op);
             while (true)
             {
                 switch (current_token.type)
                 {
-                case Token::LSHIFT: next_binary_op<Lshift>(lhs, &Parser::add_op); break;
-                case Token::RSHIFT: next_binary_op<Rshift>(lhs, &Parser::add_op); break;
-                default: return lhs;
-                }
-            }
-        }
-
-        ExpressionNodePtr Parser::add_op()
-        {
-            auto lhs = mul_op();
-            while (true)
-            {
-                switch (current_token.type)
-                {
-                case Token::PLUS: next_binary_op<Add>(lhs, &Parser::mul_op); break;
-                case Token::MINUS: next_binary_op<Sub>(lhs, &Parser::mul_op); break;
+                case Token::LSHIFT: next_binary_op<Lshift>(in_cond_op, lhs, &Parser::add_op); break;
+                case Token::RSHIFT: next_binary_op<Rshift>(in_cond_op, lhs, &Parser::add_op); break;
                 default: return lhs;
                 }
             }
         }
 
-        ExpressionNodePtr Parser::mul_op()
+        ExpressionNodePtr Parser::add_op(bool in_cond_op)
         {
-            auto lhs = unary_op();
+            auto lhs = mul_op(in_cond_op);
             while (true)
             {
                 switch (current_token.type)
                 {
-                case Token::MUL: next_binary_op<Mul>(lhs, &Parser::unary_op); break;
-                case Token::DIV: next_binary_op<Div>(lhs, &Parser::unary_op); break;
-                case Token::MOD: next_binary_op<Mod>(lhs, &Parser::unary_op); break;
+                case Token::PLUS: next_binary_op<Add>(in_cond_op, lhs, &Parser::mul_op); break;
+                case Token::MINUS: next_binary_op<Sub>(in_cond_op, lhs, &Parser::mul_op); break;
                 default: return lhs;
                 }
             }
         }
 
-        ExpressionNodePtr Parser::unary_op()
+        ExpressionNodePtr Parser::mul_op(bool in_cond_op)
+        {
+            auto lhs = unary_op(in_cond_op);
+            while (true)
+            {
+                switch (current_token.type)
+                {
+                case Token::MUL: next_binary_op<Mul>(in_cond_op, lhs, &Parser::unary_op); break;
+                case Token::DIV: next_binary_op<Div>(in_cond_op, lhs, &Parser::unary_op); break;
+                case Token::MOD: next_binary_op<Mod>(in_cond_op, lhs, &Parser::unary_op); break;
+                default: return lhs;
+                }
+            }
+        }
+
+        ExpressionNodePtr Parser::unary_op(bool in_cond_op)
         {
             ExpressionNodePtr rhs;
             while (true)
@@ -467,37 +518,37 @@ namespace slim
                 {
                 case Token::PLUS:
                     next();
-                    return unary_op();
+                    return unary_op(in_cond_op);
                 case Token::MINUS:
                     next();
-                    rhs = unary_op();
+                    rhs = unary_op(in_cond_op);
                     return slim::make_unique<Negative>(std::move(rhs));
                 case Token::NOT:
                     next();
-                    rhs = unary_op();
+                    rhs = unary_op(in_cond_op);
                     return slim::make_unique<Not>(std::move(rhs));
                 case Token::LOGICAL_NOT:
                     next();
-                    rhs = unary_op();
+                    rhs = unary_op(in_cond_op);
                     return slim::make_unique<LogicalNot>(std::move(rhs));
-                default: return pow_op();
+                default: return pow_op(in_cond_op);
                 }
             }
         }
 
-        ExpressionNodePtr Parser::pow_op()
+        ExpressionNodePtr Parser::pow_op(bool in_cond_op)
         {
-            auto lhs = member_func();
+            auto lhs = member_func(in_cond_op);
             while (current_token.type == Token::POW)
             {
-                next_binary_op<Pow>(lhs, &Parser::member_func); break;
+                next_binary_op<Pow>(in_cond_op, lhs, &Parser::member_func); break;
             }
             return lhs;
         }
 
-        ExpressionNodePtr Parser::member_func()
+        ExpressionNodePtr Parser::member_func(bool in_cond_op)
         {
-            auto lhs = value();
+            auto lhs = value(in_cond_op);
             while (true)
             {
                 if (current_token.type == Token::DOT)
@@ -507,7 +558,7 @@ namespace slim
                     auto name = symbol(current_token.str);
 
                     next();
-                    auto args = func_args();
+                    auto args = func_args(in_cond_op);
                     lhs = slim::make_unique<MemberFuncCall>(std::move(lhs), std::move(name), std::move(args));
                 }
                 else if (current_token.type == Token::SAFE_NAV)
@@ -517,7 +568,7 @@ namespace slim
                     auto name = symbol(current_token.str);
 
                     next();
-                    auto args = func_args();
+                    auto args = func_args(in_cond_op);
                     lhs = slim::make_unique<SafeNavMemberFuncCall>(std::move(lhs), std::move(name), std::move(args));
                 }
                 else if (current_token.type == Token::L_SQ_BRACKET)
