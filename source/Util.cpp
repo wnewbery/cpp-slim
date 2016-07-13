@@ -1,4 +1,5 @@
 #include "Util.hpp"
+#include "types/HtmlSafeString.hpp"
 namespace slim
 {
     std::string html_encode(const std::string &str)
@@ -18,5 +19,17 @@ namespace slim
             }
         }
         return buf;
+    }
+
+    std::string html_encode(const Object *obj)
+    {
+        if (auto safe = dynamic_cast<const HtmlSafeString*>(obj))
+        {
+            return safe->get_value();
+        }
+        else
+        {
+            return html_encode(obj->to_string());
+        }
     }
 }

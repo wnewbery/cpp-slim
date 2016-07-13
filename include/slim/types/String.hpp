@@ -35,6 +35,8 @@ namespace slim
         std::shared_ptr<Number> to_i();
         /** Also intern */
         std::shared_ptr<Symbol> to_sym();
+        /** Return a copy as a HtmlSafeString. */
+        std::shared_ptr<String> html_safe();
 
         //Encoding functions not supported. String is just UTF-8.
         //b, bytes, bytesize, byteslice

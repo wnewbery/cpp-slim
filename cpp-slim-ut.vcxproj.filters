@@ -66,5 +66,8 @@
     <ClCompile Include="tests\Maths.cpp">
       <Filter>tests</Filter>
     </ClCompile>
+    <ClCompile Include="tests\types\HtmlSafeString.cpp">
+      <Filter>tests\types</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

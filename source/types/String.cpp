@@ -1,6 +1,7 @@
 #include "types/String.hpp"
 #include "types/Array.hpp"
 #include "types/Enumerator.hpp"
+#include "types/HtmlSafeString.hpp"
 #include "types/Proc.hpp"
 #include "Value.hpp"
 #include "Function.hpp"
@@ -60,6 +61,11 @@ namespace slim
     std::shared_ptr<Symbol> String::to_sym()
     {
         return symbol(v);
+    }
+
+    std::shared_ptr<String> String::html_safe()
+    {
+        return std::make_shared<HtmlSafeString>(v);
     }
 
     ObjectPtr String::el_ref(const FunctionArgs & args)
@@ -424,6 +430,7 @@ namespace slim
             { &String::to_f, "to_f" },
             { &String::to_f, "to_d" },
             { &String::to_i, "to_i" },
+            { &String::html_safe, "html_safe" },
             { &String::ascii_only_q, "ascii_only?" },
             { &String::capitalize, "capitalize" },
             { &String::casecmp, "casecmp" },

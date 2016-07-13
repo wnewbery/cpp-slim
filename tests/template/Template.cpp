@@ -76,6 +76,11 @@ BOOST_AUTO_TEST_CASE(code_lines)
         "<!DOCTYPE html>\n"
         "<p>HTML &lt;b&gt;Safe&lt;/b&gt;</p>",
         render_tpl("p\n  =b\n", model));
+
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p>HTML <b>Safe</b></p>",
+        render_tpl("p\n  =b.html_safe\n", model));
 }
 
 BOOST_AUTO_TEST_CASE(attributes)
@@ -85,6 +90,7 @@ BOOST_AUTO_TEST_CASE(attributes)
     model.set("b", TRUE_VALUE);
     model.set("c", FALSE_VALUE);
     model.set("d", NIL_VALUE);
+    model.set("e", make_value("HTML <b>Safe</b>"));
 
     BOOST_CHECK_EQUAL(
         "<!DOCTYPE html>\n"
@@ -110,6 +116,15 @@ BOOST_AUTO_TEST_CASE(attributes)
         "<!DOCTYPE html>\n"
         "<p class=\"a b Test e f\"></p>",
         render_tpl("p.a.b class=[a, 'e', 'f']", model));
+
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p class=\"HTML &lt;b&gt;Safe&lt;/b&gt;\"></p>",
+        render_tpl("p class=e", model));
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p class=\"HTML <b>Safe</b>\"></p>",
+        render_tpl("p class=e.html_safe", model));
 }
 
 BOOST_AUTO_TEST_CASE(cond_if)

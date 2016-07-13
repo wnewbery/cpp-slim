@@ -24,7 +24,7 @@ namespace slim
         void TemplateOutputExpr::render(std::string & buffer, expr::Scope &scope) const
         {
             auto val = expression->eval(scope);
-            buffer += html_encode(val->to_string());
+            buffer += html_encode(val);
         }
 
 
@@ -73,7 +73,7 @@ namespace slim
             }
 
             std::vector<std::string> strings = static_values;
-            for (auto &v : values) strings.push_back(v->to_string());
+            for (auto &v : values) strings.push_back(html_encode(v));
 
             buffer += attr_str(attr, strings);
         }
