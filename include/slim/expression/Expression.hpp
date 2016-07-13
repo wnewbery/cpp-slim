@@ -7,5 +7,5 @@ namespace slim
     typedef expr::ExpressionNode Expression;
     typedef expr::ExpressionNodePtr ExpressionPtr;
 
-    typedef expr::Scope ViewModel;
+    typedef expr::ScopeAttributes ViewModel;
 }

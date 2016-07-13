@@ -7,8 +7,9 @@ namespace slim
     namespace expr
     {
         class Scope;
+        class ScopeAttributes;
     }
-    typedef expr::Scope ViewModel;
+    typedef expr::ScopeAttributes ViewModel;
 
     namespace tpl
     {
@@ -42,13 +43,7 @@ namespace slim
          * @param model Contains the variables for script blocks within the template.
          * @param doctype If true, prefix the HTML5 doctype.
          */
-        std::string render(ViewModel &model, bool doctype = true)
-        {
-            std::string buffer;
-            if (doctype) buffer += "<!DOCTYPE html>\n";
-            root->render(buffer, model);
-            return buffer;
-        }
+        std::string render(ViewModel &model, bool doctype = true);
         
         /**Converts the template part into a string representation, mainly for debugging.
          * Because the origenal template structure has all ready been lost, as it was converted

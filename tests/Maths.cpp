@@ -16,7 +16,8 @@ ObjectPtr eval2(const std::string &str)
     Lexer lexer(str);
     Parser parser(BUILTIN_FUNCTIONS, lexer);
     auto expr = parser.full_expression();
-    Scope scope;
+    ScopeAttributes attrs;
+    Scope scope(attrs);
     return expr->eval(scope);
 }
 double eval(const std::string &str)

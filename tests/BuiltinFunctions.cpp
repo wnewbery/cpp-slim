@@ -20,7 +20,8 @@ std::string eval(const std::string &str, Scope &scope)
 }
 std::string eval(const std::string &str)
 {
-    Scope scope;
+    ScopeAttributes attrs;
+    Scope scope(attrs);
     return eval(str, scope);
 }
 

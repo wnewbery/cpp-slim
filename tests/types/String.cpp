@@ -14,7 +14,8 @@ BOOST_AUTO_TEST_SUITE(TestString)
 
 std::string eval(const std::string &str)
 {
-    Scope scope;
+    ScopeAttributes attrs;
+    Scope scope(attrs);
     FunctionTable functions;
     Lexer lexer(str);
     Parser parser(functions, lexer);

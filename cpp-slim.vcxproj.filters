@@ -206,5 +206,8 @@
     <ClCompile Include="source\types\HtmlSafeString.cpp">
       <Filter>source\types</Filter>
     </ClCompile>
+    <ClCompile Include="source\template\Template.cpp">
+      <Filter>source\template</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

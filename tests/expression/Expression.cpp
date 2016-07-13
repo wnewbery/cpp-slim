@@ -22,7 +22,8 @@ std::string eval(const std::string &str, const FunctionTable &functions, Scope &
 std::string eval(const std::string &str)
 {
     FunctionTable functions;
-    Scope scope;
+    ScopeAttributes attrs;
+    Scope scope(attrs);
     return eval(str, functions, scope);
 }
 
@@ -48,7 +49,8 @@ BOOST_AUTO_TEST_CASE(string_interp)
 BOOST_AUTO_TEST_CASE(variables)
 {
     FunctionTable functions;
-    Scope scope;
+    ScopeAttributes attrs;
+    Scope scope(attrs);
     scope.set("test", make_value(55.0));
     BOOST_CHECK_EQUAL("55", eval("test", functions, scope));
     BOOST_CHECK_EQUAL("nil", eval("unset", functions, scope));
@@ -131,7 +133,8 @@ BOOST_AUTO_TEST_CASE(global_func)
     };
     FunctionTable functions = {{func, "func"}};
 
-    Scope scope;
+    ScopeAttributes attrs;
+    Scope scope(attrs);
     scope.set("x", make_value(55.0));
 
     BOOST_CHECK_EQUAL("60", eval("func(x, 5)", functions, scope));

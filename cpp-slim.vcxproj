@@ -69,6 +69,7 @@
     <ClCompile Include="source\Operators.cpp" />
     <ClCompile Include="source\template\Lexer.cpp" />
     <ClCompile Include="source\template\Parser.cpp" />
+    <ClCompile Include="source\template\Template.cpp" />
     <ClCompile Include="source\template\TemplateParts.cpp" />
     <ClCompile Include="source\types\Array.cpp" />
     <ClCompile Include="source\types\HtmlSafeString.cpp" />

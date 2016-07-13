@@ -26,7 +26,7 @@ namespace slim
 
         ObjectPtr Attribute::eval(Scope & scope) const
         {
-            return scope.get(name);
+            return scope.get_attr(name);
         }
 
         std::string FuncCall::to_string() const

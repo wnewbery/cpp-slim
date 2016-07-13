@@ -24,7 +24,8 @@ std::string eval(const std::string &str, Scope &scope)
 }
 std::string eval(const std::string &str)
 {
-    Scope scope;
+    ScopeAttributes attrs;
+    Scope scope(attrs);
     return eval(str, scope);
 }
 
@@ -40,7 +41,8 @@ std::shared_ptr<Hash> make_hash2(const std::vector<std::pair<std::string, double
 
 BOOST_AUTO_TEST_CASE(compare)
 {
-    Scope scope;
+    ScopeAttributes attrs;
+    Scope scope(attrs);
     scope.set("a", make_hash2({}));
     scope.set("b", make_hash2({ { "a", 5.0 },{ "b", 10.0 } }));
     scope.set("c", make_hash2({ { "a", 5.0 },{ "c", 15 } }));
@@ -62,20 +64,20 @@ BOOST_AUTO_TEST_CASE(compare)
 }
 BOOST_AUTO_TEST_CASE(basic_methods)
 {
-    Scope scope;
-    BOOST_CHECK_EQUAL("true", eval("{}.empty?", scope));
-    BOOST_CHECK_EQUAL("false", eval("{a: 5}.empty?", scope));
+    BOOST_CHECK_EQUAL("true", eval("{}.empty?"));
+    BOOST_CHECK_EQUAL("false", eval("{a: 5}.empty?"));
 
     //size
-    BOOST_CHECK_EQUAL("0", eval("{}.length", scope));
-    BOOST_CHECK_EQUAL("0", eval("{}.size", scope));
-    BOOST_CHECK_EQUAL("2", eval("{a:5, b: 6}.length", scope));
-    BOOST_CHECK_EQUAL("2", eval("{a:5, b: 6}.size", scope));
+    BOOST_CHECK_EQUAL("0", eval("{}.length"));
+    BOOST_CHECK_EQUAL("0", eval("{}.size"));
+    BOOST_CHECK_EQUAL("2", eval("{a:5, b: 6}.length"));
+    BOOST_CHECK_EQUAL("2", eval("{a:5, b: 6}.size"));
 }
 
 BOOST_AUTO_TEST_CASE(basic_access)
 {
-    Scope scope;
+    ScopeAttributes attrs;
+    Scope scope(attrs);
     scope.set("a", make_hash2({}));
     scope.set("b", make_hash2({ { "a", 5.0 },{ "b", 10.0 } }));
     scope.set("c", make_hash2({ { "a", 5.0 },{ "c", 15 },{ "10", 20 } }));

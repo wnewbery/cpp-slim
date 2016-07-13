@@ -13,7 +13,8 @@ BOOST_AUTO_TEST_SUITE(TestHtmlSafeString)
 
 ObjectPtr eval_obj(const std::string &str)
 {
-    Scope scope;
+    ScopeAttributes attrs;
+    Scope scope(attrs);
     FunctionTable functions;
     Lexer lexer(str);
     Parser parser(functions, lexer);

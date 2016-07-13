@@ -70,17 +70,17 @@ BOOST_AUTO_TEST_CASE(code_lines)
     BOOST_CHECK_EQUAL(
         "<!DOCTYPE html>\n"
         "<p>25</p>",
-        render_tpl("p\n  =5 + 2 * a\n", model));
+        render_tpl("p\n  =5 + 2 * @a\n", model));
 
     BOOST_CHECK_EQUAL(
         "<!DOCTYPE html>\n"
         "<p>HTML &lt;b&gt;Safe&lt;/b&gt;</p>",
-        render_tpl("p\n  =b\n", model));
+        render_tpl("p\n  =@b\n", model));
 
     BOOST_CHECK_EQUAL(
         "<!DOCTYPE html>\n"
         "<p>HTML <b>Safe</b></p>",
-        render_tpl("p\n  =b.html_safe\n", model));
+        render_tpl("p\n  =@b.html_safe\n", model));
 }
 
 BOOST_AUTO_TEST_CASE(attributes)
@@ -95,19 +95,19 @@ BOOST_AUTO_TEST_CASE(attributes)
     BOOST_CHECK_EQUAL(
         "<!DOCTYPE html>\n"
         "<p disabled=\"Test\"></p>",
-        render_tpl("p disabled=a", model));
+        render_tpl("p disabled=@a", model));
     BOOST_CHECK_EQUAL(
         "<!DOCTYPE html>\n"
         "<p disabled></p>",
-        render_tpl("p disabled=b", model));
+        render_tpl("p disabled=@b", model));
     BOOST_CHECK_EQUAL(
         "<!DOCTYPE html>\n"
         "<p></p>",
-        render_tpl("p disabled=c", model));
+        render_tpl("p disabled=@c", model));
     BOOST_CHECK_EQUAL(
         "<!DOCTYPE html>\n"
         "<p></p>",
-        render_tpl("p disabled=d", model));
+        render_tpl("p disabled=@d", model));
     BOOST_CHECK_EQUAL(
         "<!DOCTYPE html>\n"
         "<p class=\"a b e\"></p>",
@@ -115,16 +115,16 @@ BOOST_AUTO_TEST_CASE(attributes)
     BOOST_CHECK_EQUAL(
         "<!DOCTYPE html>\n"
         "<p class=\"a b Test e f\"></p>",
-        render_tpl("p.a.b class=[a, 'e', 'f']", model));
+        render_tpl("p.a.b class=[@a, 'e', 'f']", model));
 
     BOOST_CHECK_EQUAL(
         "<!DOCTYPE html>\n"
         "<p class=\"HTML &lt;b&gt;Safe&lt;/b&gt;\"></p>",
-        render_tpl("p class=e", model));
+        render_tpl("p class=@e", model));
     BOOST_CHECK_EQUAL(
         "<!DOCTYPE html>\n"
         "<p class=\"HTML <b>Safe</b>\"></p>",
-        render_tpl("p class=e.html_safe", model));
+        render_tpl("p class=@e.html_safe", model));
 }
 
 BOOST_AUTO_TEST_CASE(cond_if)
