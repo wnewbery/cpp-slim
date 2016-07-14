@@ -13,7 +13,9 @@ BOOST_AUTO_TEST_SUITE(TestBuiltinFunctions)
 std::string eval(const std::string &str, Scope &scope)
 {
     Lexer lexer(str);
-    Parser parser(BUILTIN_FUNCTIONS, lexer);
+    expr::LocalVarNames vars;
+    for (auto x : scope) vars.add(x.first->str());
+    Parser parser(BUILTIN_FUNCTIONS, vars, lexer);
     auto expr = parser.full_expression();
     auto result = expr->eval(scope);
     return result->to_string();

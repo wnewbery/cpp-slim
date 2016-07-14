@@ -14,7 +14,8 @@ BOOST_AUTO_TEST_SUITE(TestMaths)
 ObjectPtr eval2(const std::string &str)
 {
     Lexer lexer(str);
-    Parser parser(BUILTIN_FUNCTIONS, lexer);
+    expr::LocalVarNames vars;
+    Parser parser(BUILTIN_FUNCTIONS, vars, lexer);
     auto expr = parser.full_expression();
     ScopeAttributes attrs;
     Scope scope(attrs);

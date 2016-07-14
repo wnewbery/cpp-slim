@@ -7,6 +7,7 @@
 #include "expression/ArithmeticOp.hpp"
 #include "expression/CmpOp.hpp"
 #include "expression/LogicalOp.hpp"
+#include "expression/Scope.hpp"
 
 #include "types/Boolean.hpp"
 #include "types/Nil.hpp"
@@ -39,8 +40,10 @@ namespace slim
                 return ret;
             }
         }
-        Parser::Parser(const FunctionTable &global_functions, Lexer &lexer)
-            : global_functions(global_functions), lexer(lexer), current_token(nullptr, Token::END)
+        Parser::Parser(const FunctionTable &global_functions, const LocalVarNames &vars, Lexer &lexer)
+            : global_functions(global_functions)
+            , lexer(lexer), current_token(nullptr, Token::END)
+            , vars(vars)
         {
             next();
         }
@@ -86,12 +89,21 @@ namespace slim
                     if (current_token.type == Token::LPAREN ||
                         current_token.type == Token::L_CURLY_BRACKET ||
                         (!in_cond_op && is_func_arg_start()))
-                    {
+                    {   //local variables are not callable, so must be method
                         auto &f = global_functions.get(symbol(name));
                         FuncCall::Args args = func_args(false);
                         return slim::make_unique<GlobalFuncCall>(f, std::move(args));
                     }
-                    else return slim::make_unique<Variable>(symbol(name));
+                    else if (vars.is_var(name))
+                    {   //variables take priority over methods if they exist
+                        return slim::make_unique<Variable>(symbol(name));
+                    }
+                    else
+                    {
+                        //method call with no args
+                        auto &f = global_functions.get(symbol(name));
+                        return slim::make_unique<GlobalFuncCall>(f, FuncCall::Args());
+                    }
                 }
             case Token::ATTR_NAME:
             {
@@ -328,6 +340,7 @@ namespace slim
             next();
 
             std::vector<SymPtr> args;
+            auto old_vars = vars; //save the current variable set, new variables will only exist within the block
             if (current_token.type == Token::OR)
             {
                 next();
@@ -337,6 +350,7 @@ namespace slim
                     while (true)
                     {
                         if (current_token.type != Token::SYMBOL) throw SyntaxError("Expected symbol");
+                        vars.add(current_token.str);
                         args.push_back(symbol(current_token.str));
                         next();
 
@@ -361,6 +375,7 @@ namespace slim
             if (current_token.type != Token::R_CURLY_BRACKET) throw SyntaxError("Expected '}'");
             next();
 
+            vars = old_vars; //Remove any variables from within the block
             return slim::make_unique<Block>(std::move(args), std::move(expr));
         }
 

@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(code_lines)
     BOOST_CHECK_EQUAL("<p> <%= 5 %></p>", parse_str("p\n  =<5\n"));
     BOOST_CHECK_EQUAL("<p><%= 5 %> </p>", parse_str("p\n  =>5\n"));
     BOOST_CHECK_EQUAL("<p> <%= 5 %> </p>", parse_str("p\n  =<>5\n"));
-    BOOST_CHECK_EQUAL("<p><%= (5 + (2 * a)) %></p>", parse_str("p\n  =5 + 2 * a\n"));
+    BOOST_CHECK_EQUAL("<p><%= (5 + (2 * @a)) %></p>", parse_str("p\n  =5 + 2 * @a\n"));
     BOOST_CHECK_THROW(parse_str("="), TemplateSyntaxError);
     BOOST_CHECK_THROW(parse_str("=\n"), TemplateSyntaxError);
 
@@ -95,8 +95,8 @@ BOOST_AUTO_TEST_CASE(code_lines)
     BOOST_CHECK_EQUAL("<%= (5 + 2) %>", parse_str("= 5\\\n  + 2"));
     BOOST_CHECK_EQUAL("<p><%= (5 + 2) %></p>", parse_str("p= 5\\\n  + 2"));
 
-    BOOST_CHECK_EQUAL("<%= a.f(5, 2) %>", parse_str("= a.f 5,\n  2"));
-    BOOST_CHECK_EQUAL("<p><%= a.f(5, 2) %></p>", parse_str("p= a.f 5,\n  2"));
+    BOOST_CHECK_EQUAL("<%= @a.f(5, 2) %>", parse_str("= @a.f 5,\n  2"));
+    BOOST_CHECK_EQUAL("<p><%= @a.f(5, 2) %></p>", parse_str("p= @a.f 5,\n  2"));
 }
 
 BOOST_AUTO_TEST_CASE(void_tags)
@@ -126,15 +126,15 @@ BOOST_AUTO_TEST_CASE(id_class_shortcut)
 
 BOOST_AUTO_TEST_CASE(attributes)
 {
-    BOOST_CHECK_EQUAL("<div<%=attr('id', x)%>></div>", parse_str("div id=x"));
+    BOOST_CHECK_EQUAL("<div<%=attr('id', @x)%>></div>", parse_str("div id=@x"));
     BOOST_CHECK_EQUAL("<div id=\"x\"></div>", parse_str("div id=\"x\""));
-    BOOST_CHECK_EQUAL("<div<%=attr('id', (x + \"-name\"))%>></div>", parse_str("div id=x + \"-name\""));
-    BOOST_CHECK_EQUAL("<div<%=attr('id', \"x-#{name}\")%>></div>", parse_str("div id=\"x-#{name}\""));
+    BOOST_CHECK_EQUAL("<div<%=attr('id', (@x + \"-name\"))%>></div>", parse_str("div id=@x + \"-name\""));
+    BOOST_CHECK_EQUAL("<div<%=attr('id', \"x-#{@name}\")%>></div>", parse_str("div id=\"x-#{@name}\""));
     BOOST_CHECK_EQUAL("<div disabled></div>", parse_str("div disabled=true"));
     BOOST_CHECK_EQUAL("<div></div>", parse_str("div disabled=false"));
     BOOST_CHECK_EQUAL("<div></div>", parse_str("div disabled=nil"));
     BOOST_CHECK_EQUAL("<div class=\"a b c d\"></div>", parse_str("div.a.b class=\"c d\""));
-    BOOST_CHECK_EQUAL("<div<%=attr('class', 'a', 'b', d)%>></div>", parse_str("div.a.b class=d"));
+    BOOST_CHECK_EQUAL("<div<%=attr('class', 'a', 'b', @d)%>></div>", parse_str("div.a.b class=@d"));
 }
 
 BOOST_AUTO_TEST_CASE(cond)

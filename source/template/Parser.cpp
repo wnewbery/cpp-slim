@@ -229,7 +229,7 @@ namespace slim
             {
 
                 expr::Lexer expr_lexer(lexer.get_pos(), lexer.get_end());
-                expr::Parser expr_parser(BUILTIN_FUNCTIONS, expr_lexer); //TODO: Allow custom functions
+                expr::Parser expr_parser(BUILTIN_FUNCTIONS, local_vars, expr_lexer); //TODO: Allow custom functions
 
 
                 auto attr = current_token.str;
@@ -400,6 +400,7 @@ namespace slim
                 }
                 else
                 {
+                    //In case of "each do |a, b, c|" block, update local_vars within this scope only
                     throw TemplateSyntaxError("Unexpected control code start");
                 }
             }
@@ -427,7 +428,7 @@ namespace slim
             }
 
             expr::Lexer expr_lexer(script_src);
-            expr::Parser expr_parser(BUILTIN_FUNCTIONS, expr_lexer); //TODO: Allow custom functions
+            expr::Parser expr_parser(BUILTIN_FUNCTIONS, local_vars, expr_lexer); //TODO: Allow custom functions
             auto expr = expr_parser.full_expression();
 
             return expr;

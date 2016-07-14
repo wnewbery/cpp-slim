@@ -15,7 +15,9 @@ BOOST_AUTO_TEST_SUITE(TestArray)
 ObjectPtr eval_obj(const std::string &str, const FunctionTable &functions, Scope &scope)
 {
     Lexer lexer(str);
-    Parser parser(functions, lexer);
+    expr::LocalVarNames vars;
+    for (auto x : scope) vars.add(x.first->str());
+    Parser parser(functions, vars, lexer);
     auto expr = parser.full_expression();
     auto result = expr->eval(scope);
     return result;

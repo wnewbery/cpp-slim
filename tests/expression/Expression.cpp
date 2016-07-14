@@ -14,7 +14,9 @@ BOOST_AUTO_TEST_SUITE(TestExpr)
 std::string eval(const std::string &str, const FunctionTable &functions, Scope &scope)
 {
     Lexer lexer(str);
-    Parser parser(functions, lexer);
+    expr::LocalVarNames vars;
+    for (auto x : scope) vars.add(x.first->str());
+    Parser parser(functions, vars, lexer);
     auto expr = parser.full_expression();
     auto result = expr->eval(scope);
     return result->inspect();
@@ -53,7 +55,7 @@ BOOST_AUTO_TEST_CASE(variables)
     Scope scope(attrs);
     scope.set("test", make_value(55.0));
     BOOST_CHECK_EQUAL("55", eval("test", functions, scope));
-    BOOST_CHECK_EQUAL("nil", eval("unset", functions, scope));
+    BOOST_CHECK_THROW(eval("unset", functions, scope), NoSuchMethod); //not a variable, so considered a function
 }
 
 BOOST_AUTO_TEST_CASE(operators)

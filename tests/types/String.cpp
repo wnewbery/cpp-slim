@@ -18,7 +18,8 @@ std::string eval(const std::string &str)
     Scope scope(attrs);
     FunctionTable functions;
     Lexer lexer(str);
-    Parser parser(functions, lexer);
+    expr::LocalVarNames vars;
+    Parser parser(functions, vars, lexer);
     auto expr = parser.full_expression();
     auto result = expr->eval(scope);
     return result->inspect();

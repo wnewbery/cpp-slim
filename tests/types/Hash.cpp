@@ -17,7 +17,9 @@ std::string eval(const std::string &str, Scope &scope)
 {
     FunctionTable functions;
     Lexer lexer(str);
-    Parser parser(functions, lexer);
+    expr::LocalVarNames vars;
+    for (auto x : scope) vars.add(x.first->str());
+    Parser parser(functions, vars, lexer);
     auto expr = parser.full_expression();
     auto result = expr->eval(scope);
     return result->inspect();
@@ -46,6 +48,7 @@ BOOST_AUTO_TEST_CASE(compare)
     scope.set("a", make_hash2({}));
     scope.set("b", make_hash2({ { "a", 5.0 },{ "b", 10.0 } }));
     scope.set("c", make_hash2({ { "a", 5.0 },{ "c", 15 } }));
+    scope.set("c2", NIL_VALUE);
 
 
     BOOST_CHECK_EQUAL("true", eval("a == a", scope));

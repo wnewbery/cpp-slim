@@ -1,6 +1,7 @@
 #pragma once
 #include "Token.hpp"
 #include "Function.hpp"
+#include "Scope.hpp"
 #include <memory>
 #include <vector>
 namespace slim
@@ -15,7 +16,7 @@ namespace slim
         class Parser
         {
         public:
-            Parser(const FunctionTable &global_functions, Lexer &lexer);
+            Parser(const FunctionTable &global_functions, const LocalVarNames &vars, Lexer &lexer);
 
             /**Parse the entire source as a complete expression.
              * Same as expression, but anything other than Token::END raises an error.
@@ -33,10 +34,17 @@ namespace slim
 
             /**Gets the last token read from lexer.*/
             const Token& get_last_token()const { return current_token; }
+            const LocalVarNames& get_var_names()const { return vars; }
         private:
+
             const FunctionTable &global_functions;
+            //State
             Lexer &lexer;
             Token current_token;
+            /**Variables in current scope.
+             * blocks have own scope, so block() updates and reverts this internally.
+             */
+            LocalVarNames vars;
 
             /**Advance to the next token.*/
             void next();

@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "Token.hpp"
+#include "expression/Scope.hpp"
 namespace slim
 {
     class Template;
@@ -62,6 +63,11 @@ namespace slim
 
             Lexer &lexer;
             Token current_token;
+            /**Names of local variables as these are shared between seperate expressions.
+             * Blocks in "-x expr.each do |a, b, c|" lines can create new scopes, which is handled
+             * internally by parse_control_code().
+             */
+            expr::LocalVarNames local_vars;
 
             int current_indent();
 

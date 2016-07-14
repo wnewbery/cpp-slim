@@ -16,14 +16,17 @@ ExpressionNodePtr parse(const std::string &str)
 {
     Lexer lexer(str);
 
-    Parser parser(functions, lexer);
+    LocalVarNames vars;
+    vars.add("myvar");
+    Parser parser(functions, vars, lexer);
     return parser.full_expression();
 }
 std::string parse_part(const std::string &str)
 {
     Lexer lexer(str);
 
-    Parser parser(functions, lexer);
+    LocalVarNames vars;
+    Parser parser(functions, vars, lexer);
     return parser.expression()->to_string();
 }
 
@@ -106,15 +109,15 @@ BOOST_AUTO_TEST_CASE(single_ops)
     BOOST_CHECK_EQUAL("-10", parse("-10")->to_string());
     BOOST_CHECK_EQUAL("10", parse("+10")->to_string());
 
-    BOOST_CHECK_EQUAL("(5 ? a : b)", parse("5 ? a : b")->to_string());
+    BOOST_CHECK_EQUAL("(5 ? @a : @b)", parse("5 ? @a : @b")->to_string());
     BOOST_CHECK_EQUAL("(5 ? :a : :b)", parse("5 ? :a : :b")->to_string());
-    BOOST_CHECK_THROW(parse("true ? a.f :x :y"), SyntaxError);
+    BOOST_CHECK_THROW(parse("true ? @a.f :x :y"), SyntaxError);
 }
 
 BOOST_AUTO_TEST_CASE(associativity_single)
 {
     //conditional right to left
-    BOOST_CHECK_EQUAL("(5 ? a : (b ? d : e))", parse("5 ? a : b ? d : e")->to_string());
+    BOOST_CHECK_EQUAL("(5 ? @a : (@b ? @d : @e))", parse("5 ? @a : @b ? @d : @e")->to_string());
 
     // binary, left to right
     BOOST_CHECK_EQUAL("(((5 && 10) && 5) && true)", parse("5 && 10 && 5 && true")->to_string());
@@ -130,18 +133,18 @@ BOOST_AUTO_TEST_CASE(grouping)
     BOOST_CHECK_EQUAL("((5 - 5) * 6)", parse("(5 - 5) * 6")->to_string());
     BOOST_CHECK_EQUAL("(-((5 - 5) * 6))", parse("-((5 - 5) * 6)")->to_string());
 
-    BOOST_CHECK_EQUAL("[2, (5 + 5), a.f()]", parse("[2,5+5,a.f]")->to_string());
+    BOOST_CHECK_EQUAL("[2, (5 + 5), @a.f()]", parse("[2,5+5,@a.f]")->to_string());
 }
 
 BOOST_AUTO_TEST_CASE(string_interp)
 {
     BOOST_CHECK_EQUAL("\"hello world\"", parse("'hello world'")->to_string());
-    BOOST_CHECK_EQUAL("\"hello #{x}\"", parse("'hello #{x}'")->to_string());
-    BOOST_CHECK_EQUAL("\"hello #{(x + y)}\"", parse("'hello #{x + y}'")->to_string());
+    BOOST_CHECK_EQUAL("\"hello #{@x}\"", parse("'hello #{@x}'")->to_string());
+    BOOST_CHECK_EQUAL("\"hello #{(@x + @y)}\"", parse("'hello #{@x + @y}'")->to_string());
     BOOST_CHECK_EQUAL("\"hello #{\"nested\"}\"", parse("'hello #{'nested'}'")->to_string());
     BOOST_CHECK_EQUAL(
-        "\"hello #{\"nested #{x} interp\"}\"",
-        parse("'hello #{'nested #{x} interp'}'")->to_string());
+        "\"hello #{\"nested #{@x} interp\"}\"",
+        parse("'hello #{'nested #{@x} interp'}'")->to_string());
 }
 
 BOOST_AUTO_TEST_CASE(method_call)
@@ -155,33 +158,33 @@ BOOST_AUTO_TEST_CASE(method_call)
     BOOST_CHECK_EQUAL("f({:a => 5, :b => 6})", parse("f a: 5, b: 6")->to_string());
     BOOST_CHECK_EQUAL("f({:a => 5, :b => 6})", parse("f :a => 5, :b => 6")->to_string());
     
-    BOOST_CHECK_EQUAL("a.f()", parse("a.f")->to_string());
-    BOOST_CHECK_EQUAL("a.f()", parse("a.f()")->to_string());
-    BOOST_CHECK_EQUAL("a.f(5)", parse("a.f(5)")->to_string()); //because groups dont exist in the AST
-    BOOST_CHECK_EQUAL("a.f(5, true)", parse("a.f(5, true)")->to_string());
-    BOOST_CHECK_EQUAL("a.f().g()", parse("a.f.g")->to_string());
-    BOOST_CHECK_EQUAL("a.f(5).g()", parse("a.f(5).g")->to_string());
+    BOOST_CHECK_EQUAL("@a.f()", parse("@a.f")->to_string());
+    BOOST_CHECK_EQUAL("@a.f()", parse("@a.f()")->to_string());
+    BOOST_CHECK_EQUAL("@a.f(5)", parse("@a.f(5)")->to_string()); //because groups dont exist in the AST
+    BOOST_CHECK_EQUAL("@a.f(5, true)", parse("@a.f(5, true)")->to_string());
+    BOOST_CHECK_EQUAL("@a.f().g()", parse("@a.f.g")->to_string());
+    BOOST_CHECK_EQUAL("@a.f(5).g()", parse("@a.f(5).g")->to_string());
 
-    BOOST_CHECK_EQUAL("a.f(2, 3, 4)", parse("a.f 2, 3, 4")->to_string());
-    BOOST_CHECK_EQUAL("a.f(2, 3, (4 + 4))", parse("a.f 2, 3, 4 + 4")->to_string());
-    BOOST_CHECK_EQUAL("(a.f(2, 3, 4) + 4)", parse("(a.f 2, 3, 4) + 4")->to_string());
+    BOOST_CHECK_EQUAL("@a.f(2, 3, 4)", parse("@a.f 2, 3, 4")->to_string());
+    BOOST_CHECK_EQUAL("@a.f(2, 3, (4 + 4))", parse("@a.f 2, 3, 4 + 4")->to_string());
+    BOOST_CHECK_EQUAL("(@a.f(2, 3, 4) + 4)", parse("(@a.f 2, 3, 4) + 4")->to_string());
 
-    BOOST_CHECK_EQUAL("a&.f(2, 3, 4)", parse("a&.f 2, 3, 4")->to_string());
+    BOOST_CHECK_EQUAL("@a&.f(2, 3, 4)", parse("@a&.f 2, 3, 4")->to_string());
 
-    BOOST_CHECK_EQUAL("a[5]", parse("a[5]")->to_string());
-    BOOST_CHECK_EQUAL("a[5][5, 10]", parse("a[5][5, 10]")->to_string());
-    BOOST_CHECK_EQUAL("a[5][5, 10].to_i()", parse("a[5][5, 10].to_i")->to_string());
+    BOOST_CHECK_EQUAL("@a[5]", parse("@a[5]")->to_string());
+    BOOST_CHECK_EQUAL("@a[5][5, 10]", parse("@a[5][5, 10]")->to_string());
+    BOOST_CHECK_EQUAL("@a[5][5, 10].to_i()", parse("@a[5][5, 10].to_i")->to_string());
 
-    BOOST_CHECK_EQUAL("a.f()[5]", parse("a.f[5]")->to_string());
-    BOOST_CHECK_EQUAL("a.f()[5, 7]", parse("a.f[5, 7]")->to_string());
-    BOOST_CHECK_EQUAL("a.f()[5, 7].g()", parse("a.f[5, 7].g")->to_string());
-    BOOST_CHECK_EQUAL("a.f()[5, (7 + 8)].g()", parse("a.f[5, 7 + 8].g")->to_string());
+    BOOST_CHECK_EQUAL("@a.f()[5]", parse("@a.f[5]")->to_string());
+    BOOST_CHECK_EQUAL("@a.f()[5, 7]", parse("@a.f[5, 7]")->to_string());
+    BOOST_CHECK_EQUAL("@a.f()[5, 7].g()", parse("@a.f[5, 7].g")->to_string());
+    BOOST_CHECK_EQUAL("@a.f()[5, (7 + 8)].g()", parse("@a.f[5, 7 + 8].g")->to_string());
 
-    BOOST_CHECK_EQUAL("a.f({|| 5})", parse("a.f{|| 5}")->to_string());
-    BOOST_CHECK_EQUAL("a.f(4, {|x| x})", parse("a.f(4){|x| x}")->to_string());
-    BOOST_CHECK_EQUAL("a.f({|x, y| (x * y)})", parse("a.f{|x, y| x * y}")->to_string());
+    BOOST_CHECK_EQUAL("@a.f({|| 5})", parse("@a.f{|| 5}")->to_string());
+    BOOST_CHECK_EQUAL("@a.f(4, {|x| x})", parse("@a.f(4){|x| x}")->to_string());
+    BOOST_CHECK_EQUAL("@a.f({|x, y| (x * y)})", parse("@a.f{|x, y| x * y}")->to_string());
 
-    BOOST_CHECK_EQUAL("a.to_a()[0]", parse("a.to_a[0]")->to_string());
+    BOOST_CHECK_EQUAL("@a.to_a()[0]", parse("@a.to_a[0]")->to_string());
     //TODO:
     //BOOST_CHECK_EQUAL("a.contains?([1, 2, 3])", parse("a.contains? [1,2,3]")->to_string());
     //BOOST_CHECK_EQUAL("a.contains?({a: 5})", parse("a.contains? {a: 5}")->to_string());
@@ -193,8 +196,8 @@ BOOST_AUTO_TEST_CASE(precedence)
     BOOST_CHECK_EQUAL("(((5 - 5) == 0) && (10 != nil))", parse("5 - 5 == 0 && 10 != nil")->to_string());
     BOOST_CHECK_EQUAL("((5 < 10) == (15 >= 10))", parse("5 < 10 == 15 >= 10")->to_string());
     BOOST_CHECK_EQUAL("((5 - (-5)) == 0)", parse("5 - - 5 == 0")->to_string());
-    BOOST_CHECK_EQUAL("(c + (m * x))", parse("c + m * x")->to_string());
-    BOOST_CHECK_EQUAL("((m * x) + c)", parse("m * x + c")->to_string());
+    BOOST_CHECK_EQUAL("(@c + (@m * @x))", parse("@c + @m * @x")->to_string());
+    BOOST_CHECK_EQUAL("((@m * @x) + @c)", parse("@m * @x + @c")->to_string());
     BOOST_CHECK_EQUAL("((-(5 - 5)) * 6)", parse("-(5 - 5) * 6")->to_string());
     BOOST_CHECK_EQUAL("((5 && 1) || (0 && 7))", parse("5 && 1 || 0 && 7")->to_string());
 }
@@ -223,26 +226,26 @@ BOOST_AUTO_TEST_CASE(basic_syntax_errors)
     BOOST_CHECK_THROW(parse("((5 + 5) * 8"), SyntaxError);
     //method call
     BOOST_CHECK_THROW(parse("."), SyntaxError);
-    BOOST_CHECK_THROW(parse("a."), SyntaxError);
-    BOOST_CHECK_THROW(parse("a.f("), SyntaxError);
-    BOOST_CHECK_THROW(parse("a.f(b"), SyntaxError);
-    BOOST_CHECK_THROW(parse("a.f(b,"), SyntaxError);
-    BOOST_CHECK_THROW(parse("a.f(b,)"), SyntaxError);
-    BOOST_CHECK_THROW(parse("a.f(b,,c)"), SyntaxError);
-    BOOST_CHECK_THROW(parse("a.f(b)."), SyntaxError);
+    BOOST_CHECK_THROW(parse("@a."), SyntaxError);
+    BOOST_CHECK_THROW(parse("@a.f("), SyntaxError);
+    BOOST_CHECK_THROW(parse("@a.f(@b"), SyntaxError);
+    BOOST_CHECK_THROW(parse("@a.f(@b,"), SyntaxError);
+    BOOST_CHECK_THROW(parse("@a.f(@b,)"), SyntaxError);
+    BOOST_CHECK_THROW(parse("@a.f(@b,,@c)"), SyntaxError);
+    BOOST_CHECK_THROW(parse("@a.f(@b)."), SyntaxError);
 
-    BOOST_CHECK_THROW(parse("a[]"), SyntaxError);
-    BOOST_CHECK_THROW(parse("a[a,]"), SyntaxError);
-    BOOST_CHECK_THROW(parse("a[,a]"), SyntaxError);
-    BOOST_CHECK_THROW(parse("a["), SyntaxError);
-    BOOST_CHECK_THROW(parse("a[a"), SyntaxError);
+    BOOST_CHECK_THROW(parse("@a[]"), SyntaxError);
+    BOOST_CHECK_THROW(parse("@a[@a,]"), SyntaxError);
+    BOOST_CHECK_THROW(parse("@a[,@a]"), SyntaxError);
+    BOOST_CHECK_THROW(parse("@a["), SyntaxError);
+    BOOST_CHECK_THROW(parse("@a[@a"), SyntaxError);
     
-    BOOST_CHECK_THROW(parse("a.f{"), SyntaxError);
-    BOOST_CHECK_THROW(parse("a.f{|"), SyntaxError);
-    BOOST_CHECK_THROW(parse("a.f{|x"), SyntaxError);
-    BOOST_CHECK_THROW(parse("a.f{||"), SyntaxError);
-    BOOST_CHECK_THROW(parse("a.f{||}"), SyntaxError);
-    BOOST_CHECK_THROW(parse("a.f{||x"), SyntaxError);
+    BOOST_CHECK_THROW(parse("@a.f{"), SyntaxError);
+    BOOST_CHECK_THROW(parse("@a.f{|"), SyntaxError);
+    BOOST_CHECK_THROW(parse("@a.f{|x"), SyntaxError);
+    BOOST_CHECK_THROW(parse("@a.f{||"), SyntaxError);
+    BOOST_CHECK_THROW(parse("@a.f{||}"), SyntaxError);
+    BOOST_CHECK_THROW(parse("@a.f{|x|x"), SyntaxError);
     //array
     BOOST_CHECK_THROW(parse("["), SyntaxError);
     BOOST_CHECK_THROW(parse("]"), SyntaxError);
