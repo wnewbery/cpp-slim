@@ -132,6 +132,9 @@
     <ClInclude Include="include\slim\types\HtmlSafeString.hpp">
       <Filter>include\types</Filter>
     </ClInclude>
+    <ClInclude Include="include\slim\Template.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\types\Object.cpp">
@@ -208,6 +211,9 @@
     </ClCompile>
     <ClCompile Include="source\template\Template.cpp">
       <Filter>source\template</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Template.cpp">
+      <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
