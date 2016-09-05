@@ -27,6 +27,9 @@ namespace slim
 
         void set(ObjectPtr key, ObjectPtr val);
 
+        /**C++ convinence function for "self.fetch(key, default).to_s" expression.*/
+        std::string get_str(const std::string &key, const std::string &def);
+
         //any?
         //assoc
         //clear

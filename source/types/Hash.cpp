@@ -64,6 +64,13 @@ namespace slim
         else list[x.first->second].second = val;
     }
 
+    std::string Hash::get_str(const std::string &key, const std::string &def)
+    {
+        auto it = map.find(make_value(key));
+        if (it != map.end()) return list[it->second].second->to_string();
+        else return def;
+    }
+
     ObjectPtr Hash::el_ref(const FunctionArgs &args)
     {
         if (args.size() != 1) throw InvalidArgument(this, "[]");
