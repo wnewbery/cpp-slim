@@ -48,7 +48,7 @@ namespace slim
         }
         else return false;
     }
-    
+
     template<class T>
     bool try_unpack_arg(const ObjectPtr &arg, T **out)
     {
@@ -56,6 +56,18 @@ namespace slim
         if (ptr)
         {
             *out = ptr;
+            return true;
+        }
+        else return false;
+    }
+
+    template<class T>
+    bool try_unpack_arg(const ObjectPtr &arg, std::shared_ptr<T> *out)
+    {
+        auto ptr = std::dynamic_pointer_cast<T>(arg);
+        if (ptr)
+        {
+            *out = std::move(ptr);
             return true;
         }
         else return false;
