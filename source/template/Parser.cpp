@@ -8,7 +8,6 @@
 #include "expression/AstOp.hpp"
 #include "types/Boolean.hpp"
 #include "types/Nil.hpp"
-#include "BuiltinFunctions.hpp"
 #include "Error.hpp"
 #include "Util.hpp"
 #include <cassert>
@@ -84,8 +83,8 @@ namespace slim
             else return slim::make_unique<TemplateText>(std::string());
         }
 
-        Parser::Parser(Lexer &lexer)
-            : lexer(lexer)
+        Parser::Parser(Lexer &lexer, const FunctionTable &functions)
+            : lexer(lexer), functions(functions)
         {}
         Parser::~Parser()
         {}
@@ -229,7 +228,7 @@ namespace slim
             {
 
                 expr::Lexer expr_lexer(lexer.get_pos(), lexer.get_end());
-                expr::Parser expr_parser(BUILTIN_FUNCTIONS, local_vars, expr_lexer); //TODO: Allow custom functions
+                expr::Parser expr_parser(functions, local_vars, expr_lexer); //TODO: Allow custom functions
 
 
                 auto attr = current_token.str;
@@ -428,7 +427,7 @@ namespace slim
             }
 
             expr::Lexer expr_lexer(script_src);
-            expr::Parser expr_parser(BUILTIN_FUNCTIONS, local_vars, expr_lexer); //TODO: Allow custom functions
+            expr::Parser expr_parser(functions, local_vars, expr_lexer); //TODO: Allow custom functions
             auto expr = expr_parser.full_expression();
 
             return expr;
