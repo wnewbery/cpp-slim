@@ -12,6 +12,9 @@ namespace slim
     {
     public:
         static const std::string TYPE_NAME;
+        typedef std::vector<std::pair<ObjectPtr, ObjectPtr>> List;
+        typedef List::iterator const_iterator;
+
         Hash();
         Hash(ObjectPtr def_value)
             : def_value(), map(), list()
@@ -24,6 +27,9 @@ namespace slim
         virtual bool eq(const Object *rhs)const override;
 
         virtual ObjectPtr el_ref(const FunctionArgs &args)override;
+
+        const_iterator begin() { return list.begin(); }
+        const_iterator end() { return list.end(); }
 
         void set(ObjectPtr key, ObjectPtr val);
 
@@ -69,7 +75,6 @@ namespace slim
         virtual const MethodTable &method_table()const;
     private:
         typedef std::unordered_map<ObjectPtr, size_t, ObjHash, ObjEquals> Map;
-        typedef std::vector<std::pair<ObjectPtr, ObjectPtr>> List;
 
         ObjectPtr def_value;
         Map map;

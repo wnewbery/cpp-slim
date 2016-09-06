@@ -10,6 +10,9 @@ namespace slim
     {
     public:
         static const std::string TYPE_NAME;
+        typedef std::vector<ObjectPtr> List;
+        typedef List::iterator iterator;
+
         explicit Array() : arr() {}
         explicit Array(std::vector<ObjectPtr> &&arr) : arr(std::move(arr)) {}
         explicit Array(const std::vector<ObjectPtr> &arr) : arr(arr) {}
@@ -24,6 +27,9 @@ namespace slim
         virtual ObjectPtr el_ref(const FunctionArgs &args)override { return slice(args); }
         virtual ObjectPtr add(Object *rhs)override;
         virtual ObjectPtr sub(Object *rhs)override;
+
+        iterator begin() { return arr.begin(); }
+        iterator end() { return arr.end(); }
 
         const std::vector<ObjectPtr>& get_value()const { return arr; }
 
@@ -95,7 +101,7 @@ namespace slim
     protected:
         virtual const MethodTable &method_table()const;
     private:
-        std::vector<ObjectPtr> arr;
+        List arr;
     };
 
     inline std::shared_ptr<Array> make_value(std::vector<ObjectPtr> &&arr)
