@@ -237,6 +237,7 @@ namespace slim
             case Token::NUMBER:
             case Token::STRING_DELIM:
             case Token::SYMBOL:
+            case Token::ATTR_NAME:
                 return true;
             default:
                 return false;
