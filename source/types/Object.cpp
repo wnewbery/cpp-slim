@@ -102,11 +102,11 @@ namespace slim
         auto &method = method_table().get(this, name);
         return method(this, args);
     }
-    ObjectPtr Object::to_string_obj()const
+    std::shared_ptr<String> Object::to_string_obj()
     {
         return make_value(to_string());
     }
-    ObjectPtr Object::inspect_obj()const
+    ObjectPtr Object::inspect_obj()
     {
         return make_value(inspect());
     }

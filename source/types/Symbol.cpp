@@ -34,10 +34,6 @@ namespace slim
     {
         return ":" + _str->to_string();
     }
-    ObjectPtr Symbol::to_string_obj() const
-    {
-        return _str;
-    }
     size_t Symbol::hash() const
     {
         return std::hash<ObjectPtr>()(_str);

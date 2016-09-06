@@ -1,5 +1,5 @@
 #pragma once
-#include "types/Object.hpp"
+#include "../types/Object.hpp"
 #include <memory>
 #include <string>
 namespace slim

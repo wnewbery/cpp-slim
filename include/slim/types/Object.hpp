@@ -3,8 +3,8 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include "Error.hpp"
-#include "Operators.hpp"
+#include "../Error.hpp"
+#include "../Operators.hpp"
 namespace slim
 {
     class Object;
@@ -19,6 +19,9 @@ namespace slim
     class MethodTable;
 
     SymPtr symbol(const std::string &str);
+
+    class Object;
+    class String;
 
     /**Base abstract object for the expression interpreter.*/
     class Object : public std::enable_shared_from_this<Object>
@@ -50,11 +53,11 @@ namespace slim
         /**Convert this instance to a displayable representation of this object.*/
         virtual std::string inspect()const;
         /**Convert this instance to a displayable string object. The default uses to_string. */
-        virtual ObjectPtr to_string_obj()const;
+        virtual std::shared_ptr<String> to_string_obj();
         /**Convert this instance to a displayable representation of this object.
          * The default uses inspect.
          */
-        virtual ObjectPtr inspect_obj()const;
+        virtual ObjectPtr inspect_obj();
         /**Returns if this object instance should be considered true in a boolean context.*/
         virtual bool is_true()const { return true; }
         /**Compare with another object of the same type.

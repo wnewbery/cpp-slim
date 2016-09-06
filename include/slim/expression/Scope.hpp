@@ -1,7 +1,7 @@
 #pragma once
-#include "types/Object.hpp"
-#include "types/Nil.hpp"
-#include "types/Symbol.hpp"
+#include "../types/Object.hpp"
+#include "../types/Nil.hpp"
+#include "../types/Symbol.hpp"
 #include <string>
 #include <unordered_map>
 

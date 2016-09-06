@@ -1,7 +1,7 @@
 #pragma once
 #include "Token.hpp"
-#include "Function.hpp"
 #include "Scope.hpp"
+#include "../Function.hpp"
 #include <memory>
 #include <vector>
 namespace slim

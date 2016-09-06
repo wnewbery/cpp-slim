@@ -15,6 +15,10 @@ namespace slim
         virtual const std::string& type_name()const override { return TYPE_NAME; }
         virtual std::string to_string()const override { return v; }
         virtual std::string inspect()const override;
+        virtual std::shared_ptr<String> to_string_obj()override
+        {
+            return std::static_pointer_cast<String>(shared_from_this());
+        }
         virtual bool is_true()const override { return !v.empty(); }
         virtual bool eq(const Object *rhs)const override
         {
@@ -128,16 +132,17 @@ namespace slim
         std::vector<std::string> split_lines()const;
         std::vector<std::string> split_lines(const std::string &sep)const;
     };
+    typedef std::shared_ptr<String> StringPtr;
 
-    inline std::shared_ptr<String> make_value(std::string &&v)
+    inline StringPtr make_value(std::string &&v)
     {
         return create_object<String>(std::move(v));
     }
-    inline std::shared_ptr<String> make_value(const std::string &v)
+    inline StringPtr make_value(const std::string &v)
     {
         return create_object<String>(v);
     }
-    inline std::shared_ptr<String> make_value(const char *v)
+    inline StringPtr make_value(const char *v)
     {
         return create_object<String>(v);
     }
