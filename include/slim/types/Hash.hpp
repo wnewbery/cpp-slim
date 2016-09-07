@@ -36,6 +36,9 @@ namespace slim
         /**C++ convinence function for "self.fetch(key, default).to_s" expression.*/
         std::string get_str(const std::string &key, const std::string &def);
 
+        /**Shallow copy this hash.*/
+        std::shared_ptr<Hash> dup();
+
         //any?
         //assoc
         //clear

@@ -71,6 +71,15 @@ namespace slim
         else return def;
     }
 
+
+    std::shared_ptr<Hash> Hash::dup()
+    {
+        auto ret = create_object<Hash>();
+        ret->list = list;
+        ret->map = map;
+        return ret;
+    }
+
     ObjectPtr Hash::el_ref(const FunctionArgs &args)
     {
         if (args.size() != 1) throw InvalidArgument(this, "[]");
