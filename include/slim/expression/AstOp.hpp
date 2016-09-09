@@ -40,38 +40,36 @@ namespace slim
 
             Args args;
         };
-        class GlobalFuncCall : public FuncCall
+        class NamedFuncCall : public FuncCall
         {
         public:
-            GlobalFuncCall(const Function &function, Args &&args) : FuncCall(std::move(args)), function(function) {}
+            NamedFuncCall(const SymPtr &name, Args &&args) : FuncCall(std::move(args)), name(name) {}
+            SymPtr name;
+        };
+        class GlobalFuncCall : public NamedFuncCall
+        {
+        public:
+            using NamedFuncCall::NamedFuncCall;
             virtual std::string to_string()const override;
             virtual ObjectPtr eval(Scope &scope)const override;
-
-            const Function &function;
         };
-        class MemberFuncCall : public FuncCall
+        class MemberFuncCall : public NamedFuncCall
         {
         public:
             MemberFuncCall(ExpressionNodePtr &&lhs, const SymPtr &name, Args &&args)
-                : FuncCall(std::move(args)), lhs(std::move(lhs)), name(name)
+                : NamedFuncCall(name, std::move(args)), lhs(std::move(lhs))
             {}
             virtual std::string to_string()const override;
             virtual ObjectPtr eval(Scope &scope)const override;
 
             ExpressionNodePtr lhs;
-            SymPtr name;
         };
-        class SafeNavMemberFuncCall : public FuncCall
+        class SafeNavMemberFuncCall : public MemberFuncCall
         {
         public:
-            SafeNavMemberFuncCall(ExpressionNodePtr &&lhs, const SymPtr &name, Args &&args)
-                : FuncCall(std::move(args)), lhs(std::move(lhs)), name(name)
-            {}
+            using MemberFuncCall::MemberFuncCall;
             virtual std::string to_string()const override;
             virtual ObjectPtr eval(Scope &scope)const override;
-
-            ExpressionNodePtr lhs;
-            SymPtr name;
         };
         /**[] operator */
         class ElementRefOp : public FuncCall

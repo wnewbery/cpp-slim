@@ -15,19 +15,19 @@ BOOST_AUTO_TEST_SUITE(TestHash)
 
 std::string eval(const std::string &str, Scope &scope)
 {
-    FunctionTable functions;
     Lexer lexer(str);
     expr::LocalVarNames vars;
     for (auto x : scope) vars.add(x.first->str());
-    Parser parser(functions, vars, lexer);
+    Parser parser(vars, lexer);
     auto expr = parser.full_expression();
     auto result = expr->eval(scope);
     return result->inspect();
 }
 std::string eval(const std::string &str)
 {
+    FunctionTable functions;
     ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(functions, attrs);
     return eval(str, scope);
 }
 
@@ -43,8 +43,9 @@ std::shared_ptr<Hash> make_hash2(const std::vector<std::pair<std::string, double
 
 BOOST_AUTO_TEST_CASE(compare)
 {
+    FunctionTable functions;
     ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(functions, attrs);
     scope.set("a", make_hash2({}));
     scope.set("b", make_hash2({ { "a", 5.0 },{ "b", 10.0 } }));
     scope.set("c", make_hash2({ { "a", 5.0 },{ "c", 15 } }));
@@ -79,8 +80,9 @@ BOOST_AUTO_TEST_CASE(basic_methods)
 
 BOOST_AUTO_TEST_CASE(basic_access)
 {
+    FunctionTable functions;
     ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(functions, attrs);
     scope.set("a", make_hash2({}));
     scope.set("b", make_hash2({ { "a", 5.0 },{ "b", 10.0 } }));
     scope.set("c", make_hash2({ { "a", 5.0 },{ "c", 15 },{ "10", 20 } }));

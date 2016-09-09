@@ -40,10 +40,8 @@ namespace slim
                 return ret;
             }
         }
-        Parser::Parser(const FunctionTable &global_functions, const LocalVarNames &vars, Lexer &lexer)
-            : global_functions(global_functions)
-            , lexer(lexer), current_token(nullptr, Token::END)
-            , vars(vars)
+        Parser::Parser(const LocalVarNames &vars, Lexer &lexer)
+            : lexer(lexer), current_token(nullptr, Token::END), vars(vars)
         {
             next();
         }
@@ -90,19 +88,16 @@ namespace slim
                         current_token.type == Token::L_CURLY_BRACKET ||
                         (!in_cond_op && is_func_arg_start()))
                     {   //local variables are not callable, so must be method
-                        auto &f = global_functions.get(symbol(name));
                         FuncCall::Args args = func_args(false);
-                        return slim::make_unique<GlobalFuncCall>(f, std::move(args));
+                        return slim::make_unique<GlobalFuncCall>(symbol(name), std::move(args));
                     }
                     else if (vars.is_var(name))
                     {   //variables take priority over methods if they exist
                         return slim::make_unique<Variable>(symbol(name));
                     }
                     else
-                    {
-                        //method call with no args
-                        auto &f = global_functions.get(symbol(name));
-                        return slim::make_unique<GlobalFuncCall>(f, FuncCall::Args());
+                    {   //method call with no args
+                        return slim::make_unique<GlobalFuncCall>(symbol(name), FuncCall::Args());
                     }
                 }
             case Token::ATTR_NAME:

@@ -15,10 +15,10 @@ ObjectPtr eval2(const std::string &str)
 {
     Lexer lexer(str);
     expr::LocalVarNames vars;
-    Parser parser(BUILTIN_FUNCTIONS, vars, lexer);
+    Parser parser(vars, lexer);
     auto expr = parser.full_expression();
     ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(BUILTIN_FUNCTIONS, attrs);
     return expr->eval(scope);
 }
 double eval(const std::string &str)

@@ -16,7 +16,7 @@ namespace slim
         class Parser
         {
         public:
-            Parser(const FunctionTable &global_functions, const LocalVarNames &vars, Lexer &lexer);
+            Parser(const LocalVarNames &vars, Lexer &lexer);
 
             /**Parse the entire source as a complete expression.
              * Same as expression, but anything other than Token::END raises an error.
@@ -36,8 +36,6 @@ namespace slim
             const Token& get_last_token()const { return current_token; }
             const LocalVarNames& get_var_names()const { return vars; }
         private:
-
-            const FunctionTable &global_functions;
             //State
             Lexer &lexer;
             Token current_token;

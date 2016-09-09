@@ -2,6 +2,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "..\Function.hpp"
 namespace slim
 {
     namespace expr
@@ -43,7 +44,7 @@ namespace slim
          * @param model Contains the variables for script blocks within the template.
          * @param doctype If true, prefix the HTML5 doctype.
          */
-        std::string render(ViewModel &model, bool doctype = true);
+        std::string render(const FunctionTable &globals, ViewModel &model, bool doctype = true);
         
         /**Converts the template part into a string representation, mainly for debugging.
          * Because the origenal template structure has all ready been lost, as it was converted

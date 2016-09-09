@@ -10,15 +10,13 @@ using namespace slim;
 using namespace slim::expr;
 BOOST_AUTO_TEST_SUITE(TestExprParser)
 
-auto f = [](const FunctionArgs &args) -> ObjectPtr { return nullptr; };
-FunctionTable functions = { { f, "f" } }; // keep in scope for tests, else invalidates returned ExpressionNodePtr
 ExpressionNodePtr parse(const std::string &str)
 {
     Lexer lexer(str);
 
     LocalVarNames vars;
     vars.add("myvar");
-    Parser parser(functions, vars, lexer);
+    Parser parser(vars, lexer);
     return parser.full_expression();
 }
 std::string parse_part(const std::string &str)
@@ -26,7 +24,7 @@ std::string parse_part(const std::string &str)
     Lexer lexer(str);
 
     LocalVarNames vars;
-    Parser parser(functions, vars, lexer);
+    Parser parser(vars, lexer);
     return parser.expression()->to_string();
 }
 

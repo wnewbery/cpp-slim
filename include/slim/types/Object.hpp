@@ -16,6 +16,7 @@ namespace slim
     typedef std::shared_ptr<Symbol> SymPtr;
 
     typedef std::vector<ObjectPtr> FunctionArgs;
+    class Method;
     class MethodTable;
 
     SymPtr symbol(const std::string &str);
@@ -87,7 +88,8 @@ namespace slim
         virtual ObjectPtr bit_xor(Object *rhs);
         virtual ObjectPtr bit_not();
 
-        virtual ObjectPtr call_method(SymPtr name, const FunctionArgs &args);
+        const Method *find_method(SymPtr name)const;
+        ObjectPtr call_method(SymPtr name, const FunctionArgs &args);
     protected:
         /**Get a function table for the default implementation of call_method.*/
         virtual const MethodTable &method_table()const;

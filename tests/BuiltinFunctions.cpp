@@ -15,7 +15,7 @@ std::string eval(const std::string &str, Scope &scope)
     Lexer lexer(str);
     expr::LocalVarNames vars;
     for (auto x : scope) vars.add(x.first->str());
-    Parser parser(BUILTIN_FUNCTIONS, vars, lexer);
+    Parser parser(vars, lexer);
     auto expr = parser.full_expression();
     auto result = expr->eval(scope);
     return result->to_string();
@@ -23,7 +23,7 @@ std::string eval(const std::string &str, Scope &scope)
 std::string eval(const std::string &str)
 {
     ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(BUILTIN_FUNCTIONS, attrs);
     return eval(str, scope);
 }
 

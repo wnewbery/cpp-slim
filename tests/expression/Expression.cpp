@@ -11,12 +11,12 @@ using namespace slim;
 using namespace slim::expr;
 BOOST_AUTO_TEST_SUITE(TestExpr)
 
-std::string eval(const std::string &str, const FunctionTable &functions, Scope &scope)
+std::string eval(const std::string &str, Scope &scope)
 {
     Lexer lexer(str);
     expr::LocalVarNames vars;
     for (auto x : scope) vars.add(x.first->str());
-    Parser parser(functions, vars, lexer);
+    Parser parser(vars, lexer);
     auto expr = parser.full_expression();
     auto result = expr->eval(scope);
     return result->inspect();
@@ -25,8 +25,8 @@ std::string eval(const std::string &str)
 {
     FunctionTable functions;
     ScopeAttributes attrs;
-    Scope scope(attrs);
-    return eval(str, functions, scope);
+    Scope scope(functions, attrs);
+    return eval(str, scope);
 }
 
 BOOST_AUTO_TEST_CASE(literals)
@@ -52,10 +52,10 @@ BOOST_AUTO_TEST_CASE(variables)
 {
     FunctionTable functions;
     ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(functions, attrs);
     scope.set("test", make_value(55.0));
-    BOOST_CHECK_EQUAL("55", eval("test", functions, scope));
-    BOOST_CHECK_THROW(eval("unset", functions, scope), NoSuchMethod); //not a variable, so considered a function
+    BOOST_CHECK_EQUAL("55", eval("test", scope));
+    BOOST_CHECK_THROW(eval("unset", scope), NoSuchMethod); //not a variable, so considered a function
 }
 
 BOOST_AUTO_TEST_CASE(operators)
@@ -136,15 +136,15 @@ BOOST_AUTO_TEST_CASE(global_func)
     FunctionTable functions = {{func, "func"}};
 
     ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(functions, attrs);
     scope.set("x", make_value(55.0));
 
-    BOOST_CHECK_EQUAL("60", eval("func(x, 5)", functions, scope));
-    BOOST_CHECK_EQUAL("60", eval("func x, 5", functions, scope));
-    BOOST_CHECK_THROW(eval("func2()", functions, scope), NoSuchMethod);
-    BOOST_CHECK_THROW(eval("func()", functions, scope), InvalidArgument);
-    BOOST_CHECK_THROW(eval("func(10, 20, 30)", functions, scope), InvalidArgument);
-    BOOST_CHECK_THROW(eval("func 10, 20, 30", functions, scope), InvalidArgument);
+    BOOST_CHECK_EQUAL("60", eval("func(x, 5)", scope));
+    BOOST_CHECK_EQUAL("60", eval("func x, 5", scope));
+    BOOST_CHECK_THROW(eval("func2()", scope), NoSuchMethod);
+    BOOST_CHECK_THROW(eval("func()", scope), InvalidArgument);
+    BOOST_CHECK_THROW(eval("func(10, 20, 30)", scope), InvalidArgument);
+    BOOST_CHECK_THROW(eval("func 10, 20, 30", scope), InvalidArgument);
 }
 
 BOOST_AUTO_TEST_CASE(member_func)

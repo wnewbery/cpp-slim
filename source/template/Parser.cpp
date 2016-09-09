@@ -228,7 +228,7 @@ namespace slim
             {
 
                 expr::Lexer expr_lexer(lexer.get_pos(), lexer.get_end());
-                expr::Parser expr_parser(functions, local_vars, expr_lexer); //TODO: Allow custom functions
+                expr::Parser expr_parser(local_vars, expr_lexer); //TODO: Allow custom functions
 
 
                 auto attr = current_token.str;
@@ -427,7 +427,7 @@ namespace slim
             }
 
             expr::Lexer expr_lexer(script_src);
-            expr::Parser expr_parser(functions, local_vars, expr_lexer); //TODO: Allow custom functions
+            expr::Parser expr_parser(local_vars, expr_lexer); //TODO: Allow custom functions
             auto expr = expr_parser.full_expression();
 
             return expr;

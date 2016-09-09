@@ -14,10 +14,10 @@ std::string eval(const std::string &str)
 {
     FunctionTable functions;
     Lexer lexer(str);
-    Parser parser(functions, expr::LocalVarNames(), lexer);
+    Parser parser(expr::LocalVarNames(), lexer);
     auto expr = parser.full_expression();
     ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(functions, attrs);
     auto result = expr->eval(scope);
     return result->inspect();
 }

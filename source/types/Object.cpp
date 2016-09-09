@@ -97,10 +97,15 @@ namespace slim
         throw NoSuchMethod(this, "~");
     }
 
+    const Method *Object::find_method(SymPtr name)const
+    {
+        return method_table().get(name);
+    }
     ObjectPtr Object::call_method(SymPtr name, const FunctionArgs &args)
     {
-        auto &method = method_table().get(this, name);
-        return method(this, args);
+        auto method = find_method(name);
+        if (method) return (*method)(this, args);
+        else throw NoSuchMethod(this, name.get());
     }
     std::shared_ptr<String> Object::to_string_obj()
     {

@@ -15,11 +15,11 @@ BOOST_AUTO_TEST_SUITE(TestString)
 std::string eval(const std::string &str)
 {
     ScopeAttributes attrs;
-    Scope scope(attrs);
     FunctionTable functions;
+    Scope scope(functions, attrs);
     Lexer lexer(str);
     expr::LocalVarNames vars;
-    Parser parser(functions, vars, lexer);
+    Parser parser(vars, lexer);
     auto expr = parser.full_expression();
     auto result = expr->eval(scope);
     return result->inspect();

@@ -46,12 +46,21 @@ namespace slim
 
         std::string GlobalFuncCall::to_string() const
         {
-            return function.name->str() + "(" + FuncCall::to_string() + ")";
+            return name->str() + "(" + FuncCall::to_string() + ")";
         }
         ObjectPtr GlobalFuncCall::eval(Scope & scope) const
         {
+            auto self = scope.self();
             auto args = eval_args(scope);
-            return function(args);
+            //member method on self takes precedence
+            if (self)
+            {
+                auto member = self->find_method(name);
+                if (member) return (*member)(self.get(), args);
+            }
+            //global/file scope method
+            auto global = scope.get_globals().get(name);
+            return global(args);
         }
 
         std::string MemberFuncCall::to_string() const

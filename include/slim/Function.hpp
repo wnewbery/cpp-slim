@@ -186,11 +186,11 @@ namespace slim
     {
     public:
         using BaseFunctionTable<Method>::BaseFunctionTable;
-        const Method& get(const Object *self, SymPtr name)const
+        const Method *get(SymPtr name)const
         {
             auto f = find(name);
-            if (f) return *f;
-            else throw NoSuchMethod(self, name.get());
+            if (f) return &*f;
+            else return nullptr;
         }
     };
 }
