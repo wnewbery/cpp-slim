@@ -79,4 +79,8 @@ namespace slim
     {
         return create_object<Number>(v);
     }
+    inline std::shared_ptr<Number> make_value(int v)
+    {
+        return create_object<Number>(v);
+    }
 }

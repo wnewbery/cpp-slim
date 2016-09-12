@@ -116,15 +116,13 @@ namespace slim
     class Method
     {
     public:
-        detail::RawMethod method;
-        ObjectPtr(*caller)(Object *, detail::RawMethod,const FunctionArgs &);
-        SymPtr name;
+        const SymPtr name;
 
         template<class Func>
         Method(Func func, const SymPtr &name)
-            : method((detail::RawMethod)func)
+            : name(name)
+            , method((detail::RawMethod)func)
             , caller(&detail::wrapped_call<Func>)
-            , name(name)
         {}
         template<class Func>
         Method(Func func, const std::string &name)
@@ -135,7 +133,10 @@ namespace slim
         {
             return caller(self, method, args);
         }
-    }; 
+    private:
+        detail::RawMethod method;
+        ObjectPtr(*caller)(Object *, detail::RawMethod, const FunctionArgs &);
+    };
 
     class MethodTable
     {
