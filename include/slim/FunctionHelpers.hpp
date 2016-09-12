@@ -1,5 +1,4 @@
 #pragma once
-#include "Function.hpp"
 #include "Error.hpp"
 #include "types/Boolean.hpp"
 #include "types/Number.hpp"
@@ -71,6 +70,15 @@ namespace slim
             return true;
         }
         else return false;
+    }
+
+    template<class T>
+    T unpack_arg(const ObjectPtr &arg)
+    {
+        T out;
+        if (try_unpack_arg(arg, &out))
+            return out;
+        throw InvalidArgument();
     }
 
     inline bool try_unpack_inner(FunctionArgs::const_iterator begin, FunctionArgs::const_iterator end)

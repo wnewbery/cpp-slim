@@ -8,136 +8,132 @@
 #include "types/Object.hpp"
 #include "types/Nil.hpp"
 #include "types/Symbol.hpp"
+#include "FunctionHelpers.hpp"
 namespace slim
 {
     class Object;
     typedef std::shared_ptr<Object> ObjectPtr;
     typedef std::function<ObjectPtr(Object *self, const FunctionArgs &args)> Method2;
 
-    class Method
+    typedef ObjectPtr(*RawFunction)(Object *self, const FunctionArgs &args);
+    namespace detail
     {
-    public:
-        Method2 f;
-        SymPtr name;
-
-        Method(Method2 f, const std::string &name_str) : f(f), name(symbol(name_str)) {}
-
-        template<class T, class U>
-        Method(U(T::*f2)(const FunctionArgs &args)const, const std::string &name_str)
-            : f(), name(symbol(name_str))
-        {
-            f = [f2](Object *self, const FunctionArgs &args) -> ObjectPtr
-            {
-                assert(dynamic_cast<T*>(self) == static_cast<T*>(self));
-                return do_call(self, f2, args);
-            };
-        }
-        template<class T, class U>
-        Method(U(T::*f2)()const, const std::string &name_str)
-            : f(), name(symbol(name_str))
-        {
-            auto name = this->name;
-            f = [f2, name](Object *self, const FunctionArgs &args) -> ObjectPtr
-            {
-                assert(dynamic_cast<T*>(self) == static_cast<T*>(self));
-                if (!args.empty()) throw InvalidArgument(self, name->str());
-                return do_call(self, f2);
-            };
-        }
-        //varargs
-        template<class T, class U>
-        Method(U(T::*f2)(const FunctionArgs &args), const std::string &name_str)
-            : f(), name(symbol(name_str))
-        {
-            f = [f2](Object *self, const FunctionArgs &args) -> ObjectPtr
-            {
-                assert(dynamic_cast<T*>(self) == static_cast<T*>(self));
-                return do_call(self, f2, args);
-            };
-        }
-        //no args
-        template<class T, class U>
-        Method(U(T::*f2)(), const std::string &name_str)
-            : f(), name(symbol(name_str))
-        {
-            auto name = this->name;
-            f = [f2, name](Object *self, const FunctionArgs &args) -> ObjectPtr
-            {
-                assert(dynamic_cast<T*>(self) == static_cast<T*>(self));
-                if (!args.empty()) throw InvalidArgument(self, name->str());
-                return do_call(self, f2);
-            };
-        }
-        //1 arg
-        template<class T, class U, class ARG1>
-        Method(U(T::*f2)(ARG1 arg1), const std::string &name_str)
-            : f(), name(symbol(name_str))
-        {
-            auto name = this->name;
-            f = [f2, name](Object *self, const FunctionArgs &args) -> ObjectPtr
-            {
-                assert(dynamic_cast<T*>(self) == static_cast<T*>(self));
-                if (args.size() != 1) throw InvalidArgument(self, name->str());
-                auto arg1 = dynamic_cast<ARG1>(args[0].get());
-                if (!arg1) throw InvalidArgument(name->str());
-                return do_call(self, f2, arg1);
-            };
-        }
-        //2 arg
-        template<class T, class U, class ARG1, class ARG2>
-        Method(U(T::*f2)(ARG1 arg1, ARG2 arg2), const std::string &name_str)
-            : f(), name(symbol(name_str))
-        {
-            auto name = this->name;
-            f = [f2, name](Object *self, const FunctionArgs &args) -> ObjectPtr
-            {
-                assert(dynamic_cast<T*>(self) == static_cast<T*>(self));
-                if (args.size() != 2) throw InvalidArgument(self, name->str());
-                auto arg1 = dynamic_cast<ARG1>(args[0].get());
-                auto arg2 = dynamic_cast<ARG2>(args[1].get());
-                if (!arg1 || !arg2) throw InvalidArgument(name->str());
-                return do_call(self, f2, arg1, arg2);
-            };
-        }
-
-        ObjectPtr operator()(Object *self, const FunctionArgs &args)const
-        {
-            return f(self, args);
-        }
-
-    private:
-        /**Helper for do_call to determine the self (C++ this) type and void returns.*/
-        template<class T> struct FunctionTraits;
+        template<class T> struct MethodTraits;
         template<class RetType, class SelfType, class... Args>
-        struct FunctionTraits<RetType(SelfType::*)(Args...)>
+        struct MethodTraits<RetType(SelfType::*)(Args...)>
         {
             typedef RetType result_type;
             typedef SelfType self_type;
             typedef std::is_void<result_type> is_void_result;
+            static constexpr size_t arg_count = sizeof...(Args);
         };
 
-        /**Call the member function pointer with the correct self type, and convert a void return
-         * to "nil".
+        //Want to expand the functions arguments along with the dynamic FunctionArgs array while converting
+        //each type.
+        /**A varadic type that takes a pack of size_t indices as a parameter pack.*/
+        template<size_t...> struct Indices {};
+        /**Recursively build a parameter pack from 0 to N - 1.
+         * Fully resolves to a type derived from Indices containing those values as template parameters.
+         * 
+         * e.g.
+         * BuildIndices<3> : BuildIndices<2, 2>
+         * BuildIndices<2, 2> : BuildIndices<1, 1, 2>
+         * BuildIndices<1, 1, 2> : BuildIndices<0, 0, 1, 2>
+         * BuildIndices<0, 0, 1, 2> : Indices<0, 1, 2>
          */
-        template<class Func, class... Args>
-        static ObjectPtr do_call(Object *self, Func func, Args &&... args)
-        {
-            typedef FunctionTraits<Func> Traits;
-            auto self2 = static_cast<Traits::self_type*>(self);
-            return do_call2(self2, func, Traits::is_void_result(), std::forward<Args>(args)...);
-        }
+        template<size_t N, size_t... Is> struct BuildIndices
+            : BuildIndices<N - 1, N - 1, Is...> {};
+        /**BuildIndices terminal case which is a Indices<>.*/
+        template<size_t... Is> struct BuildIndices<0, Is...> : Indices<Is...> {};
 
 
+        /**Call and handle void returns. For std::true_type return NIL_VALUE.*/
         template<class SelfType, class Func, class... Args>
-        static ObjectPtr do_call2(SelfType *self, Func func, std::true_type, Args &&... args)
+        static ObjectPtr do_call_void_ret(SelfType *self, Func func, std::true_type, Args &&... args)
         {
             (self->*func)(std::forward<Args>(args)...);
             return NIL_VALUE;
         }
+        /**Call and handle void returns. For std::false_type return result of func implicitly
+         * converted to ObjectPtr.
+         */
         template<class SelfType, class Func, class... Args>
-        static ObjectPtr do_call2(SelfType *self, Func func, std::false_type, Args &&... args)
+        static ObjectPtr do_call_void_ret(SelfType *self, Func func, std::false_type, Args &&... args)
         {
             return (self->*func)(std::forward<Args>(args)...);
+        }
+        /**Call a function with the correct self (C++ this) type with already correct arguments.*/
+        template<class Func, class... Args>
+        ObjectPtr do_call(Object *self, Func func, Args &&... args)
+        {
+            typedef MethodTraits<Func> Traits;
+            auto self_typed = static_cast<Traits::self_type*>(self);
+            assert(self_typed == dynamic_cast<Traits::self_type*>(self));
+            return do_call_void_ret(self_typed, func, Traits::is_void_result(), std::forward<Args>(args)...);
+        }
+        /**Call a varargs function.*/
+        template<class Func> ObjectPtr call_varargs(Object *self, Func func, const FunctionArgs &args)
+        {
+            return do_call(self, func, args);
+        }
+        /**Implementation detail of call_typed. Has a matching pack of argument types and indices for them.*/
+        template<class... Args, class Func, size_t ...indices>
+        ObjectPtr do_call_typed(Object *self, Func func, const FunctionArgs &args, Indices<indices...>)
+        {
+            return do_call(self, func, slim::unpack_arg<Args>(args[indices])...);
+        }
+        /**Call func by converting each element of args to the appropriate type.*/
+        template<class RetType, class SelfType, class... Args>
+        ObjectPtr call_typed(Object *self, RetType(SelfType::*func)(Args...), const FunctionArgs &args)
+        {
+            if (args.size() != sizeof...(Args))
+            {
+                throw InvalidArgumentCount(args.size(), sizeof...(Args), sizeof...(Args));
+            }
+            return do_call_typed<Args...>(self, func, args, BuildIndices<sizeof...(Args)>{});
+        }
+
+        template<class RetType, class SelfType>
+        ObjectPtr call(Object *self, RetType(SelfType::*func)(const FunctionArgs &args), const FunctionArgs &args)
+        {
+            return call_varargs(self, func, args);
+        }
+        template<class RetType, class SelfType, class... Args>
+        ObjectPtr call(Object *self, RetType(SelfType::*func)(Args...), const FunctionArgs &args)
+        {
+            return call_typed(self, func, args);
+        }
+
+        typedef ObjectPtr(Object::*RawMethod)(const FunctionArgs &args);
+        
+        template<class Func>
+        ObjectPtr wrapped_call(Object *self, RawMethod func, const FunctionArgs &args)
+        {
+            return call(self, (Func)func, args);
+        }
+    }
+
+    class Method
+    {
+    public:
+        detail::RawMethod method;
+        ObjectPtr(*caller)(Object *, detail::RawMethod,const FunctionArgs &);
+        SymPtr name;
+
+        template<class Func>
+        Method(Func func, const SymPtr &name)
+            : method((detail::RawMethod)func)
+            , caller(&detail::wrapped_call<Func>)
+            , name(name)
+        {}
+        template<class Func>
+        Method(Func func, const std::string &name)
+            : Method(func, symbol(name))
+        {}
+
+        ObjectPtr operator()(Object *self, const FunctionArgs &args)const
+        {
+            return caller(self, method, args);
         }
     }; 
 
