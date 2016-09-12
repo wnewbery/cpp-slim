@@ -14,7 +14,7 @@ std::string render_tpl(const char *str, ViewModel &model)
 {
     Lexer lexer(str, str + strlen(str));
     Parser parser(lexer);
-    return parser.parse().render(BUILTIN_FUNCTIONS, model);
+    return parser.parse().render(model);
 }
 std::string render_tpl(const char *str)
 {

@@ -6,55 +6,14 @@
 #include <cassert>
 #include "Error.hpp"
 #include "types/Object.hpp"
+#include "types/Nil.hpp"
 #include "types/Symbol.hpp"
 namespace slim
 {
     class Object;
     typedef std::shared_ptr<Object> ObjectPtr;
-    typedef std::function<ObjectPtr(const FunctionArgs &args)> Function2;
     typedef std::function<ObjectPtr(Object *self, const FunctionArgs &args)> Method2;
-    class Function
-    {
-    public:
-        Function2 f;
-        SymPtr name;
 
-
-        Function(Function2 f, const std::string &name) : f(f), name(symbol(name)) {}
-
-        //1 arg
-        template<class RET, class ARG1>
-        Function(RET(*f2)(ARG1 arg1), const std::string &name_str) : f(), name(symbol(name_str))
-        {
-            auto name = this->name;
-            f = [f2, name](const FunctionArgs &args) -> ObjectPtr
-            {
-                if (args.size() != 1) throw InvalidArgument(name->str());
-                auto arg1 = dynamic_cast<ARG1>(args[0].get());
-                if (!arg1) throw InvalidArgument(name->str());
-                return f2(arg1);
-            };
-        }
-        //2 arg
-        template<class RET, class ARG1, class ARG2>
-        Function(RET(*f2)(ARG1 arg1, ARG2 arg2), const std::string &name_str) : f(), name(symbol(name_str))
-        {
-            auto name = this->name;
-            f = [f2, name](const FunctionArgs &args) -> ObjectPtr
-            {
-                if (args.size() != 2) throw InvalidArgument(name->str());
-                auto arg1 = dynamic_cast<ARG1>(args[0].get());
-                auto arg2 = dynamic_cast<ARG2>(args[1].get());
-                if (!arg1 || !arg2) throw InvalidArgument(name->str());
-                return f2(arg1, arg2);
-            };
-        }
-
-        ObjectPtr operator()(const FunctionArgs &args)const
-        {
-            return f(args);
-        }
-    };
     class Method
     {
     public:
@@ -70,7 +29,7 @@ namespace slim
             f = [f2](Object *self, const FunctionArgs &args) -> ObjectPtr
             {
                 assert(dynamic_cast<T*>(self) == static_cast<T*>(self));
-                return (static_cast<T*>(self)->*f2)(args);
+                return do_call(self, f2, args);
             };
         }
         template<class T, class U>
@@ -82,7 +41,7 @@ namespace slim
             {
                 assert(dynamic_cast<T*>(self) == static_cast<T*>(self));
                 if (!args.empty()) throw InvalidArgument(self, name->str());
-                return (static_cast<T*>(self)->*f2)();
+                return do_call(self, f2);
             };
         }
         //varargs
@@ -93,7 +52,7 @@ namespace slim
             f = [f2](Object *self, const FunctionArgs &args) -> ObjectPtr
             {
                 assert(dynamic_cast<T*>(self) == static_cast<T*>(self));
-                return (static_cast<T*>(self)->*f2)(args);
+                return do_call(self, f2, args);
             };
         }
         //no args
@@ -106,7 +65,7 @@ namespace slim
             {
                 assert(dynamic_cast<T*>(self) == static_cast<T*>(self));
                 if (!args.empty()) throw InvalidArgument(self, name->str());
-                return (static_cast<T*>(self)->*f2)();
+                return do_call(self, f2);
             };
         }
         //1 arg
@@ -121,7 +80,7 @@ namespace slim
                 if (args.size() != 1) throw InvalidArgument(self, name->str());
                 auto arg1 = dynamic_cast<ARG1>(args[0].get());
                 if (!arg1) throw InvalidArgument(name->str());
-                return (static_cast<T*>(self)->*f2)(arg1);
+                return do_call(self, f2, arg1);
             };
         }
         //2 arg
@@ -137,7 +96,7 @@ namespace slim
                 auto arg1 = dynamic_cast<ARG1>(args[0].get());
                 auto arg2 = dynamic_cast<ARG2>(args[1].get());
                 if (!arg1 || !arg2) throw InvalidArgument(name->str());
-                return (static_cast<T*>(self)->*f2)(arg1, arg2);
+                return do_call(self, f2, arg1, arg2);
             };
         }
 
@@ -145,34 +104,69 @@ namespace slim
         {
             return f(self, args);
         }
-    };
 
-    template <class T> class BaseFunctionTable
+    private:
+        /**Helper for do_call to determine the self (C++ this) type and void returns.*/
+        template<class T> struct FunctionTraits;
+        template<class RetType, class SelfType, class... Args>
+        struct FunctionTraits<RetType(SelfType::*)(Args...)>
+        {
+            typedef RetType result_type;
+            typedef SelfType self_type;
+            typedef std::is_void<result_type> is_void_result;
+        };
+
+        /**Call the member function pointer with the correct self type, and convert a void return
+         * to "nil".
+         */
+        template<class Func, class... Args>
+        static ObjectPtr do_call(Object *self, Func func, Args &&... args)
+        {
+            typedef FunctionTraits<Func> Traits;
+            auto self2 = static_cast<Traits::self_type*>(self);
+            return do_call2(self2, func, Traits::is_void_result(), std::forward<Args>(args)...);
+        }
+
+
+        template<class SelfType, class Func, class... Args>
+        static ObjectPtr do_call2(SelfType *self, Func func, std::true_type, Args &&... args)
+        {
+            (self->*func)(std::forward<Args>(args)...);
+            return NIL_VALUE;
+        }
+        template<class SelfType, class Func, class... Args>
+        static ObjectPtr do_call2(SelfType *self, Func func, std::false_type, Args &&... args)
+        {
+            return (self->*func)(std::forward<Args>(args)...);
+        }
+    }; 
+
+    class MethodTable
     {
     public:
-        typedef std::unordered_map<SymPtr, T, ObjHash, ObjEquals> Map;
+        typedef std::unordered_map<SymPtr, Method, ObjHash, ObjEquals> Map;
 
-        BaseFunctionTable() : map() {}
-        BaseFunctionTable(std::initializer_list<T> functions)
+        MethodTable() : map() {}
+        MethodTable(std::initializer_list<Method> functions)
         {
             for (auto &f : functions) add(f);
         }
-        BaseFunctionTable(const BaseFunctionTable<T> &table, std::initializer_list<T> functions)
+        MethodTable(const MethodTable &table, std::initializer_list<Method> functions)
             : map(table.map)
         {
             for (auto &f : functions) add(f);
         }
 
-        void add(const T &func)
+        void add(const Method &func)
         {
             map.emplace(func.name, func);
         }
-        const T *find(SymPtr name)const
+        const Method *find(SymPtr name)const
         {
             auto it = map.find(name);
             return it != map.end() ? &it->second : nullptr;
         }
-        const T& get(SymPtr name)const
+        const Method& get(SymPtr name)const
         {
             auto f = find(name);
             if (f) return *f;
@@ -180,17 +174,5 @@ namespace slim
         }
     private:
         Map map;
-    };
-    typedef BaseFunctionTable<Function> FunctionTable;
-    class MethodTable : public BaseFunctionTable<Method>
-    {
-    public:
-        using BaseFunctionTable<Method>::BaseFunctionTable;
-        const Method *get(SymPtr name)const
-        {
-            auto f = find(name);
-            if (f) return &*f;
-            else return nullptr;
-        }
     };
 }

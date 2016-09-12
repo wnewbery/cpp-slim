@@ -25,9 +25,8 @@ std::string eval(const std::string &str, Scope &scope)
 }
 std::string eval(const std::string &str)
 {
-    FunctionTable functions;
     ScopeAttributes attrs;
-    Scope scope(functions, attrs);
+    Scope scope( attrs);
     return eval(str, scope);
 }
 
@@ -43,9 +42,8 @@ std::shared_ptr<Hash> make_hash2(const std::vector<std::pair<std::string, double
 
 BOOST_AUTO_TEST_CASE(compare)
 {
-    FunctionTable functions;
     ScopeAttributes attrs;
-    Scope scope(functions, attrs);
+    Scope scope(attrs);
     scope.set("a", make_hash2({}));
     scope.set("b", make_hash2({ { "a", 5.0 },{ "b", 10.0 } }));
     scope.set("c", make_hash2({ { "a", 5.0 },{ "c", 15 } }));
@@ -80,9 +78,8 @@ BOOST_AUTO_TEST_CASE(basic_methods)
 
 BOOST_AUTO_TEST_CASE(basic_access)
 {
-    FunctionTable functions;
     ScopeAttributes attrs;
-    Scope scope(functions, attrs);
+    Scope scope(attrs);
     scope.set("a", make_hash2({}));
     scope.set("b", make_hash2({ { "a", 5.0 },{ "b", 10.0 } }));
     scope.set("c", make_hash2({ { "a", 5.0 },{ "c", 15 },{ "10", 20 } }));

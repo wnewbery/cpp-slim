@@ -28,9 +28,8 @@ std::string eval(const std::string &str, Scope &scope)
 }
 std::string eval(const std::string &str)
 {
-    FunctionTable functions;
     ScopeAttributes attrs;
-    Scope scope(functions, attrs);
+    Scope scope( attrs);
     return eval(str, scope);
 }
 
@@ -43,9 +42,8 @@ std::shared_ptr<Array> make_array2(const std::vector<double> &arr)
 
 BOOST_AUTO_TEST_CASE(compare)
 {
-    FunctionTable functions;
     ScopeAttributes attrs;
-    Scope scope(functions, attrs);
+    Scope scope(attrs);
     scope.set("a", make_array({}));
     scope.set("b", make_array2({ 5.0, 10.0 }));
     scope.set("c", make_array2({ 5.0, 10.0, 5.0 }));
@@ -71,9 +69,8 @@ BOOST_AUTO_TEST_CASE(compare)
 }
 BOOST_AUTO_TEST_CASE(basic_methods)
 {
-    FunctionTable functions;
     ScopeAttributes attrs;
-    Scope scope(functions, attrs);
+    Scope scope(attrs);
     scope.set("a", make_array({}));
     scope.set("b", make_array2({ 5.0, 10.0 }));
     scope.set("c", make_array2({ 5.0, 10.0, 5.0 }));
@@ -114,9 +111,8 @@ BOOST_AUTO_TEST_CASE(add)
 }
 BOOST_AUTO_TEST_CASE(sub)
 {
-    FunctionTable functions;
     ScopeAttributes attrs;
-    Scope scope(functions, attrs);
+    Scope scope(attrs);
     scope.set("a", make_array({}));
     scope.set("b", make_array2({ 5.0, 10.0 }));
     scope.set("c", make_array2({ 5.0, 10.0, 5.0, 7.0 }));
@@ -129,9 +125,8 @@ BOOST_AUTO_TEST_CASE(sub)
 
 BOOST_AUTO_TEST_CASE(basic_access)
 {
-    FunctionTable functions;
     ScopeAttributes attrs;
-    Scope scope(functions, attrs);
+    Scope scope(attrs);
     scope.set("a", make_array2({ 1.0, 2.0, 3.0, 5.0, 8.0, 11.0 }));
     scope.set("b", make_array({}));
     //at(index)
@@ -211,9 +206,8 @@ BOOST_AUTO_TEST_CASE(assoc)
     auto s2 = make_array({make_value("letters"), make_value("a"), make_value("b"), make_value("c")});
     auto s3 = make_value("foo");
 
-    FunctionTable functions;
     ScopeAttributes attrs;
-    Scope scope(functions, attrs);
+    Scope scope(attrs);
     scope.set("a", make_array({s1, s2, s3}));
     //assoc
     BOOST_CHECK_EQUAL("[\"letters\", \"a\", \"b\", \"c\"]", eval("a.assoc('letters')", scope));
@@ -235,9 +229,8 @@ BOOST_AUTO_TEST_CASE(flatten)
 
 BOOST_AUTO_TEST_CASE(compact)
 {
-    FunctionTable functions;
     ScopeAttributes attrs;
-    Scope scope(functions, attrs);
+    Scope scope(attrs);
     scope.set("a", make_array({ make_value(1.0), make_value(5.0), make_value(5.0), make_value(0.0) }));
     scope.set("b", make_array({ NIL_VALUE, make_value(1.0), make_value(5.0), NIL_VALUE, make_value(5.0), make_value(0.0) }));
 
@@ -246,9 +239,8 @@ BOOST_AUTO_TEST_CASE(compact)
 }
 BOOST_AUTO_TEST_CASE(index)
 {
-    FunctionTable functions;
     ScopeAttributes attrs;
-    Scope scope(functions, attrs);
+    Scope scope(attrs);
     scope.set("a", make_array2({ 1.0, 2.0, 3.0, 5.0, 8.0, 5.0, 1.0 }));
     //index
     BOOST_CHECK_EQUAL("3", eval("a.index(5)", scope));
@@ -262,17 +254,15 @@ BOOST_AUTO_TEST_CASE(index)
 }
 BOOST_AUTO_TEST_CASE(join)
 {
-    FunctionTable functions;
     ScopeAttributes attrs;
-    Scope scope(functions, attrs);
+    Scope scope(attrs);
     scope.set("a", make_array2({ 1.0, 2.0, 3.0, 5.0, 8.0, 11.0 }));
     BOOST_CHECK_EQUAL("\"1, 2, 3, 5, 8, 11\"", eval("a.join(', ')", scope));
 }
 BOOST_AUTO_TEST_CASE(rotate)
 {
-    FunctionTable functions;
     ScopeAttributes attrs;
-    Scope scope(functions, attrs);
+    Scope scope(attrs);
     scope.set("a", make_array2({ 1.0, 2.0, 3.0 }));
     scope.set("b", make_array2({}));
 
@@ -294,36 +284,48 @@ BOOST_AUTO_TEST_CASE(rotate)
 
 BOOST_AUTO_TEST_CASE(uniq)
 {
-    FunctionTable functions;
     ScopeAttributes attrs;
-    Scope scope(functions, attrs);
+    Scope scope(attrs);
     scope.set("a", make_array({ make_value("5"), make_value(5.0), make_value(5.0), make_value("z") }));
     BOOST_CHECK_EQUAL("[\"5\", 5, \"z\"]", eval("a.uniq", scope));
 }
 
 BOOST_AUTO_TEST_CASE(enumerate)
 {
-    FunctionTable functions;
     ScopeAttributes attrs;
-    Scope scope(functions, attrs);
-    double sum = 0;
-    Function2 test = [&sum](const FunctionArgs &args) -> ObjectPtr
+    Scope scope(attrs);
+
+    class Test : public Object
     {
-        sum += coerce<Number>(args[0])->get_value();
-        return NIL_VALUE;
+    public:
+        double sum = 0;
+        std::string name = "Test";
+
+        virtual const std::string& type_name()const override { return name; }
+        virtual const MethodTable &method_table()const override
+        {
+            static const MethodTable table(Object::method_table(),
+            { { &Test::test, "test" } });
+            return table;
+        }
+        void test(Number *n)
+        {
+            sum += n->get_value();
+        }
     };
-    functions.add({test, "test"});
+    auto test = create_object<Test>();
+    scope.set("self", test);
 
     BOOST_CHECK_EQUAL("[]", eval("[].each{|x| test x}", scope));
-    BOOST_CHECK_EQUAL(0, sum);
+    BOOST_CHECK_EQUAL(0, test->sum);
     BOOST_CHECK_EQUAL("[1, 2, 3]", eval("[1, 2, 3].each{|x| test x}", scope));
-    BOOST_CHECK_EQUAL(6, sum);
+    BOOST_CHECK_EQUAL(6, test->sum);
     BOOST_CHECK_THROW(eval("[].each 1, 1"), InvalidArgument);
 
     auto enumerator = eval_obj("[5, 6, 9].each", scope);
     scope.set("e", enumerator);
     BOOST_CHECK_EQUAL("[5, 6, 9]", eval("e.each{|x| test x}", scope));
-    BOOST_CHECK_EQUAL(26, sum);
+    BOOST_CHECK_EQUAL(26, test->sum);
 
 }
 

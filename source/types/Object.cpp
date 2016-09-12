@@ -99,7 +99,7 @@ namespace slim
 
     const Method *Object::find_method(SymPtr name)const
     {
-        return method_table().get(name);
+        return method_table().find(name);
     }
     ObjectPtr Object::call_method(SymPtr name, const FunctionArgs &args)
     {

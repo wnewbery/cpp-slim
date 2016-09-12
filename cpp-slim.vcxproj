@@ -31,7 +31,6 @@
     <ClInclude Include="include\slim\expression\Scope.hpp" />
     <ClInclude Include="include\slim\expression\Token.hpp" />
     <ClInclude Include="include\slim\Function.hpp" />
-    <ClInclude Include="include\slim\BuiltinFunctions.hpp" />
     <ClInclude Include="include\slim\FunctionHelpers.hpp" />
     <ClInclude Include="include\slim\Operators.hpp" />
     <ClInclude Include="include\slim\Template.hpp" />
@@ -58,7 +57,6 @@
     <ClInclude Include="include\slim\Value.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\BuiltinFunctions.cpp" />
     <ClCompile Include="source\Error.cpp" />
     <ClCompile Include="source\expression\ArithmeticOp.cpp" />
     <ClCompile Include="source\expression\AstOp.cpp" />

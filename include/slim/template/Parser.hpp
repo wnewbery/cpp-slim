@@ -3,7 +3,6 @@
 #include <stack>
 #include <string>
 #include <vector>
-#include "BuiltinFunctions.hpp"
 #include "Function.hpp"
 #include "Token.hpp"
 #include "expression/Scope.hpp"
@@ -21,7 +20,7 @@ namespace slim
         class Parser
         {
         public:
-            Parser(Lexer &lexer, const FunctionTable &functions = BUILTIN_FUNCTIONS);
+            Parser(Lexer &lexer);
             ~Parser();
 
             Template parse();
@@ -64,7 +63,6 @@ namespace slim
             };
 
             Lexer &lexer;
-            const FunctionTable &functions;
             Token current_token;
             /**Names of local variables as these are shared between seperate expressions.
              * Blocks in "-x expr.each do |a, b, c|" lines can create new scopes, which is handled

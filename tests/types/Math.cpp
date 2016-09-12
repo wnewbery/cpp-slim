@@ -5,7 +5,6 @@
 #include "expression/Scope.hpp"
 #include "types/Number.hpp"
 #include "types/Math.hpp"
-#include "BuiltinFunctions.hpp"
 #include <cmath>
 
 using namespace slim;
@@ -19,7 +18,7 @@ ObjectPtr eval2(const std::string &str)
     Parser parser(vars, lexer);
     auto expr = parser.full_expression();
     ScopeAttributes attrs;
-    Scope scope(BUILTIN_FUNCTIONS, attrs);
+    Scope scope(attrs);
     scope.set(symbol("self"), create_object<Math>());
     return expr->eval(scope);
 }

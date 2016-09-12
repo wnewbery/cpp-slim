@@ -23,9 +23,8 @@ std::string eval(const std::string &str, Scope &scope)
 }
 std::string eval(const std::string &str)
 {
-    FunctionTable functions;
     ScopeAttributes attrs;
-    Scope scope(functions, attrs);
+    Scope scope(attrs);
     return eval(str, scope);
 }
 
@@ -50,10 +49,10 @@ BOOST_AUTO_TEST_CASE(string_interp)
 
 BOOST_AUTO_TEST_CASE(variables)
 {
-    FunctionTable functions;
     ScopeAttributes attrs;
-    Scope scope(functions, attrs);
+    Scope scope(attrs);
     scope.set("test", make_value(55.0));
+    scope.set("self", NIL_VALUE);
     BOOST_CHECK_EQUAL("55", eval("test", scope));
     BOOST_CHECK_THROW(eval("unset", scope), NoSuchMethod); //not a variable, so considered a function
 }
@@ -124,27 +123,6 @@ BOOST_AUTO_TEST_CASE(precedence)
 
     BOOST_CHECK_EQUAL("12", eval("5 < 7 ? 3 * 4 : 2 ** 2"));
     BOOST_CHECK_EQUAL("4", eval("9 < 7 ? 3 * 4 : 2 ** 2"));
-}
-
-BOOST_AUTO_TEST_CASE(global_func)
-{
-    auto func = [](const FunctionArgs &args) -> ObjectPtr
-    {
-        if (args.size() != 2) throw InvalidArgument("test");
-        return args[0]->add(args[1].get());
-    };
-    FunctionTable functions = {{func, "func"}};
-
-    ScopeAttributes attrs;
-    Scope scope(functions, attrs);
-    scope.set("x", make_value(55.0));
-
-    BOOST_CHECK_EQUAL("60", eval("func(x, 5)", scope));
-    BOOST_CHECK_EQUAL("60", eval("func x, 5", scope));
-    BOOST_CHECK_THROW(eval("func2()", scope), NoSuchMethod);
-    BOOST_CHECK_THROW(eval("func()", scope), InvalidArgument);
-    BOOST_CHECK_THROW(eval("func(10, 20, 30)", scope), InvalidArgument);
-    BOOST_CHECK_THROW(eval("func 10, 20, 30", scope), InvalidArgument);
 }
 
 BOOST_AUTO_TEST_CASE(member_func)

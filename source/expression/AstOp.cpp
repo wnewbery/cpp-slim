@@ -52,15 +52,7 @@ namespace slim
         {
             auto self = scope.self();
             auto args = eval_args(scope);
-            //member method on self takes precedence
-            if (self)
-            {
-                auto member = self->find_method(name);
-                if (member) return (*member)(self.get(), args);
-            }
-            //global/file scope method
-            auto global = scope.get_globals().get(name);
-            return global(args);
+            return self->call_method(name, args);
         }
 
         std::string MemberFuncCall::to_string() const

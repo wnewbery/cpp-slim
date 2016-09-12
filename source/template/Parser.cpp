@@ -83,8 +83,8 @@ namespace slim
             else return slim::make_unique<TemplateText>(std::string());
         }
 
-        Parser::Parser(Lexer &lexer, const FunctionTable &functions)
-            : lexer(lexer), functions(functions)
+        Parser::Parser(Lexer &lexer)
+            : lexer(lexer)
         {}
         Parser::~Parser()
         {}

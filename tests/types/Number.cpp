@@ -22,9 +22,8 @@ std::string eval(const std::string &str, Scope &scope)
 }
 std::string eval(const std::string &str)
 {
-    FunctionTable functions;
     ScopeAttributes attrs;
-    Scope scope(functions, attrs);
+    Scope scope( attrs);
     return eval(str, scope);
 }
 
@@ -33,8 +32,7 @@ BOOST_AUTO_TEST_CASE(basic_methods)
     BOOST_CHECK_EQUAL("inf", make_value(INFINITY)->to_string());
     BOOST_CHECK_EQUAL("-inf", make_value(-INFINITY)->to_string());
     ScopeAttributes attrs;
-    FunctionTable functions;
-    Scope scope(functions, attrs);
+    Scope scope(attrs);
     scope.set("inf", make_value(INFINITY));
     scope.set("ninf", make_value(-INFINITY));
     scope.set("min", make_value(-std::numeric_limits<double>::max()));

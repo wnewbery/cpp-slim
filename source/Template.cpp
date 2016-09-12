@@ -5,19 +5,19 @@
 
 namespace slim
 {
-    Template parse_template(const char *str, size_t len, const FunctionTable &functions)
+    Template parse_template(const char *str, size_t len)
     {
         tpl::Lexer lexer(str, str + len);
-        tpl::Parser parser(lexer, functions);
+        tpl::Parser parser(lexer);
         return parser.parse();
     }
 
-    Template parse_template(const std::string &source, const FunctionTable &functions)
+    Template parse_template(const std::string &source)
     {
-        return parse_template(source.c_str(), source.size(), functions);
+        return parse_template(source.c_str(), source.size());
     }
 
-    Template parse_template_file(const std::string &path, const FunctionTable &functions)
+    Template parse_template_file(const std::string &path)
     {
         std::ifstream is(path, std::ios::in | std::ios::binary);
         is.seekg(0, std::ios::end);
@@ -28,6 +28,6 @@ namespace slim
 
         if (is.tellg() != (std::streampos)size) throw std::runtime_error("Failed to load " + path);
 
-        return parse_template(str.get(), size, functions);
+        return parse_template(str.get(), size);
     }
 }
