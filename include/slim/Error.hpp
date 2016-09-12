@@ -68,6 +68,16 @@ namespace slim
         NoSuchMethod(const Object *obj, const Symbol *method_name);
         explicit NoSuchMethod(const Symbol *method_name);
     };
+    class NameError : public ScriptError
+    {
+    public:
+        using ScriptError::ScriptError;
+    };
+    class NoSuchConstant : public NameError
+    {
+    public:
+        NoSuchConstant(const Object *self, SymPtr name);
+    };
     class InvalidArgument : public ScriptError
     {
     public:

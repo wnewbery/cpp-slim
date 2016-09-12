@@ -84,9 +84,6 @@
     <ClInclude Include="include\slim\BuiltinFunctions.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\slim\Maths.hpp">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\slim\types\Array.hpp">
       <Filter>include\types</Filter>
     </ClInclude>
@@ -135,6 +132,12 @@
     <ClInclude Include="include\slim\Template.hpp">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\slim\types\Math.hpp">
+      <Filter>include\types</Filter>
+    </ClInclude>
+    <ClInclude Include="include\slim\types\Type.hpp">
+      <Filter>include\types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\types\Object.cpp">
@@ -169,9 +172,6 @@
     </ClCompile>
     <ClCompile Include="source\types\Number.cpp">
       <Filter>source\types</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Maths.cpp">
-      <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="source\BuiltinFunctions.cpp">
       <Filter>source</Filter>
@@ -214,6 +214,9 @@
     </ClCompile>
     <ClCompile Include="source\Template.cpp">
       <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\types\Math.cpp">
+      <Filter>source\types</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -26,6 +26,10 @@ namespace slim
         : ScriptError("No global function " + method_name->str())
     {
     }
+    NoSuchConstant::NoSuchConstant(const Object *self, SymPtr name)
+        : NameError(self->type_name() + " has no constant " + name->str())
+    {
+    }
     InvalidArgument::InvalidArgument(const std::string &method_name)
         : ScriptError("Invalid argument for " + method_name)
     {

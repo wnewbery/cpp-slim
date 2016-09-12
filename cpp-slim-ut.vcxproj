@@ -154,13 +154,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="tests\BuiltinFunctions.cpp" />
     <ClCompile Include="tests\expression\Expression.cpp" />
     <ClCompile Include="tests\expression\Lexer.cpp" />
     <ClCompile Include="tests\expression\Parser.cpp" />
     <ClCompile Include="tests\FunctionHelpers.cpp" />
     <ClCompile Include="tests\Main.cpp" />
-    <ClCompile Include="tests\Maths.cpp" />
     <ClCompile Include="tests\Operators.cpp" />
     <ClCompile Include="tests\template\Lexer.cpp" />
     <ClCompile Include="tests\template\Parser.cpp" />
@@ -169,6 +167,7 @@
     <ClCompile Include="tests\types\BasicTypes.cpp" />
     <ClCompile Include="tests\types\Hash.cpp" />
     <ClCompile Include="tests\types\HtmlSafeString.cpp" />
+    <ClCompile Include="tests\types\Math.cpp" />
     <ClCompile Include="tests\types\Number.cpp" />
     <ClCompile Include="tests\types\String.cpp" />
     <ClCompile Include="tests\Util.cpp" />

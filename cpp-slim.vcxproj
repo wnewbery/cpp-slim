@@ -33,7 +33,6 @@
     <ClInclude Include="include\slim\Function.hpp" />
     <ClInclude Include="include\slim\BuiltinFunctions.hpp" />
     <ClInclude Include="include\slim\FunctionHelpers.hpp" />
-    <ClInclude Include="include\slim\Maths.hpp" />
     <ClInclude Include="include\slim\Operators.hpp" />
     <ClInclude Include="include\slim\Template.hpp" />
     <ClInclude Include="include\slim\template\Attributes.hpp" />
@@ -47,12 +46,14 @@
     <ClInclude Include="include\slim\types\Enumerator.hpp" />
     <ClInclude Include="include\slim\types\Hash.hpp" />
     <ClInclude Include="include\slim\types\HtmlSafeString.hpp" />
+    <ClInclude Include="include\slim\types\Math.hpp" />
     <ClInclude Include="include\slim\types\Nil.hpp" />
     <ClInclude Include="include\slim\types\Number.hpp" />
     <ClInclude Include="include\slim\types\Proc.hpp" />
     <ClInclude Include="include\slim\types\String.hpp" />
     <ClInclude Include="include\slim\types\Object.hpp" />
     <ClInclude Include="include\slim\types\Symbol.hpp" />
+    <ClInclude Include="include\slim\types\Type.hpp" />
     <ClInclude Include="include\slim\Util.hpp" />
     <ClInclude Include="include\slim\Value.hpp" />
   </ItemGroup>
@@ -66,7 +67,6 @@
     <ClCompile Include="source\expression\Lexer.cpp" />
     <ClCompile Include="source\expression\Parser.cpp" />
     <ClCompile Include="source\expression\LogicalOp.cpp" />
-    <ClCompile Include="source\Maths.cpp" />
     <ClCompile Include="source\Operators.cpp" />
     <ClCompile Include="source\Template.cpp" />
     <ClCompile Include="source\template\Lexer.cpp" />
@@ -75,6 +75,7 @@
     <ClCompile Include="source\template\TemplateParts.cpp" />
     <ClCompile Include="source\types\Array.cpp" />
     <ClCompile Include="source\types\HtmlSafeString.cpp" />
+    <ClCompile Include="source\types\Math.cpp" />
     <ClCompile Include="source\types\String.cpp" />
     <ClCompile Include="source\types\Symbol.cpp" />
     <ClCompile Include="source\types\Enumerator.cpp" />

@@ -4,12 +4,13 @@
 #include "expression/Lexer.hpp"
 #include "expression/Scope.hpp"
 #include "types/Number.hpp"
+#include "types/Math.hpp"
 #include "BuiltinFunctions.hpp"
 #include <cmath>
 
 using namespace slim;
 using namespace slim::expr;
-BOOST_AUTO_TEST_SUITE(TestMaths)
+BOOST_AUTO_TEST_SUITE(TestMath)
 
 ObjectPtr eval2(const std::string &str)
 {
@@ -19,6 +20,7 @@ ObjectPtr eval2(const std::string &str)
     auto expr = parser.full_expression();
     ScopeAttributes attrs;
     Scope scope(BUILTIN_FUNCTIONS, attrs);
+    scope.set(symbol("self"), create_object<Math>());
     return expr->eval(scope);
 }
 double eval(const std::string &str)
@@ -53,7 +55,7 @@ BOOST_AUTO_TEST_CASE(basic_methods)
     BOOST_CHECK_CLOSE(0.8427007929497149, eval("erf(1)"), 0.0001);
     BOOST_CHECK_CLOSE(0.15729920705028513, eval("erfc(1)"), 0.0001);
     BOOST_CHECK_CLOSE(1.772453850905516, eval("gamma(0.5)"), 0.0001);
-    BOOST_CHECK_CLOSE(std::sqrt(2*2 + 3*3), eval("hypot(2, 3)"), 0.0001);
+    BOOST_CHECK_CLOSE(std::sqrt(2 * 2 + 3 * 3), eval("hypot(2, 3)"), 0.0001);
     BOOST_CHECK_CLOSE(4, eval("ldexp(1, 2)"), 0.0001);
     BOOST_CHECK_EQUAL("[0.572365, 1]", eval2("lgamma(0.5)")->inspect());
 }

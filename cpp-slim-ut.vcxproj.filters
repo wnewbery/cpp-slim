@@ -36,9 +36,6 @@
     <ClCompile Include="tests\types\Number.cpp">
       <Filter>tests\types</Filter>
     </ClCompile>
-    <ClCompile Include="tests\BuiltinFunctions.cpp">
-      <Filter>tests</Filter>
-    </ClCompile>
     <ClCompile Include="tests\types\Array.cpp">
       <Filter>tests\types</Filter>
     </ClCompile>
@@ -63,10 +60,10 @@
     <ClCompile Include="tests\FunctionHelpers.cpp">
       <Filter>tests</Filter>
     </ClCompile>
-    <ClCompile Include="tests\Maths.cpp">
-      <Filter>tests</Filter>
-    </ClCompile>
     <ClCompile Include="tests\types\HtmlSafeString.cpp">
+      <Filter>tests\types</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\types\Math.cpp">
       <Filter>tests\types</Filter>
     </ClCompile>
   </ItemGroup>
