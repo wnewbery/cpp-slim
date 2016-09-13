@@ -61,6 +61,12 @@ namespace slim
 
                 void handle_in_tag();
             };
+            struct ParsedCodeLine
+            {
+                bool leading_space = false;
+                bool trailing_space = false;
+                std::unique_ptr<expr::ExpressionNode> expr;
+            };
 
             Lexer &lexer;
             Token current_token;
@@ -74,13 +80,27 @@ namespace slim
 
             void parse_lines(int base_indent, OutputFrame &output);
 
+            /**Parses a line as text, including following indented text lines.
+             * Used for verbatim text, html, template comments and html comments.
+             */
             std::string parse_text_line(int base_indent);
+            /**Parses a tag line. Calls parse_lines to create the tags contents.*/
             void parse_tag(int base_indent, OutputFrame &output);
-            void parse_code_output(OutputFrame &output);
+            /**Parses a control code line. Calls parse_lines to create the blocks contrents.*/
             void parse_control_code(int base_indent, OutputFrame &output);
 
             /**Parse code starting with '-', '=', etc. and handling '\' and ',' line continuation.*/
             std::unique_ptr<expr::ExpressionNode> parse_code_lines();
+            /**Parses a single code fragment and writes it to output.*/
+            void parse_code_output(OutputFrame &output);
+            /**Parses a single code line and returns it.*/
+            ParsedCodeLine parse_code_output();
+            /**Writes the code output parsed by parse_code_output.*/
+            void add_code_output(ParsedCodeLine &code, OutputFrame &output);
+            /**Parses a code line, and uses parse_lines to build a block for the final method call.*/
+            void parse_code_line(int base_indent, OutputFrame &output);
+
+
         };
     }
 }

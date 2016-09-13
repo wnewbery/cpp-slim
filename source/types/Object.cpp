@@ -107,6 +107,11 @@ namespace slim
         if (method) return (*method)(this, args);
         else throw NoSuchMethod(this, name.get());
     }
+    ObjectPtr Object::get_constant(SymPtr)
+    {
+        throw TypeError(this->inspect() + " is not a class/module");
+    }
+
     std::shared_ptr<String> Object::to_string_obj()
     {
         return make_value(to_string());

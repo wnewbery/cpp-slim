@@ -92,7 +92,7 @@ namespace slim
         ObjectPtr call_method(SymPtr name, const FunctionArgs &args);
 
         /**Gets a constant, throws NameError if not found.*/
-        ObjectPtr get_constant(SymPtr name);
+        virtual ObjectPtr get_constant(SymPtr name);
     protected:
         /**Get a function table for the default implementation of call_method.*/
         virtual const MethodTable &method_table()const;

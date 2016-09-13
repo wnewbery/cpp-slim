@@ -3,8 +3,10 @@
 #include "types/Object.hpp"
 #include "types/Array.hpp"
 #include "types/Hash.hpp"
+#include "types/HtmlSafeString.hpp"
 #include "types/String.hpp"
 #include "types/Proc.hpp"
+#include "template/Template.hpp"
 #include <sstream>
 namespace slim
 {
@@ -135,6 +137,30 @@ namespace slim
         ObjectPtr Block::eval(Scope & scope) const
         {
             return std::make_shared<Proc>(*code, param_names, scope);
+        }
+
+        TemplateBlock::TemplateBlock(
+            std::vector<SymPtr> &&param_names, std::unique_ptr<tpl::TemplatePart> &&tpl)
+            : param_names(std::move(param_names)), tpl(std::move(tpl))
+        {}
+        TemplateBlock::~TemplateBlock() {}
+        std::string TemplateBlock::to_string()const
+        {
+            std::stringstream ss;
+            ss << "{|";
+            if (!param_names.empty()) ss << param_names[0]->str();
+            for (size_t i = 1; i < param_names.size(); ++i)
+                ss << ", " << param_names[i]->str();
+            ss << "|%>";
+            ss << tpl->to_string();
+            ss << "<%}";
+            return ss.str();
+        }
+        ObjectPtr TemplateBlock::eval(Scope &scope)const
+        {
+            std::string str;
+            tpl->render(str, scope);
+            return create_object<HtmlSafeString>(std::move(str));
         }
 
         std::string Conditional::to_string() const

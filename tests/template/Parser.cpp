@@ -99,6 +99,16 @@ BOOST_AUTO_TEST_CASE(code_lines)
     BOOST_CHECK_EQUAL("<p><%= @a.f(5, 2) %></p>", parse_str("p= @a.f 5,\n  2"));
 }
 
+BOOST_AUTO_TEST_CASE(code_block_lines)
+{
+    BOOST_CHECK_EQUAL("<%= func({||%>content<%}) %>", parse_str("=func\n  | content"));
+    BOOST_CHECK_EQUAL("<%= func({||%>content<%}) %><br/>", parse_str("=func\n  | content\nbr"));
+    BOOST_CHECK_EQUAL("<%= f().g({||%>content<%}) %>", parse_str("=f.g\n  | content"));
+    BOOST_CHECK_EQUAL("<%= f().g({||%>content<%}) %><br/>", parse_str("=f.g\n  | content\nbr"));
+
+    BOOST_CHECK_THROW(parse_str("=@attr\n  | content"), TemplateSyntaxError);
+}
+
 BOOST_AUTO_TEST_CASE(void_tags)
 {
     BOOST_CHECK_EQUAL("<br/>", parse_str("br"));

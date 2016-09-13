@@ -131,7 +131,7 @@ namespace slim
                     parse_tag(my_indent, output);
                     break;
                 case Token::OUTPUT_LINE:
-                    parse_code_output(output);
+                    parse_code_line(my_indent, output);
                     break;
                 case Token::CONTROL_LINE:
                     parse_control_code(my_indent, output);
@@ -314,28 +314,59 @@ namespace slim
 
         void Parser::parse_code_output(OutputFrame &output)
         {
+            add_code_output(parse_code_output(), output);
+        }
+
+        void Parser::parse_code_line(int base_indent, OutputFrame &output)
+        {
+            auto code = parse_code_output();
+            // See if there is further content to turn into a block
+            if (current_token.type == Token::INDENT && current_indent() > base_indent)
+            {
+                auto func_call = dynamic_cast<expr::FuncCall*>(code.expr.get());
+                if (!func_call) throw TemplateSyntaxError("Indented block after code line, but no method call to pass block to");
+                //Pass the indented contents into a new block
+                OutputFrame block_frame;
+                parse_lines(base_indent, block_frame);
+                //Create the executable template
+                auto block_tpl = block_frame.make_tpl();
+                //Turn it into a expr::TemplateBlock AST node
+                auto expr = slim::make_unique<expr::TemplateBlock>(std::vector<SymPtr>(), std::move(block_tpl));
+
+                //Add it as a block param to the function call
+                func_call->args.push_back(std::move(expr));
+            }
+            add_code_output(code, output);
+        }
+
+        Parser::ParsedCodeLine Parser::parse_code_output()
+        {
             assert(current_token.type == Token::OUTPUT_LINE);
             current_token = lexer.next_whitespace_control();
 
-            bool leading_space = false, trailing_space = false;
+            ParsedCodeLine out;
             switch (current_token.type)
             {
             case Token::ADD_LEADING_WHITESPACE:
-                leading_space = true; break;
+                out.leading_space = true; break;
             case Token::ADD_TRAILING_WHITESPACE:
-                trailing_space = true;  break;
+                out.trailing_space = true; break;
             case Token::ADD_LEADING_AND_TRAILING_WHITESPACE:
-                leading_space = trailing_space = true; break;
+                out.leading_space = out.trailing_space = true; break;
             default: break;
             }
 
-            auto expr = parse_code_lines();
-
-            if (leading_space) output << ' ';
-            output << std::move(expr);
-            if (trailing_space) output << ' ';
+            out.expr = parse_code_lines();
 
             current_token = lexer.next_indent();
+            return out;
+        }
+
+        void Parser::add_code_output(ParsedCodeLine &code, OutputFrame &output)
+        {
+            if (code.leading_space) output << ' ';
+            output << std::move(code.expr);
+            if (code.trailing_space) output << ' ';
         }
 
         void Parser::parse_control_code(int base_indent, OutputFrame &output)
@@ -426,8 +457,9 @@ namespace slim
                 else break;
             }
 
+            //TODO: If ends with "do" or "do |vars|" need to handle that as a block
             expr::Lexer expr_lexer(script_src);
-            expr::Parser expr_parser(local_vars, expr_lexer); //TODO: Allow custom functions
+            expr::Parser expr_parser(local_vars, expr_lexer);
             auto expr = expr_parser.full_expression();
 
             return expr;

@@ -3,6 +3,10 @@
 #include "Function.hpp"
 namespace slim
 {
+    namespace tpl
+    {
+        class TemplatePart;
+    }
     namespace expr
     {
         //Some misc nodes
@@ -109,6 +113,21 @@ namespace slim
         private:
             std::vector<SymPtr> param_names;
             std::unique_ptr<ExpressionNode> code;
+        };
+
+        /**A block which contains a template fragment.
+         * This node will evaulate to a Proc which when executed returns a HtmlSafeString.
+         */
+        class TemplateBlock : public ExpressionNode
+        {
+        public:
+            TemplateBlock(std::vector<SymPtr> &&param_names, std::unique_ptr<tpl::TemplatePart> &&tpl);
+            ~TemplateBlock();
+            virtual std::string to_string()const override;
+            virtual ObjectPtr eval(Scope &scope)const override;
+        private:
+            std::vector<SymPtr> param_names;
+            std::unique_ptr<tpl::TemplatePart> tpl;
         };
 
         /**Conditional ternary operator. cond ? true : false. */
