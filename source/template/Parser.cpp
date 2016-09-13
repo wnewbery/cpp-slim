@@ -1,8 +1,9 @@
 #include "template/Parser.hpp"
-#include "template/Lexer.hpp"
-#include "template/Token.hpp"
-#include "template/TemplateParts.hpp"
 #include "template/Attributes.hpp"
+#include "template/Lexer.hpp"
+#include "template/TemplateParts.hpp"
+#include "template/TemplateBlock.hpp"
+#include "template/Token.hpp"
 #include "expression/Lexer.hpp"
 #include "expression/Parser.hpp"
 #include "expression/AstOp.hpp"
@@ -331,7 +332,7 @@ namespace slim
                 //Create the executable template
                 auto block_tpl = block_frame.make_tpl();
                 //Turn it into a expr::TemplateBlock AST node
-                auto expr = slim::make_unique<expr::TemplateBlock>(std::vector<SymPtr>(), std::move(block_tpl));
+                auto expr = create_tpl_block(std::vector<SymPtr>(), std::move(block_tpl));
 
                 //Add it as a block param to the function call
                 func_call->args.push_back(std::move(expr));

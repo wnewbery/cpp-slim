@@ -55,6 +55,7 @@
     <ClInclude Include="include\slim\types\Type.hpp" />
     <ClInclude Include="include\slim\Util.hpp" />
     <ClInclude Include="include\slim\Value.hpp" />
+    <ClInclude Include="source\template\TemplateBlock.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Error.cpp" />
@@ -70,6 +71,7 @@
     <ClCompile Include="source\template\Lexer.cpp" />
     <ClCompile Include="source\template\Parser.cpp" />
     <ClCompile Include="source\template\Template.cpp" />
+    <ClCompile Include="source\template\TemplateBlock.cpp" />
     <ClCompile Include="source\template\TemplateParts.cpp" />
     <ClCompile Include="source\types\Array.cpp" />
     <ClCompile Include="source\types\HtmlSafeString.cpp" />

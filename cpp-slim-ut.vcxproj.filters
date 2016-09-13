@@ -66,5 +66,8 @@
     <ClCompile Include="tests\types\Math.cpp">
       <Filter>tests\types</Filter>
     </ClCompile>
+    <ClCompile Include="tests\types\TemplateBlock.cpp">
+      <Filter>tests\template</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
