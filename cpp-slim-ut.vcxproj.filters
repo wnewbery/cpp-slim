@@ -72,5 +72,8 @@
     <ClCompile Include="tests\types\Symbol.cpp">
       <Filter>tests\types</Filter>
     </ClCompile>
+    <ClCompile Include="tests\types\Object.cpp">
+      <Filter>tests\types</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
