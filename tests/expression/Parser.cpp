@@ -67,6 +67,10 @@ BOOST_AUTO_TEST_CASE(single_values)
     BOOST_CHECK_EQUAL("{:a => 5}", parse("{a: 5}")->to_string());
     BOOST_CHECK_EQUAL("{1 => 2, 5 => true}", parse("{1 => 2, 5 => true}")->to_string());
 
+    BOOST_CHECK(is_node_type<GlobalConstant>(parse("Const")));
+    BOOST_CHECK_EQUAL("Const", parse("Const")->to_string());
+
+    //Note that myvar was added to the variable scope for the parser
     BOOST_CHECK(is_node_type<Variable>(parse("myvar")));
     BOOST_CHECK_EQUAL("myvar", parse("myvar")->to_string());
 
@@ -147,6 +151,7 @@ BOOST_AUTO_TEST_CASE(string_interp)
 
 BOOST_AUTO_TEST_CASE(method_call)
 {
+    BOOST_CHECK_EQUAL("f()", parse("f")->to_string());
     BOOST_CHECK_EQUAL("f()", parse("f()")->to_string());
     BOOST_CHECK_EQUAL("f(5)", parse("f(5)")->to_string());
     BOOST_CHECK_EQUAL("f(5, true)", parse("f(5, true)")->to_string());

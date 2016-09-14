@@ -52,6 +52,13 @@ namespace slim
 
             /**Advance to the next token.*/
             void next();
+            /**A symbol starting with a capital letter is a constant by default.*/
+            bool is_constant(const std::string &str)const
+            {
+                assert(!str.empty());
+                return str[0] >= 'A' && str[0] <= 'Z';
+            }
+
             /** '(' expression ')' */
             ExpressionNodePtr sub_expression();
             /**A literal value, variable, or global function call.

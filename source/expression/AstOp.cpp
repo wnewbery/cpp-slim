@@ -31,6 +31,11 @@ namespace slim
             return scope.get_attr(name);
         }
 
+        ObjectPtr GlobalConstant::eval(Scope &scope)const
+        {
+            return scope.self()->get_constant(name);
+        }
+
         std::string FuncCall::to_string() const
         {
             std::stringstream ss;

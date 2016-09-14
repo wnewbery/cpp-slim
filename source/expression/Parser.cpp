@@ -128,13 +128,18 @@ namespace slim
                     if (current_token.type == Token::LPAREN ||
                         current_token.type == Token::L_CURLY_BRACKET ||
                         (!in_cond_op && is_func_arg_start()))
-                    {   //local variables are not callable, so must be method
+                    {   //local variables and constants are not callable, so must be method
                         FuncCall::Args args = func_args(false);
                         return slim::make_unique<GlobalFuncCall>(symbol(name), std::move(args));
                     }
                     else if (vars.is_var(name))
                     {   //variables take priority over methods if they exist
+                        assert(!is_constant(name)); //should not be possible to create such a constant
                         return slim::make_unique<Variable>(symbol(name));
+                    }
+                    else if (is_constant(name))
+                    {
+                        return slim::make_unique<GlobalConstant>(symbol(name));
                     }
                     else
                     {   //method call with no args
