@@ -12,7 +12,6 @@ namespace slim
         virtual const std::string& type_name()const override { return TYPE_NAME; }
         virtual std::string to_string()const override;
         virtual std::string inspect()const override;
-        virtual bool is_true()const override { return true; }
         virtual bool eq(const Object *rhs)const override { return this == rhs; }
         virtual size_t hash()const override;
         virtual int cmp(const Object *rhs)const override;

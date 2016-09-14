@@ -170,6 +170,7 @@
     <ClCompile Include="tests\types\Math.cpp" />
     <ClCompile Include="tests\types\Number.cpp" />
     <ClCompile Include="tests\types\String.cpp" />
+    <ClCompile Include="tests\types\Symbol.cpp" />
     <ClCompile Include="tests\types\TemplateBlock.cpp" />
     <ClCompile Include="tests\Util.cpp" />
   </ItemGroup>
