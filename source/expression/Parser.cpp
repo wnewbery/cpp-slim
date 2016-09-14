@@ -60,6 +60,47 @@ namespace slim
         {
             return conditional_op();
         }
+
+        std::vector<SymPtr> Parser::param_list()
+        {
+            std::vector<SymPtr> out;
+            if (current_token.type == Token::LOGICAL_OR)
+            {   //Lexer picked up "||" as logical or operator, but it is also an empty param lsit
+                next();
+            }
+            else if (current_token.type == Token::OR)
+            {   //Have "|", may have "| |" or, one or more params
+                next();
+                if (current_token.type == Token::OR)
+                {   //Had "| |"
+                    next();
+                }
+                else
+                {
+                    while (true)
+                    {
+                        if (current_token.type != Token::SYMBOL) throw SyntaxError("Expected symbol");
+                        out.push_back(symbol(current_token.str));
+                        next();
+
+                        if (current_token.type == Token::OR)
+                        {
+                            next();
+                            break;
+                        }
+                        else if (current_token.type == Token::COMMA)
+                        {
+                            next();
+                            continue;
+                        }
+                        else throw SyntaxError("Expected ',' or '|'");
+                    }
+                }
+            }
+            //else no list, no params
+            return out;
+        }
+
         ExpressionNodePtr Parser::sub_expression()
         {
             if (current_token.type != Token::LPAREN) throw SyntaxError("Expected '('");
@@ -335,36 +376,10 @@ namespace slim
             assert(current_token.type == Token::L_CURLY_BRACKET);
             next();
 
-            std::vector<SymPtr> args;
+            std::vector<SymPtr> params = param_list();
             auto old_vars = vars; //save the current variable set, new variables will only exist within the block
-            if (current_token.type == Token::OR)
-            {
-                next();
-                if (current_token.type == Token::OR) next();
-                else
-                {
-                    while (true)
-                    {
-                        if (current_token.type != Token::SYMBOL) throw SyntaxError("Expected symbol");
-                        vars.add(current_token.str);
-                        args.push_back(symbol(current_token.str));
-                        next();
-
-                        if (current_token.type == Token::OR)
-                        {
-                            next();
-                            break;
-                        }
-                        else if (current_token.type == Token::COMMA)
-                        {
-                            next();
-                            continue;
-                        }
-                        else throw SyntaxError("Expected ',' or '|'");
-                    }
-                }
-            }
-            else if (current_token.type == Token::LOGICAL_OR) next();
+            for (auto &param : params)
+                vars.add(param->str());
 
             auto expr = expression();
 
@@ -372,7 +387,7 @@ namespace slim
             next();
 
             vars = old_vars; //Remove any variables from within the block
-            return slim::make_unique<Block>(std::move(args), std::move(expr));
+            return slim::make_unique<Block>(std::move(params), std::move(expr));
         }
 
         template<class T, class U>

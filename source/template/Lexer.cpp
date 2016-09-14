@@ -165,7 +165,7 @@ namespace slim
 
         void Lexer::set_pos(const char *p)
         {
-            assert(p >= this->p && p <= this->end);
+            assert(p >= this->begin && p <= this->end);
             this->p = p;
         }
 

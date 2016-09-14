@@ -80,8 +80,7 @@ namespace slim
                 if (p[1] == '.') return p += 2, Token(start, Token::SAFE_NAV);
                 else return make_tok(Token::AND);
             case '|':
-                if (p + 1 >= end) error("Unexpected end");
-                if (p[1] == '|') return p += 2, Token(start, Token::LOGICAL_OR);
+                if (p + 1 < end && p[1] == '|') return p += 2, Token(start, Token::LOGICAL_OR);
                 else return make_tok(Token::OR);
             case '!':
                 if (p + 1 >= end) error("Unexpected end");

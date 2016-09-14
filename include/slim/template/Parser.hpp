@@ -61,11 +61,10 @@ namespace slim
 
                 void handle_in_tag();
             };
-            struct ParsedCodeLine
+            struct WhiteSpaceControl
             {
                 bool leading_space = false;
                 bool trailing_space = false;
-                std::unique_ptr<expr::ExpressionNode> expr;
             };
 
             Lexer &lexer;
@@ -89,18 +88,19 @@ namespace slim
             /**Parses a control code line. Calls parse_lines to create the blocks contrents.*/
             void parse_control_code(int base_indent, OutputFrame &output);
 
-            /**Parse code starting with '-', '=', etc. and handling '\' and ',' line continuation.*/
-            std::unique_ptr<expr::ExpressionNode> parse_code_lines();
-            /**Parses a single code fragment and writes it to output.*/
-            void parse_code_output(OutputFrame &output);
-            /**Parses a single code line and returns it.*/
-            ParsedCodeLine parse_code_output();
-            /**Writes the code output parsed by parse_code_output.*/
-            void add_code_output(ParsedCodeLine &code, OutputFrame &output);
+            /**Parse code starting with '-', '=', etc. as an expression.
+             * Uses parse_code_src to get the source code.
+             */
+            std::unique_ptr<expr::ExpressionNode> parse_code_expr();
+            /**Parse lines startin withg '-', '=', etc., handling line continuation '\' and ','.
+             * Returns the script source string.
+             */
+            std::string parse_code_src();
             /**Parses a code line, and uses parse_lines to build a block for the final method call.*/
             void parse_code_line(int base_indent, OutputFrame &output);
 
-
+            /**Parse '<' and '>' and return them.*/
+            WhiteSpaceControl parse_ws_control();
         };
     }
 }

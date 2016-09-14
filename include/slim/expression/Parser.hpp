@@ -32,6 +32,12 @@ namespace slim
              */
             ExpressionNodePtr expression();
 
+            /**Parse a list of parameters in a |params| for blocks.
+             * Also used explicitly by the template parser as "do |params|" or "{|params|"
+             * is not a valid expression due to the lack of a body and end.
+             */
+            std::vector<SymPtr> param_list();
+
             /**Gets the last token read from lexer.*/
             const Token& get_last_token()const { return current_token; }
             const LocalVarNames& get_var_names()const { return vars; }

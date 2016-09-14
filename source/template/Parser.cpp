@@ -13,6 +13,7 @@
 #include "Util.hpp"
 #include <cassert>
 #include <unordered_set>
+#include <regex>
 
 namespace slim
 {
@@ -295,7 +296,10 @@ namespace slim
             }
             else if (current_token.type == Token::OUTPUT_LINE)
             {
-                parse_code_output(output);
+                auto ws = parse_ws_control();
+                if (ws.leading_space) output << ' ';
+                output << parse_code_expr();
+                if (ws.trailing_space) output << ' ';
             }
             else if (current_token.type != Token::END)
             {
@@ -313,61 +317,85 @@ namespace slim
             if (trailing_space) output << ' ';
         }
 
-        void Parser::parse_code_output(OutputFrame &output)
-        {
-            add_code_output(parse_code_output(), output);
-        }
-
         void Parser::parse_code_line(int base_indent, OutputFrame &output)
         {
-            auto code = parse_code_output();
+            auto ws = parse_ws_control();
+            auto src = parse_code_src();
+
+            std::vector<SymPtr> params;
+            //See if there is a do block, but avoid breaking constructs that contain those letters in a word
+            auto do_pos = src.rfind(" do");
+            bool had_do = false;
+            if(do_pos != std::string::npos)
+            {
+                //Check do is either at end, or has a |params| only after. Otherwise might have found
+                //somthing inside the expression
+                auto after = do_pos + 3;
+                auto p = src.find(' ', after);
+                if (p >= src.size() - 1)
+                {   //" do *"
+                    had_do = true;
+                }
+                else if(src[p + 1] == '|')
+                {   //Expect a second '|' after this, and then only whitespace
+                    auto p2 = src.find('|', p + 2);
+                    if (p2 != std::string::npos && src.find_first_not_of(' ', p2 + 1) == std::string::npos)
+                    { 
+                        had_do = true;
+                    }
+                }
+
+                if (had_do)
+                {
+                    had_do = true;
+                    auto left = src.size() - do_pos;
+                    auto end = src.data() + src.size();
+
+                    expr::Lexer expr_lexer(src.data() + do_pos + 3, end);
+                    expr::Parser expr_parser(local_vars, expr_lexer);
+                    params = expr_parser.param_list();
+
+                    if (expr_parser.get_last_token().pos != end)
+                    {
+                        throw TemplateSyntaxError("Unexpected contents after block param list");
+                    }
+
+                    src.resize(src.size() - left);
+                }
+            }
+
+            //parse code
+            expr::Lexer expr_lexer(src);
+            expr::Parser expr_parser(local_vars, expr_lexer);
+            auto expr = expr_parser.full_expression();
+
             // See if there is further content to turn into a block
             if (current_token.type == Token::INDENT && current_indent() > base_indent)
             {
-                auto func_call = dynamic_cast<expr::FuncCall*>(code.expr.get());
+                auto func_call = dynamic_cast<expr::FuncCall*>(expr.get());
                 if (!func_call) throw TemplateSyntaxError("Indented block after code line, but no method call to pass block to");
+                //add new local variables for block call
+                auto old_vars = local_vars;
+                for (auto &param : params)
+                    local_vars.add(param->str());
                 //Pass the indented contents into a new block
                 OutputFrame block_frame;
                 parse_lines(base_indent, block_frame);
                 //Create the executable template
                 auto block_tpl = block_frame.make_tpl();
-                //Turn it into a expr::TemplateBlock AST node
-                auto expr = create_tpl_block(std::vector<SymPtr>(), std::move(block_tpl));
-
+                //Turn it into a expr::Block and TemplateBlock AST node
+                auto expr = create_tpl_block(std::move(params), std::move(block_tpl));
+                //Put variables back
+                local_vars = old_vars;
                 //Add it as a block param to the function call
                 func_call->args.push_back(std::move(expr));
             }
-            add_code_output(code, output);
-        }
+            else if (had_do) throw TemplateSyntaxError("Previous code line started 'do' block, but has no content");
 
-        Parser::ParsedCodeLine Parser::parse_code_output()
-        {
-            assert(current_token.type == Token::OUTPUT_LINE);
-            current_token = lexer.next_whitespace_control();
-
-            ParsedCodeLine out;
-            switch (current_token.type)
-            {
-            case Token::ADD_LEADING_WHITESPACE:
-                out.leading_space = true; break;
-            case Token::ADD_TRAILING_WHITESPACE:
-                out.trailing_space = true; break;
-            case Token::ADD_LEADING_AND_TRAILING_WHITESPACE:
-                out.leading_space = out.trailing_space = true; break;
-            default: break;
-            }
-
-            out.expr = parse_code_lines();
-
-            current_token = lexer.next_indent();
-            return out;
-        }
-
-        void Parser::add_code_output(ParsedCodeLine &code, OutputFrame &output)
-        {
-            if (code.leading_space) output << ' ';
-            output << std::move(code.expr);
-            if (code.trailing_space) output << ' ';
+            //Output
+            if (ws.leading_space) output << ' ';
+            output << std::move(expr);
+            if (ws.trailing_space) output << ' ';
         }
 
         void Parser::parse_control_code(int base_indent, OutputFrame &output)
@@ -381,12 +409,11 @@ namespace slim
                 have_control_line = false;
                 if (current_token.type == Token::IF)
                 {
-                    auto if_expr = parse_code_lines();
+                    auto if_expr = parse_code_expr();
                     OutputFrame if_body;
                     std::vector<TemplateCondExpr> elsif;
                     std::unique_ptr<TemplatePart> else_body;
 
-                    current_token = lexer.next_indent();
                     parse_lines(base_indent, if_body);
 
                     while (current_indent() == base_indent && lexer.try_control_line())
@@ -394,10 +421,9 @@ namespace slim
                         current_token = lexer.control_code_start();
                         if (current_token.type == Token::ELSIF)
                         {
-                            auto expr = parse_code_lines();
-                            OutputFrame frame;
+                            auto expr = parse_code_expr();
 
-                            current_token = lexer.next_indent();
+                            OutputFrame frame;
                             parse_lines(base_indent, frame);
 
                             elsif.emplace_back(std::move(expr), frame.make_tpl());
@@ -437,7 +463,15 @@ namespace slim
             }
         }
 
-        std::unique_ptr<expr::ExpressionNode> Parser::parse_code_lines()
+        std::unique_ptr<expr::ExpressionNode> Parser::parse_code_expr()
+        {
+            auto script_src = parse_code_src();
+            expr::Lexer expr_lexer(script_src);
+            expr::Parser expr_parser(local_vars, expr_lexer);
+            return expr_parser.full_expression();
+        }
+
+        std::string Parser::parse_code_src()
         {
             std::string script_src;
             while (true)
@@ -457,13 +491,25 @@ namespace slim
                 }
                 else break;
             }
+            current_token = lexer.next_indent();
+            return script_src;
+        }
 
-            //TODO: If ends with "do" or "do |vars|" need to handle that as a block
-            expr::Lexer expr_lexer(script_src);
-            expr::Parser expr_parser(local_vars, expr_lexer);
-            auto expr = expr_parser.full_expression();
-
-            return expr;
+        Parser::WhiteSpaceControl Parser::parse_ws_control()
+        {
+            WhiteSpaceControl out;
+            current_token = lexer.next_whitespace_control();
+            switch (current_token.type)
+            {
+            case Token::ADD_LEADING_WHITESPACE:
+                out.leading_space = true; break;
+            case Token::ADD_TRAILING_WHITESPACE:
+                out.trailing_space = true; break;
+            case Token::ADD_LEADING_AND_TRAILING_WHITESPACE:
+                out.leading_space = out.trailing_space = true; break;
+            default: break;
+            }
+            return out;
         }
 
         int Parser::current_indent()
@@ -472,6 +518,5 @@ namespace slim
             assert(current_token.type == Token::INDENT);
             return (int)current_token.str.size();
         }
-
     }
 }
