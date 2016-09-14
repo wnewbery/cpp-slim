@@ -112,14 +112,15 @@ namespace slim
                 switch (current_token.type)
                 {
                 case Token::TEXT_LINE:
-                    output << parse_text_line(my_indent);
+                    add_interpolated_text(parse_text_line(my_indent), output);
                     break;
                 case Token::TEXT_LINE_WITH_TRAILING_SPACE:
-                    output << parse_text_line(my_indent);
+                    add_interpolated_text(parse_text_line(my_indent), output);
                     output << ' ';
                     break;
                 case Token::HTML_LINE:
-                    output << '<' << parse_text_line(my_indent);
+                    output << '<';
+                    add_interpolated_text(parse_text_line(my_indent), output);
                     break;
                 case Token::COMMENT_LINE:
                     parse_text_line(my_indent);
@@ -286,7 +287,7 @@ namespace slim
             output.set_in_tag();
             if (current_token.type == Token::TEXT_CONTENT)
             {
-                output << current_token.str;
+                add_interpolated_text(current_token.str, output);
                 current_token = lexer.next_indent();
             }
             else if (current_token.type == Token::EOL)
@@ -517,6 +518,37 @@ namespace slim
             if (current_token.type == Token::END) return -1;
             assert(current_token.type == Token::INDENT);
             return (int)current_token.str.size();
+        }
+
+        void Parser::add_interpolated_text(const std::string &text, OutputFrame &output)
+        {
+            auto end = text.data() + text.size();
+            size_t p = 0, p2;
+            while ((p2 = text.find("#{", p)) != std::string::npos)
+            {
+                auto start = p;
+                p = p2 + 2; //skip past the #{
+                if (p2 > 0 && text[p2 - 1] == '\\')
+                {   //Escaped #{
+                    output << text.substr(start, p2 - start - 1);
+                    output << "#{";
+                }
+                else
+                {   //Parse interpolation
+                    output << text.substr(start, p2 - start);
+                    expr::Lexer expr_lexer(text.data() + p, end);
+                    expr::Parser expr_parser(local_vars, expr_lexer);
+                    auto expr = expr_parser.expression();
+                    if (expr_parser.get_last_token().type != expr::Token::R_CURLY_BRACKET)
+                        throw TemplateSyntaxError("Expected '}' to end interpolated text");
+                    
+                    output << std::move(expr);
+
+                    p = expr_lexer.get_pos() - text.data();
+                    assert(text[p - 1] == '}');
+                }
+            }
+            if (p < text.size()) output << text.substr(p);
         }
     }
 }

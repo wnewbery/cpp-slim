@@ -17,6 +17,8 @@ namespace slim
             /**STRING_TEXT, STRING_INTERP_START, STRING_TERM*/
             Token next_str_interp(char delim);
 
+            /**Get current position.*/
+            const char *get_pos() { return p; }
         private:
             const char *start, *p, *end;
 

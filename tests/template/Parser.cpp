@@ -74,6 +74,30 @@ BOOST_AUTO_TEST_CASE(text_lines)
         parse_str("<p>Hello <strong>World</strong></p>"));
 }
 
+BOOST_AUTO_TEST_CASE(interpolated_text_lines)
+{
+    BOOST_CHECK_EQUAL(
+        "<p>Hello #{@name}</p>",
+        parse_str("p Hello \\#{@name}"));
+
+    BOOST_CHECK_EQUAL(
+        "<p>Hello <%= @name %></p>",
+        parse_str("p Hello #{@name}"));
+    BOOST_CHECK_EQUAL(
+        "<p>Hello <%= @name %></p>",
+        parse_str("p\n  | Hello #{@name}"));
+    BOOST_CHECK_EQUAL(
+        "<p>Hello <%= @name %> </p>",
+        parse_str("p\n  ' Hello #{@name}"));
+    BOOST_CHECK_EQUAL(
+        "<p>Hello <%= @name %></p>",
+        parse_str("<p>Hello #{@name}</p>"));
+
+    BOOST_CHECK_EQUAL(
+        "<p>Hello <%= \"nested #{@name}\" %></p>",
+        parse_str("p Hello #{\"nested #{@name}\"}"));
+}
+
 BOOST_AUTO_TEST_CASE(code_lines)
 {
     BOOST_CHECK_EQUAL("<p></p>", parse_str("p"));

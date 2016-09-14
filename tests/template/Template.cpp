@@ -52,6 +52,44 @@ BOOST_AUTO_TEST_CASE(text)
         render_tpl("html\n  p<>"));
 }
 
+BOOST_AUTO_TEST_CASE(interpolated_text_lines)
+{
+    ViewModel model;
+    model.set("a", make_value("Test"));
+    model.set("b", make_value("<escape>"));
+
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p>#{@a}</p>",
+        render_tpl("p \\#{@a}", model));
+
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p>Test</p>",
+        render_tpl("p #{@a}", model));
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p>Hello Test</p>",
+        render_tpl("p Hello #{@a}", model));
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p>Hello Test</p>",
+        render_tpl("p\n  | Hello #{@a}", model));
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p>Hello Test</p>",
+        render_tpl("<p>Hello #{@a}</p>", model));
+
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p>Hello &lt;escape&gt;</p>",
+        render_tpl("p Hello #{@b}", model));
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p>Hello <escape></p>",
+        render_tpl("p Hello #{@b.html_safe}", model));
+}
+
 
 BOOST_AUTO_TEST_CASE(code_lines)
 {

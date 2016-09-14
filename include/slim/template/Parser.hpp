@@ -101,6 +101,11 @@ namespace slim
 
             /**Parse '<' and '>' and return them.*/
             WhiteSpaceControl parse_ws_control();
+
+            /**Looks for interpolated #{} blocks in the string, and adds the fragments to the output.
+             * Used for "|" test lines, literal HTML and tag text content.
+             */
+            void add_interpolated_text(const std::string &text, OutputFrame &output);
         };
     }
 }
