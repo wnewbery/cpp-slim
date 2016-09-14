@@ -42,6 +42,18 @@ namespace slim
             virtual ObjectPtr eval(Scope &scope)const override;
             SymPtr name;
         };
+        class ConstantNav : public ExpressionNode
+        {
+        public:
+            ConstantNav(ExpressionNodePtr &&lhs, const SymPtr &name)
+                : lhs(std::move(lhs)), name(std::move(name))
+            {}
+            virtual std::string to_string()const override;
+            virtual ObjectPtr eval(Scope &scope)const override;
+
+            ExpressionNodePtr lhs;
+            SymPtr name;
+        };
         class FuncCall : public ExpressionNode
         {
         public:

@@ -59,7 +59,9 @@ namespace slim
             case '%': return make_tok(Token::MOD);
             case '~': return make_tok(Token::NOT);
             case '^': return make_tok(Token::XOR);
-            case ':': return make_tok(Token::COLON);
+            case ':':
+                if (p + 1 < end && p[1] == ':') return p += 2, Token(start, Token::CONST_NAV);
+                else return make_tok(Token::COLON);
             case '?': return make_tok(Token::CONDITIONAL);
             case '\'':
             case '\"':
@@ -177,7 +179,7 @@ namespace slim
 
             if (p < end)
             {
-                if (*p == ':')
+                if (*p == ':' && (p + 1 >= end || p[1] != ':')) //symbol:: is SYMBOL + CONST_NAV
                 {
                     ++p;
                     type = Token::HASH_SYMBOL;

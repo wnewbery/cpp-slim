@@ -36,6 +36,16 @@ namespace slim
             return scope.self()->get_constant(name);
         }
 
+
+        std::string ConstantNav::to_string()const
+        {
+            return lhs->to_string() + "::" + name->str();
+        }
+        ObjectPtr ConstantNav::eval(Scope &scope)const
+        {
+            return lhs->eval(scope)->get_constant(name);
+        }
+
         std::string FuncCall::to_string() const
         {
             std::stringstream ss;

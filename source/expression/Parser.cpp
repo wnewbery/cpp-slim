@@ -618,6 +618,14 @@ namespace slim
                     next();
                     lhs = slim::make_unique<ElementRefOp>(std::move(lhs), std::move(args));
                 }
+                else if (current_token.type == Token::CONST_NAV)
+                {
+                    next();
+                    if (current_token.type != Token::SYMBOL || !is_constant(current_token.str))
+                        throw SyntaxError("Expected constant name");
+                    lhs = slim::make_unique<ConstantNav>(std::move(lhs), symbol(current_token.str));
+                    next();
+                }
                 else break;
             }
             return lhs;

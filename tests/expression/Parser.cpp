@@ -78,6 +78,21 @@ BOOST_AUTO_TEST_CASE(single_values)
     BOOST_CHECK_EQUAL("@myvar", parse("@myvar")->to_string());
 }
 
+BOOST_AUTO_TEST_CASE(const_nav)
+{
+    BOOST_CHECK(is_node_type<ConstantNav>(parse("X::PI")));
+    BOOST_CHECK_EQUAL("X::PI", parse("X::PI")->to_string());
+    BOOST_CHECK_EQUAL("x()::PI", parse("x::PI")->to_string());
+    BOOST_CHECK_EQUAL("myvar::PI", parse("myvar::PI")->to_string());
+    BOOST_CHECK_EQUAL("myvar::Math::PI", parse("myvar::Math::PI")->to_string());
+    BOOST_CHECK_EQUAL("myvar.class()::Math::PI", parse("myvar.class::Math::PI")->to_string());
+
+    BOOST_CHECK_THROW(parse("X::not_a_const"), SyntaxError);
+    BOOST_CHECK_THROW(parse("X::"), SyntaxError);
+    //NOTE: This syntax may be available in the future to refer to "main" if it ever exists
+    BOOST_CHECK_THROW(parse("::X"), SyntaxError);
+    BOOST_CHECK_THROW(parse("::"), SyntaxError);
+}
 
 BOOST_AUTO_TEST_CASE(single_ops)
 {

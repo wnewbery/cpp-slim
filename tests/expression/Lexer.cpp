@@ -31,6 +31,7 @@ BOOST_AUTO_TEST_CASE(single_tokens)
     BOOST_CHECK_EQUAL(Token::DOT, single_token(".").type);
     BOOST_CHECK_EQUAL(Token::SAFE_NAV, single_token("&.").type);
     BOOST_CHECK_EQUAL(Token::COLON, single_token(":").type);
+    BOOST_CHECK_EQUAL(Token::CONST_NAV, single_token("::").type);
     BOOST_CHECK_EQUAL(Token::CONDITIONAL, single_token("?").type);
     BOOST_CHECK_EQUAL(Token::PLUS, single_token("+").type);
     BOOST_CHECK_EQUAL(Token::MINUS, single_token("- ").type);
@@ -93,6 +94,10 @@ BOOST_AUTO_TEST_CASE(single_tokens)
 
     tok = single_token("test_func55:");
     BOOST_CHECK_EQUAL(Token::HASH_SYMBOL, tok.type);
+    BOOST_CHECK_EQUAL("test_func55", tok.str);
+
+    tok = single_token("test_func55::"); //double colon is constant lookup, not hash key symbol
+    BOOST_CHECK_EQUAL(Token::SYMBOL, tok.type);
     BOOST_CHECK_EQUAL("test_func55", tok.str);
 
     tok = single_token("@my_attr");

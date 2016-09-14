@@ -41,6 +41,8 @@ namespace slim
                 R_CURLY_BRACKET,
                 COMMA,
                 DOT,
+                /**::, double colon for type::Const, e.g. Math::PI*/
+                CONST_NAV,
                 /**&.*/
                 SAFE_NAV,
                 COLON,
