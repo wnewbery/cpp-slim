@@ -40,6 +40,19 @@ std::shared_ptr<Hash> make_hash2(const std::vector<std::pair<std::string, double
     return map2;
 }
 
+BOOST_AUTO_TEST_CASE(dup)
+{
+    ScopeAttributes attrs;
+    Scope scope(attrs);
+    auto a = make_hash2({ { "a", 5.0 }, { "x", 10 }, { "b", 1} });
+    scope.set("a", a);
+
+    BOOST_CHECK_EQUAL("true", eval("a == a.dup", scope));
+    BOOST_CHECK_EQUAL("[\"a\", \"x\", \"b\"]", eval("a.dup.keys", scope));
+    BOOST_CHECK_EQUAL("[5, 10, 1]", eval("a.dup.values", scope));
+    BOOST_CHECK(a != a->dup());
+}
+
 BOOST_AUTO_TEST_CASE(compare)
 {
     ScopeAttributes attrs;

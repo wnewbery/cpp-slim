@@ -191,6 +191,7 @@ namespace slim
     {
         static const MethodTable table(Object::method_table(),
         {
+            { &Hash::dup, "dup" },
             { &Hash::empty_q, "empty?" },
             { &Hash::fetch, "fetch" },
             { &Hash::flatten, "flatten" },
