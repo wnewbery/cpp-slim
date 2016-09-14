@@ -12,10 +12,8 @@ using namespace slim;
 using namespace slim::expr;
 BOOST_AUTO_TEST_SUITE(TestString)
 
-std::string eval(const std::string &str)
+std::string eval(Scope &scope, const std::string &str)
 {
-    ScopeAttributes attrs;
-    Scope scope(attrs);
     Lexer lexer(str);
     expr::LocalVarNames vars;
     Parser parser(vars, lexer);
@@ -23,11 +21,23 @@ std::string eval(const std::string &str)
     auto result = expr->eval(scope);
     return result->inspect();
 }
+std::string eval(const std::string &str)
+{
+    ScopeAttributes attrs;
+    Scope scope(attrs);
+    return eval(scope, str);
+}
 
 BOOST_AUTO_TEST_CASE(ascii_only)
 {
     BOOST_CHECK_EQUAL("true", eval("'abcd'.ascii_only?"));
     BOOST_CHECK_EQUAL("false", eval("'abcd£'.ascii_only?"));
+}
+
+BOOST_AUTO_TEST_CASE(inspect_escape)
+{
+    std::string escaped = "\"\\\\ \\' \\\" \\r \\n \\t\"";
+    BOOST_CHECK_EQUAL(escaped, eval(escaped));
 }
 
 BOOST_AUTO_TEST_CASE(cmp)
@@ -212,6 +222,8 @@ BOOST_AUTO_TEST_CASE(chomp)
 
     BOOST_CHECK_EQUAL("\"test\"", eval("'test\\n\\n'.chomp ''"));
     BOOST_CHECK_EQUAL("\"test\"", eval("'test\\n\\n\\r'.chomp ''"));
+
+    BOOST_CHECK_THROW(eval("''.chomp 1, 2"), InvalidArgument);
 }
 
 BOOST_AUTO_TEST_CASE(strip)
@@ -243,12 +255,48 @@ BOOST_AUTO_TEST_CASE(reverse)
 
 BOOST_AUTO_TEST_CASE(lines)
 {
+    BOOST_CHECK_EQUAL("[\"hello world\"]", eval("'hello world'.lines"));
+    BOOST_CHECK_EQUAL("[\"hello\\n\", \"world\"]", eval("'hello\nworld'.lines"));
+
     BOOST_CHECK_EQUAL("[\"hello\\n\", \"world\\n\", \"\\n\", \"lines\"]", eval("'hello\\nworld\\n\\nlines'.lines"));
     BOOST_CHECK_EQUAL("[\"hello\\n\", \"world\\n\", \"\\n\", \"lines\\n\"]", eval("'hello\\nworld\\n\\nlines\\n'.lines"));
 
     BOOST_CHECK_EQUAL("[\"hello \", \"world\\n\\nlines\\n\"]", eval("'hello world\\n\\nlines\\n'.lines ' '"));
 
     BOOST_CHECK_EQUAL("[\"hello\\nworld\\n\\n\", \"lines\\n\"]", eval("'hello\\nworld\\n\\nlines\\n'.lines ''"));
+}
+
+BOOST_AUTO_TEST_CASE(each_line)
+{
+    class Test : public Object
+    {
+    public:
+        std::string name = "Test";
+        std::vector<std::string> lines;
+
+        virtual const std::string& type_name()const override { return name; }
+        virtual const MethodTable &method_table()const override
+        {
+            static const MethodTable table(Object::method_table(),
+            { { &Test::test, "test" } });
+            return table;
+        }
+        void test(String *line)
+        {
+            lines.push_back(line->get_value());
+        }
+    };
+    auto test = create_object<Test>();
+
+    ScopeAttributes attrs;
+    Scope scope(attrs);
+    scope.set("self", test);
+
+    BOOST_CHECK_EQUAL("\"test\"", eval(scope, "'test'.each_line{|x| test x}"));
+    BOOST_REQUIRE_EQUAL(1, test->lines.size());
+    BOOST_CHECK_EQUAL("test", test->lines[0]);
+
+    //BOOST_CHECK_EQUAL("[\"hello\\n\", \"world\\n\", \"\\n\", \"lines\"]", eval("'hello\\nworld\\n\\nlines'.lines"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

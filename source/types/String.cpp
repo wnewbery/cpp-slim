@@ -221,8 +221,7 @@ namespace slim
         Proc *proc;
         std::string sep = "\n";
         unpack<1>(args, &proc, &sep);
-        std::vector<std::string> lines;
-        split_lines(sep);
+        std::vector<std::string> lines = split_lines(sep);
 
         for (auto &i : lines) proc->call({ make_value(i) });
 
