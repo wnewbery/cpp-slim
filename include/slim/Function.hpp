@@ -67,9 +67,11 @@ namespace slim
         ObjectPtr do_call(Object *self, Func func, Args &&... args)
         {
             typedef MethodTraits<Func> Traits;
-            auto self_typed = static_cast<Traits::self_type*>(self);
-            assert(self_typed == dynamic_cast<Traits::self_type*>(self));
-            return do_call_void_ret(self_typed, func, Traits::is_void_result(), std::forward<Args>(args)...);
+            auto self_typed = static_cast<typename Traits::self_type*>(self);
+            assert(self_typed == dynamic_cast<typename Traits::self_type*>(self));
+            return do_call_void_ret(self_typed, func,
+              typename Traits::is_void_result(),
+              std::forward<Args>(args)...);
         }
         /**Call a varargs function.*/
         template<class Func> ObjectPtr call_varargs(Object *self, Func func, const FunctionArgs &args)
