@@ -37,6 +37,7 @@ BOOST_AUTO_TEST_CASE(test)
 {
     auto obj = create_object<Test>();
     BOOST_CHECK_EQUAL("Test", obj->type_name());
+    BOOST_CHECK_EQUAL("1", eval("self ? 1 : 2"));
     BOOST_CHECK_EQUAL("true", eval("self == self"));
     BOOST_CHECK_EQUAL("false", eval("self == @b"));
     BOOST_CHECK_EQUAL("false", eval("self != self"));

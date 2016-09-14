@@ -27,6 +27,8 @@ BOOST_AUTO_TEST_SUITE(TestSymbol)
 
 BOOST_AUTO_TEST_CASE(test)
 {
+    BOOST_CHECK_EQUAL("Symbol", symbol("sym")->type_name());
+
     BOOST_CHECK(symbol(make_value("sym")) == symbol("sym"));
     BOOST_CHECK(symbol("sym") == eval2(":sym"));
     BOOST_CHECK_EQUAL("sym", symbol("sym")->c_str());

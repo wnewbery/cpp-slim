@@ -79,6 +79,10 @@ BOOST_AUTO_TEST_CASE(basic_methods)
     BOOST_CHECK_EQUAL("true", eval("a.empty?", scope));
     BOOST_CHECK_EQUAL("false", eval("b.empty?", scope));
 
+    //to_s, inspect
+    BOOST_CHECK_EQUAL("\"[2, 1, \\\"a\\\"]\"", eval("[2, 1, 'a'].to_s"));
+    BOOST_CHECK_EQUAL("\"[2, 1, \\\"a\\\"]\"", eval("[2, 1, 'a'].inspect"));
+
     //size
     BOOST_CHECK_EQUAL("0", eval("a.length", scope));
     BOOST_CHECK_EQUAL("0", eval("a.size", scope));

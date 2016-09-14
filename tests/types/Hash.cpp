@@ -87,6 +87,10 @@ BOOST_AUTO_TEST_CASE(basic_methods)
     BOOST_CHECK_EQUAL("0", eval("{}.size"));
     BOOST_CHECK_EQUAL("2", eval("{a:5, b: 6}.length"));
     BOOST_CHECK_EQUAL("2", eval("{a:5, b: 6}.size"));
+
+    //to_s, inspect
+    BOOST_CHECK_EQUAL("\"{1 => 2}\"", eval("{1 => 2}.to_s"));
+    BOOST_CHECK_EQUAL("\"{1 => 2}\"", eval("{1 => 2}.inspect"));
 }
 
 BOOST_AUTO_TEST_CASE(basic_access)

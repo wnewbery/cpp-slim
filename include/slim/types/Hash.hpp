@@ -33,6 +33,7 @@ namespace slim
 
         void set(ObjectPtr key, ObjectPtr val);
 
+        //TODO: Needs some more thought (e.g. string vs symbol keys)
         /**C++ convinence function for "self.fetch(key, default).to_s" expression.*/
         std::string get_str(const std::string &key, const std::string &def);
 

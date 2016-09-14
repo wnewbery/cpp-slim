@@ -30,10 +30,15 @@ double eval(const std::string &str)
 
 BOOST_AUTO_TEST_CASE(basic_methods)
 {
+    BOOST_CHECK_EQUAL("Math", create_object<Math>()->type_name());
+    BOOST_CHECK_EQUAL("Math", create_object<Math>()->inspect());
+    BOOST_CHECK_EQUAL("Math", create_object<Math>()->to_string());
+
     BOOST_CHECK_CLOSE(2.718281828459045, eval("E"), 0.0001);
     BOOST_CHECK_CLOSE(2.718281828459045, eval("self::E"), 0.0001);
     BOOST_CHECK_CLOSE(3.141592653589793, eval("PI"), 0.0001);
     BOOST_CHECK_CLOSE(3.141592653589793, eval("self::PI"), 0.0001);
+    BOOST_CHECK_THROW(eval("X"), NoSuchConstant);
 
     BOOST_CHECK_CLOSE(1.5707963267948966, eval("acos(0)"), 0.0001);
     BOOST_CHECK_CLOSE(1.5707963267948966, eval("asin(1)"), 0.0001);

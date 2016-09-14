@@ -29,6 +29,9 @@ BOOST_AUTO_TEST_CASE(boolean)
     BOOST_CHECK_EQUAL(true_val, TRUE_VALUE);
     BOOST_CHECK_EQUAL(false_val, FALSE_VALUE);
 
+    BOOST_CHECK_EQUAL(1, TRUE_VALUE->hash());
+    BOOST_CHECK_EQUAL(0, FALSE_VALUE->hash());
+
     BOOST_CHECK_EQUAL("Boolean", Boolean::TYPE_NAME);
     BOOST_CHECK_EQUAL("Boolean", true_val->type_name());
     BOOST_CHECK_EQUAL("true", true_val->to_string());
@@ -47,6 +50,7 @@ BOOST_AUTO_TEST_CASE(nil)
     auto nil_val = create_object<Nil>();
 
     BOOST_CHECK_EQUAL(nil_val, NIL_VALUE);
+    BOOST_CHECK_EQUAL(0, NIL_VALUE->hash());
 
     BOOST_CHECK_EQUAL("Nil", Nil::TYPE_NAME);
     BOOST_CHECK_EQUAL("Nil", nil_val->type_name());
@@ -131,6 +135,21 @@ BOOST_AUTO_TEST_CASE(to_i)
     BOOST_CHECK_EQUAL(1.0, make_value(true)->to_i()->get_value());
     BOOST_CHECK_EQUAL(0.0, make_value(false)->to_i()->get_value());
     BOOST_CHECK_EQUAL(0.0, NIL_VALUE->to_i()->get_value());
+}
+
+BOOST_AUTO_TEST_CASE(test_coerce)
+{
+    ObjectPtr a = make_value("test");
+    const auto ca = a;
+    BOOST_CHECK(a.get() == coerce<String>(a.get()));
+    BOOST_CHECK(a.get() == coerce<String>(ca.get()));
+    BOOST_CHECK(a == coerce<String>(a));
+    BOOST_CHECK(a == coerce<String>(ca));
+
+    BOOST_CHECK_THROW(coerce<Number>(a.get()), TypeError);
+    BOOST_CHECK_THROW(coerce<Number>(ca.get()), TypeError);
+    BOOST_CHECK_THROW(coerce<Number>(a), TypeError);
+    BOOST_CHECK_THROW(coerce<Number>(ca), TypeError);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
