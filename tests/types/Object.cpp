@@ -33,6 +33,31 @@ std::string eval(const std::string &str)
     return expr->eval(scope)->inspect();
 }
 
+std::string match_inspect(const std::string &pattern, const std::string &str)
+{
+    size_t max_digits = sizeof(void*) * 2;
+    for (size_t i = 0, j = 0; i < pattern.size(); ++i)
+    {
+        if (j == str.size()) return str;
+
+        if (pattern[i] == '*')
+        {
+            for (size_t k = 0; k < max_digits; ++k, ++j)
+            {
+                if (j == str.size()) return str;
+                auto c = str[j];
+                if ((c < '0' || c > '9') && (c < 'a' || c > 'f')) break;
+            }
+        }
+        else
+        {
+            if (pattern[i] != str[j]) return str;
+            ++j;
+        }
+    }
+    return "";
+}
+
 BOOST_AUTO_TEST_CASE(test)
 {
     auto obj = create_object<Test>();
@@ -42,7 +67,7 @@ BOOST_AUTO_TEST_CASE(test)
     BOOST_CHECK_EQUAL("false", eval("self == @b"));
     BOOST_CHECK_EQUAL("false", eval("self != self"));
     BOOST_CHECK_EQUAL("true", eval("self != @b"));
-    BOOST_CHECK(std::regex_match(obj->inspect(), std::regex("#<Test: [0-9a-f]{8,16}>")));
+    BOOST_CHECK_EQUAL("", match_inspect("#<Test: *>", obj->inspect()));
     BOOST_CHECK_EQUAL("true", eval("self.to_s == self.inspect"));
     BOOST_CHECK_THROW(eval("self <=> @b"), UnorderableTypeError);
     BOOST_CHECK_THROW(eval("self < @b"), UnorderableTypeError);
