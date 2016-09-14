@@ -20,8 +20,8 @@ namespace slim
     std::string Object::inspect()const
     {
         std::stringstream ss;
-        ss << "#<" << type_name() << ": ";
-        ss << std::hex << std::setw(sizeof(void*)) << std::setfill('-') << std::right;
+        ss << "#<" << type_name() << ":0x";
+        ss << std::hex << std::setw((int)sizeof(void*) * 2) << std::setfill('0') << std::right;
         ss << ((uintptr_t)this);
         ss << ">";
         return ss.str();
