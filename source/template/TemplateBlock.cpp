@@ -28,8 +28,7 @@ namespace slim
             std::unique_ptr<TemplatePart> &&tpl)
         {
             auto tpl_block = slim::make_unique<TemplateBlock>(std::move(tpl));
-            auto block = slim::make_unique<expr::Block>(std::move(param_names), std::move(tpl_block));
-            return block;
+            return slim::make_unique<expr::Block>(std::move(param_names), std::move(tpl_block));
         }
     }
 }
