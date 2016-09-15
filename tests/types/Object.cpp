@@ -26,9 +26,9 @@ std::string eval(const std::string &str)
     expr::LocalVarNames vars;
     Parser parser(vars, lexer);
     auto expr = parser.full_expression();
-    ScopeAttributes attrs;
-    attrs.set("b", create_object<Test>());
-    Scope scope(attrs);
+    auto mv = create_view_model();
+    mv->set_attr("b", create_object<Test>());
+    Scope scope(mv);
     scope.set("self", create_object<Test>());
     return expr->eval(scope)->inspect();
 }

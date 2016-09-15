@@ -28,8 +28,7 @@ std::string eval(const std::string &str, Scope &scope)
 }
 std::string eval(const std::string &str)
 {
-    ScopeAttributes attrs;
-    Scope scope( attrs);
+    Scope scope(create_view_model());
     return eval(str, scope);
 }
 
@@ -42,8 +41,7 @@ std::shared_ptr<Array> make_array2(const std::vector<double> &arr)
 
 BOOST_AUTO_TEST_CASE(compare)
 {
-    ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(create_view_model());
     scope.set("a", make_array({}));
     scope.set("b", make_array2({ 5.0, 10.0 }));
     scope.set("c", make_array2({ 5.0, 10.0, 5.0 }));
@@ -69,8 +67,7 @@ BOOST_AUTO_TEST_CASE(compare)
 }
 BOOST_AUTO_TEST_CASE(basic_methods)
 {
-    ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(create_view_model());
     scope.set("a", make_array({}));
     scope.set("b", make_array2({ 5.0, 10.0 }));
     scope.set("c", make_array2({ 5.0, 10.0, 5.0 }));
@@ -115,8 +112,7 @@ BOOST_AUTO_TEST_CASE(add)
 }
 BOOST_AUTO_TEST_CASE(sub)
 {
-    ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(create_view_model());
     scope.set("a", make_array({}));
     scope.set("b", make_array2({ 5.0, 10.0 }));
     scope.set("c", make_array2({ 5.0, 10.0, 5.0, 7.0 }));
@@ -129,8 +125,7 @@ BOOST_AUTO_TEST_CASE(sub)
 
 BOOST_AUTO_TEST_CASE(basic_access)
 {
-    ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(create_view_model());
     scope.set("a", make_array2({ 1.0, 2.0, 3.0, 5.0, 8.0, 11.0 }));
     scope.set("b", make_array({}));
     //at(index)
@@ -210,8 +205,7 @@ BOOST_AUTO_TEST_CASE(assoc)
     auto s2 = make_array({make_value("letters"), make_value("a"), make_value("b"), make_value("c")});
     auto s3 = make_value("foo");
 
-    ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(create_view_model());
     scope.set("a", make_array({s1, s2, s3}));
     //assoc
     BOOST_CHECK_EQUAL("[\"letters\", \"a\", \"b\", \"c\"]", eval("a.assoc('letters')", scope));
@@ -233,8 +227,7 @@ BOOST_AUTO_TEST_CASE(flatten)
 
 BOOST_AUTO_TEST_CASE(compact)
 {
-    ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(create_view_model());
     scope.set("a", make_array({ make_value(1.0), make_value(5.0), make_value(5.0), make_value(0.0) }));
     scope.set("b", make_array({ NIL_VALUE, make_value(1.0), make_value(5.0), NIL_VALUE, make_value(5.0), make_value(0.0) }));
 
@@ -243,8 +236,7 @@ BOOST_AUTO_TEST_CASE(compact)
 }
 BOOST_AUTO_TEST_CASE(index)
 {
-    ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(create_view_model());
     scope.set("a", make_array2({ 1.0, 2.0, 3.0, 5.0, 8.0, 5.0, 1.0 }));
     //index
     BOOST_CHECK_EQUAL("3", eval("a.index(5)", scope));
@@ -258,15 +250,13 @@ BOOST_AUTO_TEST_CASE(index)
 }
 BOOST_AUTO_TEST_CASE(join)
 {
-    ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(create_view_model());
     scope.set("a", make_array2({ 1.0, 2.0, 3.0, 5.0, 8.0, 11.0 }));
     BOOST_CHECK_EQUAL("\"1, 2, 3, 5, 8, 11\"", eval("a.join(', ')", scope));
 }
 BOOST_AUTO_TEST_CASE(rotate)
 {
-    ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(create_view_model());
     scope.set("a", make_array2({ 1.0, 2.0, 3.0 }));
     scope.set("b", make_array2({}));
 
@@ -288,18 +278,15 @@ BOOST_AUTO_TEST_CASE(rotate)
 
 BOOST_AUTO_TEST_CASE(uniq)
 {
-    ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(create_view_model());
     scope.set("a", make_array({ make_value("5"), make_value(5.0), make_value(5.0), make_value("z") }));
     BOOST_CHECK_EQUAL("[\"5\", 5, \"z\"]", eval("a.uniq", scope));
 }
 
 BOOST_AUTO_TEST_CASE(enumerate)
 {
-    ScopeAttributes attrs;
-    Scope scope(attrs);
 
-    class Test : public Object
+    class Test : public ViewModel
     {
     public:
         double sum = 0;
@@ -318,7 +305,7 @@ BOOST_AUTO_TEST_CASE(enumerate)
         }
     };
     auto test = create_object<Test>();
-    scope.set("self", test);
+    Scope scope(test);
 
     BOOST_CHECK_EQUAL("[]", eval("[].each{|x| test x}", scope));
     BOOST_CHECK_EQUAL(0, test->sum);

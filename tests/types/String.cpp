@@ -23,8 +23,7 @@ std::string eval(Scope &scope, const std::string &str)
 }
 std::string eval(const std::string &str)
 {
-    ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(create_view_model());
     return eval(scope, str);
 }
 
@@ -268,7 +267,7 @@ BOOST_AUTO_TEST_CASE(lines)
 
 BOOST_AUTO_TEST_CASE(each_line)
 {
-    class Test : public Object
+    class Test : public ViewModel
     {
     public:
         std::string name = "Test";
@@ -288,9 +287,7 @@ BOOST_AUTO_TEST_CASE(each_line)
     };
     auto test = create_object<Test>();
 
-    ScopeAttributes attrs;
-    Scope scope(attrs);
-    scope.set("self", test);
+    Scope scope(test);
 
     BOOST_CHECK_EQUAL("\"test\"", eval(scope, "'test'.each_line{|x| test x}"));
     BOOST_REQUIRE_EQUAL(1, test->lines.size());

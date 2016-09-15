@@ -23,8 +23,7 @@ std::string eval(const std::string &str, Scope &scope)
 }
 std::string eval(const std::string &str)
 {
-    ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(create_view_model());
     return eval(str, scope);
 }
 
@@ -49,8 +48,7 @@ BOOST_AUTO_TEST_CASE(string_interp)
 
 BOOST_AUTO_TEST_CASE(variables)
 {
-    ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(create_view_model());
     scope.set("test", make_value(55.0));
     scope.set("self", NIL_VALUE);
     BOOST_CHECK_EQUAL("55", eval("test", scope));

@@ -11,7 +11,7 @@ using namespace slim;
 using namespace slim::tpl;
 BOOST_AUTO_TEST_SUITE(TestTemplate)
 
-std::string render_tpl(const char *str, ViewModel &model)
+std::string render_tpl(const char *str, ViewModelPtr model)
 {
     Lexer lexer(str, str + strlen(str));
     Parser parser(lexer);
@@ -19,8 +19,7 @@ std::string render_tpl(const char *str, ViewModel &model)
 }
 std::string render_tpl(const char *str)
 {
-    ViewModel model;
-    return render_tpl(str, model);
+    return render_tpl(str, create_view_model());
 }
 
 BOOST_AUTO_TEST_CASE(text)
@@ -55,9 +54,9 @@ BOOST_AUTO_TEST_CASE(text)
 
 BOOST_AUTO_TEST_CASE(interpolated_text_lines)
 {
-    ViewModel model;
-    model.set("a", make_value("Test"));
-    model.set("b", make_value("<escape>"));
+    auto model = create_view_model();
+    model->set_attr("a", make_value("Test"));
+    model->set_attr("b", make_value("<escape>"));
 
     BOOST_CHECK_EQUAL(
         "<!DOCTYPE html>\n"
@@ -94,9 +93,9 @@ BOOST_AUTO_TEST_CASE(interpolated_text_lines)
 
 BOOST_AUTO_TEST_CASE(code_lines)
 {
-    ViewModel model;
-    model.set("a", make_value(10.0));
-    model.set("b", make_value("HTML <b>Safe</b>"));
+    auto model = create_view_model();
+    model->set_attr("a", make_value(10.0));
+    model->set_attr("b", make_value("HTML <b>Safe</b>"));
 
     BOOST_CHECK_EQUAL(
         "<!DOCTYPE html>\n"
@@ -124,12 +123,12 @@ BOOST_AUTO_TEST_CASE(code_lines)
 
 BOOST_AUTO_TEST_CASE(attributes)
 {
-    ViewModel model;
-    model.set("a", make_value("Test"));
-    model.set("b", TRUE_VALUE);
-    model.set("c", FALSE_VALUE);
-    model.set("d", NIL_VALUE);
-    model.set("e", make_value("HTML <b>Safe</b>"));
+    auto model = create_view_model();
+    model->set_attr("a", make_value("Test"));
+    model->set_attr("b", TRUE_VALUE);
+    model->set_attr("c", FALSE_VALUE);
+    model->set_attr("d", NIL_VALUE);
+    model->set_attr("e", make_value("HTML <b>Safe</b>"));
 
     BOOST_CHECK_EQUAL(
         "<!DOCTYPE html>\n"

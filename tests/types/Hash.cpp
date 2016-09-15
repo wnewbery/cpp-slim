@@ -25,8 +25,7 @@ std::string eval(const std::string &str, Scope &scope)
 }
 std::string eval(const std::string &str)
 {
-    ScopeAttributes attrs;
-    Scope scope( attrs);
+    Scope scope(create_view_model());
     return eval(str, scope);
 }
 
@@ -42,8 +41,7 @@ std::shared_ptr<Hash> make_hash2(const std::vector<std::pair<std::string, double
 
 BOOST_AUTO_TEST_CASE(dup)
 {
-    ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(create_view_model());
     auto a = make_hash2({ { "a", 5.0 }, { "x", 10 }, { "b", 1} });
     scope.set("a", a);
 
@@ -55,8 +53,7 @@ BOOST_AUTO_TEST_CASE(dup)
 
 BOOST_AUTO_TEST_CASE(compare)
 {
-    ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(create_view_model());
     scope.set("a", make_hash2({}));
     scope.set("b", make_hash2({ { "a", 5.0 },{ "b", 10.0 } }));
     scope.set("c", make_hash2({ { "a", 5.0 },{ "c", 15 } }));
@@ -95,8 +92,7 @@ BOOST_AUTO_TEST_CASE(basic_methods)
 
 BOOST_AUTO_TEST_CASE(basic_access)
 {
-    ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(create_view_model());
     scope.set("a", make_hash2({}));
     scope.set("b", make_hash2({ { "a", 5.0 },{ "b", 10.0 } }));
     scope.set("c", make_hash2({ { "a", 5.0 },{ "c", 15 },{ "10", 20 } }));

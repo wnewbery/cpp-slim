@@ -2,47 +2,26 @@
 #include "../types/Object.hpp"
 #include "../types/Nil.hpp"
 #include "../types/Symbol.hpp"
+#include "../types/ViewModel.hpp"
 #include "../Function.hpp"
 #include <string>
 #include <unordered_map>
 
 namespace slim { namespace expr
 {
-    /**Attributes on the in-scope "self" variable.*/
-    class ScopeAttributes
-    {
-    public:
-        typedef std::unordered_map<SymPtr, ObjectPtr, ObjHash, ObjEquals> Map;
-
-        void set(const SymPtr &name, ObjectPtr val)
-        {
-            map[name] = val;
-        }
-        void set(const std::string &name, ObjectPtr val)
-        {
-            set(symbol(name), val);
-        }
-        ObjectPtr get(const SymPtr &name)
-        {
-            auto it = map.find(name);
-            return it != map.end() ? it->second : NIL_VALUE;
-        }
-    private:
-        Map map;
-    };
     /**Variable scope. */
     class Scope
     {
     public:
         typedef std::unordered_map<SymPtr, ObjectPtr, ObjHash, ObjEquals> Map;
 
-        explicit Scope(ScopeAttributes &attrs)
-            : attrs(attrs), parent(nullptr), map()
+        explicit Scope(ViewModelPtr self)
+            : parent(nullptr), _self(self), map()
         {
-            map[symbol("self")] = NIL_VALUE;
+            map[symbol("self")] = _self;
         }
         explicit Scope(Scope &parent)
-            : attrs(parent.attrs), parent(&parent), map() {}
+            : parent(&parent), _self(parent._self), map() {}
 
         void set(const SymPtr &name, ObjectPtr val)
         {
@@ -59,30 +38,17 @@ namespace slim { namespace expr
             else if (parent) return parent->get(name);
             else return NIL_VALUE;
         }
+
         /**Get the "self" variable.
          * In most situations, "self" should be set to a non-nil value.
          */
-        ObjectPtr self()
-        {
-            static auto sym = symbol("self");
-            auto it = map.find(sym);
-            if (it != map.end()) return it->second;
-            else
-            {
-                assert(parent);
-                return parent->self();
-            }
-        }
-        ObjectPtr get_attr(const SymPtr &name)
-        {
-            return attrs.get(name);
-        }
+        ViewModelPtr self() { return _self; }
 
         Map::iterator begin() { return map.begin(); }
         Map::iterator end() { return map.end(); }
     private:
-        ScopeAttributes &attrs;
         Scope *parent;
+        ViewModelPtr _self;
         Map map;
     };
     /**Local variable symbol names in scope. Used to tell at parse time if a symbol refers

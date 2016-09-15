@@ -141,6 +141,9 @@
     <ClInclude Include="include\slim\template\TemplatePart.hpp">
       <Filter>include\template</Filter>
     </ClInclude>
+    <ClInclude Include="include\slim\types\ViewModel.hpp">
+      <Filter>include\types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\types\Object.cpp">
@@ -220,6 +223,9 @@
     </ClCompile>
     <ClCompile Include="source\template\TemplateBlock.cpp">
       <Filter>source\template</Filter>
+    </ClCompile>
+    <ClCompile Include="source\types\ViewModel.cpp">
+      <Filter>source\types</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

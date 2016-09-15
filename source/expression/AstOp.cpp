@@ -28,7 +28,7 @@ namespace slim
 
         ObjectPtr Attribute::eval(Scope & scope) const
         {
-            return scope.get_attr(name);
+            return scope.self()->get_attr(name);
         }
 
         ObjectPtr GlobalConstant::eval(Scope &scope)const

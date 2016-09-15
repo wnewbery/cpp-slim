@@ -48,7 +48,7 @@ std::string parse_str(const std::string &src)
 {
     return parse_template(src).to_string();
 }
-std::string render_tpl(const std::string &src, ViewModel &model)
+std::string render_tpl(const std::string &src, ViewModelPtr model)
 {
     return parse_template(src).render(model, false);
 }
@@ -72,9 +72,9 @@ BOOST_AUTO_TEST_CASE(parse_params)
 
 BOOST_AUTO_TEST_CASE(render)
 {
-    ViewModel model;
-    model.set("test", create_object<Test>());
-    model.set("a", make_value(10.0));
+    auto model = create_view_model();
+    model->set_attr("test", create_object<Test>());
+    model->set_attr("a", make_value(10.0));
 
     BOOST_CHECK_EQUAL(
         "<p>10</p>",

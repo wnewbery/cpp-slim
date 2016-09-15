@@ -14,8 +14,7 @@ ObjectPtr eval2(const std::string &str)
     expr::LocalVarNames vars;
     Parser parser(vars, lexer);
     auto expr = parser.full_expression();
-    ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(create_view_model());
     return expr->eval(scope);
 }
 std::string eval(const std::string &str)

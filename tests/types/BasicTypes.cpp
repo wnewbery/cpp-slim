@@ -15,8 +15,7 @@ std::string eval(const std::string &str)
     Lexer lexer(str);
     Parser parser(expr::LocalVarNames(), lexer);
     auto expr = parser.full_expression();
-    ScopeAttributes attrs;
-    Scope scope(attrs);
+    Scope scope(create_view_model());
     auto result = expr->eval(scope);
     return result->inspect();
 }

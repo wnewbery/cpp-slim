@@ -13,7 +13,7 @@ namespace slim
     Template::Template(Template &&) = default;
     Template& Template::operator = (Template &&) = default;
 
-    std::string Template::render(ViewModel &model, bool doctype)
+    std::string Template::render(ViewModelPtr model, bool doctype)
     {
         std::string buffer;
         if (doctype) buffer += "<!DOCTYPE html>\n";
