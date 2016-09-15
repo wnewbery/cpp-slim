@@ -53,9 +53,9 @@ BOOST_AUTO_TEST_CASE(nil)
 
     BOOST_CHECK_EQUAL("Nil", Nil::TYPE_NAME);
     BOOST_CHECK_EQUAL("Nil", nil_val->type_name());
-    BOOST_CHECK_EQUAL("nil", nil_val->to_string());
+    BOOST_CHECK_EQUAL("", nil_val->to_string());
     BOOST_CHECK_EQUAL(false, nil_val->is_true());
-    BOOST_CHECK_EQUAL("\"nil\"", eval("nil.to_s"));
+    BOOST_CHECK_EQUAL("\"\"", eval("nil.to_s"));
     BOOST_CHECK_EQUAL("\"nil\"", eval("nil.inspect"));
     BOOST_CHECK_EQUAL("0", eval("nil.to_i"));
 }

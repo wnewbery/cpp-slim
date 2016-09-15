@@ -18,8 +18,8 @@ namespace slim
         explicit Nil() {}
 
         virtual const std::string& type_name()const override { return TYPE_NAME; }
-        virtual std::string to_string()const override { return "nil"; }
-        virtual std::string inspect()const override  { return to_string(); }
+        virtual std::string to_string()const override { return ""; }
+        virtual std::string inspect()const override  { return "nil"; }
         virtual bool is_true()const override { return false; }
         virtual size_t hash()const { return 0; }
         std::shared_ptr<Number> to_f();
