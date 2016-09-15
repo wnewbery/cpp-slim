@@ -160,6 +160,7 @@
     <ClCompile Include="tests\FunctionHelpers.cpp" />
     <ClCompile Include="tests\Main.cpp" />
     <ClCompile Include="tests\Operators.cpp" />
+    <ClCompile Include="tests\template\Layout.cpp" />
     <ClCompile Include="tests\template\Lexer.cpp" />
     <ClCompile Include="tests\template\Parser.cpp" />
     <ClCompile Include="tests\template\Template.cpp" />

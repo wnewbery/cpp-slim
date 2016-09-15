@@ -11,6 +11,7 @@ namespace slim
         static const std::string TYPE_NAME;
         explicit String(std::string &&v) : v(std::move(v)) {}
         explicit String(const std::string &v) : v(v) {}
+        explicit String() : v() {}
 
         virtual const std::string& type_name()const override { return TYPE_NAME; }
         virtual std::string to_string()const override { return v; }

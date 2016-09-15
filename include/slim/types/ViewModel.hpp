@@ -2,6 +2,8 @@
 #include "Object.hpp"
 namespace slim
 {
+    class Proc;
+    class HtmlSafeString;
     /**"self" object for rendering templates.
      *
      * The ViewModel holds all the attributes, methods and constants.
@@ -25,9 +27,20 @@ namespace slim
         ObjectPtr get_attr(SymPtr name);
         void set_attr(SymPtr name, ObjectPtr value);
         void set_attr(const std::string &name, ObjectPtr value);
+
+        void content_for(SymPtr name, std::shared_ptr<Proc> proc);
+        std::shared_ptr<HtmlSafeString> yield(const FunctionArgs &args);
+        /**Used by Template to store the content for the layout Template.*/
+        void set_main_content(std::shared_ptr<HtmlSafeString> content);
     protected:
         ObjectMap attrs;
         ObjectMap constants;
+        /**Content from the main view for a "yield" in layout.*/
+        std::shared_ptr<HtmlSafeString> main_content;
+        /**Save all the rendered content_for blocks for yield.*/
+        ObjectMap content_for_store;
+
+        virtual const MethodTable &method_table()const override;
     };
 
     typedef std::shared_ptr<ViewModel> ViewModelPtr;

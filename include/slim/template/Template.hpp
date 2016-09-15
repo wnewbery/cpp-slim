@@ -32,7 +32,12 @@ namespace slim
          * @param model Contains the variables for script blocks within the template.
          * @param doctype If true, prefix the HTML5 doctype.
          */
-        std::string render(ViewModelPtr model, bool doctype = true);
+        std::string render(ViewModelPtr model, bool doctype = true)const;
+        /**Render this template with a layout template.
+         * This template will be rendered first, and its output, and any "content_for" blocks will
+         * then be used for the layouts "yield" output.
+         */
+        std::string render_layout(Template &layout, ViewModelPtr model, bool doctype = true)const;
         
         /**Converts the template part into a string representation, mainly for debugging.
          * Because the origenal template structure has all ready been lost, as it was converted
