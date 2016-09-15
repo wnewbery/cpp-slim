@@ -1,5 +1,5 @@
 #pragma once
-#include "Template.hpp"
+#include "TemplatePart.hpp"
 #include "../expression/Expression.hpp"
 namespace slim
 {

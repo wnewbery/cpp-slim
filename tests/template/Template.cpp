@@ -1,5 +1,6 @@
 #include <boost/test/unit_test.hpp>
 #include "template/Template.hpp"
+#include "template/TemplatePart.hpp"
 #include "template/Lexer.hpp"
 #include "template/Parser.hpp"
 #include "expression/Scope.hpp"

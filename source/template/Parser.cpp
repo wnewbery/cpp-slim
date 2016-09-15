@@ -1,6 +1,8 @@
 #include "template/Parser.hpp"
 #include "template/Attributes.hpp"
 #include "template/Lexer.hpp"
+#include "template/Template.hpp"
+#include "template/TemplatePart.hpp"
 #include "template/TemplateParts.hpp"
 #include "template/TemplateBlock.hpp"
 #include "template/Token.hpp"
@@ -29,61 +31,80 @@ namespace slim
             const std::string DEF_TAG = "div";
         }
 
-        Parser::OutputFrame& Parser::OutputFrame::operator << (const std::string &text_content)
+        class Parser::OutputFrame
         {
-            handle_in_tag();
-            this->text_content += text_content;
-            return *this;
-        }
-        Parser::OutputFrame& Parser::OutputFrame::operator << (char txt_chr)
-        {
-            handle_in_tag();
-            this->text_content += txt_chr;
-            return *this;
-        }
+        public:
+            OutputFrame() : contents(), text_content(), _in_tag(false) {}
+            OutputFrame& operator << (const std::string &text_content)
+            {
+                handle_in_tag();
+                this->text_content += text_content;
+                return *this;
+            }
+            OutputFrame& operator << (char txt_chr)
+            {
+                handle_in_tag();
+                this->text_content += txt_chr;
+                return *this;
+            }
+            OutputFrame& operator << (std::unique_ptr<expr::ExpressionNode> &&expr)
+            {
+                return *this << slim::make_unique<TemplateOutputExpr>(std::move(expr));
+            }
+            OutputFrame& operator << (std::unique_ptr<TemplatePart> &&part)
+            {
+                handle_in_tag();
+                if (text_content.size())
+                {
+                    contents.push_back(slim::make_unique<TemplateText>(std::move(text_content)));
+                    text_content.clear();
+                }
+                contents.push_back(std::move(part));
+                return *this;
+            }
 
-        Parser::OutputFrame& Parser::OutputFrame::operator << (std::unique_ptr<expr::ExpressionNode> &&expr)
-        {
-            return *this << slim::make_unique<TemplateOutputExpr>(std::move(expr));
-        }
+            std::unique_ptr<TemplatePart> make_tpl()
+            {
+                if (!text_content.empty())
+                {
+                    contents.push_back(slim::make_unique<TemplateText>(std::move(text_content)));
+                }
+                if (contents.size() > 1)
+                {
+                    return slim::make_unique<TemplatePartsList>(std::move(contents));
+                }
+                else if (contents.size() == 1)
+                {
+                    return std::move(contents[0]);
+                }
+                else return slim::make_unique<TemplateText>(std::string());
+            }
 
-        Parser::OutputFrame& Parser::OutputFrame::operator << (std::unique_ptr<TemplatePart> &&part)
-        {
-            handle_in_tag();
-            if (text_content.size())
-            {
-                contents.push_back(slim::make_unique<TemplateText>(std::move(text_content)));
-                text_content.clear();
-            }
-            contents.push_back(std::move(part));
-            return *this;
-        }
-        
-        void Parser::OutputFrame::handle_in_tag()
-        {
-            if (in_tag())
-            {
-                set_in_tag(false);
-                this->text_content += '>';
-            }
-        }
+            bool in_tag()const { return _in_tag; }
+            void set_in_tag(bool b = true) { _in_tag = b; }
+        private:
+            /**The sequence of completed template parts reading to add to the template or
+             * parent frame control block.
+             */
+            std::vector<std::unique_ptr<TemplatePart>> contents;
+            /**Text content to go after contents. When adding a non-text part, any text in
+             * this buffer is first converted to a TemplateText part.
+             */
+            std::string text_content;
+            /**Currently in a start tag. This will need top be closed with a '<' before other
+             * output.
+             */
+            bool _in_tag;
 
-        std::unique_ptr<TemplatePart> Parser::OutputFrame::make_tpl()
-        {
-            if (!text_content.empty())
+            void handle_in_tag()
             {
-                contents.push_back(slim::make_unique<TemplateText>(std::move(text_content)));
+                if (in_tag())
+                {
+                    set_in_tag(false);
+                    this->text_content += '>';
+                }
             }
-            if (contents.size() > 1)
-            {
-                return slim::make_unique<TemplatePartsList>(std::move(contents));
-            }
-            else if (contents.size() == 1)
-            {
-                return std::move(contents[0]);
-            }
-            else return slim::make_unique<TemplateText>(std::string());
-        }
+        }; 
 
         Parser::Parser(Lexer &lexer)
             : lexer(lexer)

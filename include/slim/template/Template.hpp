@@ -2,43 +2,30 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "../Function.hpp"
+
 namespace slim
 {
     namespace expr
     {
-        class Scope;
         class ScopeAttributes;
+    }
+    namespace tpl
+    {
+        class TemplatePart;
     }
     typedef expr::ScopeAttributes ViewModel;
 
-    namespace tpl
-    {
-        /**@brief A part of a template.
-         * This is essentially an abstract syntax tree with all the adjacent plain text nodes merged.
-         */
-        class TemplatePart
-        {
-        public:
-            virtual ~TemplatePart() {};
-
-            /**See Template::to_string. */
-            virtual std::string to_string()const = 0;
-            /**Renders this part to the buffer, using the specified variable scope.*/
-            virtual void render(std::string &buffer, expr::Scope &scope)const = 0;
-        };
-    }
     /**@brief A parsed template, ready to be rendered using variables in a ViewModel.*/
     class Template
     {
     public:
-        Template(std::unique_ptr<tpl::TemplatePart> &&root)
-            : root(std::move(root))
-        {}
-        Template(Template &&) = default;
-        Template& operator = (Template &&) = default;
+        Template(std::unique_ptr<tpl::TemplatePart> &&root);
+        Template(Template &&);
+        Template& operator = (Template &&);
         Template(const Template &) = delete;
         Template& operator = (const Template &) = delete;
+
+        ~Template();
 
         /**Render this template.
          * @param model Contains the variables for script blocks within the template.
@@ -51,7 +38,7 @@ namespace slim
          * to plain HTML fragments with script blocks, the output will use the Ruby ERB syntax,
          * without any whitespace formatting.
          */
-        std::string to_string()const { return root->to_string(); }
+        std::string to_string()const;
     private:
         /**The root TemplatePart part. Most likely a TemplatePartsList, but this is not garunteed.*/
         std::unique_ptr<tpl::TemplatePart> root;

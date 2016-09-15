@@ -1,5 +1,5 @@
 #include "TemplateBlock.hpp"
-#include "Template.hpp"
+#include "template/TemplatePart.hpp"
 #include "types/HtmlSafeString.hpp"
 #include "expression/AstOp.hpp"
 #include "Util.hpp"

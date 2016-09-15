@@ -138,6 +138,9 @@
     <ClInclude Include="source\template\TemplateBlock.hpp">
       <Filter>source\template</Filter>
     </ClInclude>
+    <ClInclude Include="include\slim\template\TemplatePart.hpp">
+      <Filter>include\template</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\types\Object.cpp">

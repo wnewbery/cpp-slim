@@ -39,6 +39,7 @@
     <ClInclude Include="include\slim\template\Parser.hpp" />
     <ClInclude Include="include\slim\template\Template.hpp" />
     <ClInclude Include="include\slim\template\TemplateParts.hpp" />
+    <ClInclude Include="include\slim\template\TemplatePart.hpp" />
     <ClInclude Include="include\slim\template\Token.hpp" />
     <ClInclude Include="include\slim\types\Array.hpp" />
     <ClInclude Include="include\slim\types\Boolean.hpp" />
