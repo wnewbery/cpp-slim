@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <cassert>
 #include "Error.hpp"
 namespace slim
 {
@@ -26,23 +27,38 @@ namespace slim
     public:
         BaseLexer(const char *str, const char *end)
             : _file_name("unknown")
-            , begin(str), p(str), end(end), line_begin(str), line(1)
-        {}
+            , begin(str), p(str), end(end), line_begin(str), _line(1)
+        {
+            assert(begin <= end);
+            assert(begin <= p && p <= end);
+        }
         BaseLexer(const char *str, size_t len) : BaseLexer(str, str + len) {}
-        BaseLexer(const std::string &str) : BaseLexer(str.data(), str.size()) {}
+        explicit BaseLexer(const std::string &str) : BaseLexer(str.data(), str.size()) {}
 
         const std::string& file_name()const { return _file_name; }
+
+        /**Override the reported position.
+         * Useful when parsing embedded languages (e.g. scripts in templates) and already
+         * determined the range to parse.
+         */
+        void set_reported_pos(int line, int offset)
+        {
+            _line = line;
+            line_begin = p - offset + 1;
+        }
+        /**Get the current line.*/
+        int line()const { return _line; }
+        /**Get the current line offset.*/
+        int line_offset()const { return (int)(p - line_begin) + 1; }
     protected:
         std::string _file_name;
         const char *begin, *p, *end, *line_begin;
-        int line;
+        int _line;
 
-        /**Get the current line offset.*/
-        int line_offset()const { return (int)(p - line_begin) + 1; }
         /**Create a basic token with positional info and a type.*/
         Token token(typename Token::Type type)const
         {
-            return{ line, line_offset(), p, std::string(), type };
+            return{ _line, line_offset(), p, std::string(), type };
         }
 
 
@@ -51,7 +67,7 @@ namespace slim
         {
             if (*p == '\n')
             {
-                ++line;
+                ++_line;
                 ++p;
                 line_begin = p;
                 return true;
@@ -60,14 +76,14 @@ namespace slim
             {
                 if (p + 1 < end && p[1] == '\n')
                 {
-                    ++line;
+                    ++_line;
                     p += 2;
                     line_begin = p;
                     return true;
                 }
                 else
                 {
-                    ++line;
+                    ++_line;
                     ++p;
                     line_begin = p;
                     return true;

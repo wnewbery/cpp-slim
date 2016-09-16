@@ -159,6 +159,19 @@ namespace slim
             return t;
         }
 
+        Token Lexer::next_text_line()
+        {
+            auto t = token(Token::END);
+            if (p > end) error("Unexpected end");
+            if (p == end) return ++p, t;
+
+            auto start = p;
+            while (p < end && !try_newline()) ++p;
+            t.type = Token::TEXT_CONTENT;
+            t.str = std::string(start, p - start);
+            return t;
+        }
+
         Token Lexer::next_whitespace_control()
         {
             auto t = token(Token::END);

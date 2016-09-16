@@ -59,6 +59,11 @@ namespace slim
             Token next_tag_content();
             /**Rest of line as text.*/
             Token next_text_content();
+            /**Rest of the line, including the line terminator if present.
+             * Used for script parsing because modifying the source makes script error positions
+             * wrong.
+             */
+            Token next_text_line();
             /**Reads '<', '>', or '<>', else 'END' even if not actually end of source.*/
             Token next_whitespace_control();
             /**Reads the first token from a control code line.
@@ -88,7 +93,7 @@ namespace slim
             /**Throw SyntaxError at current position.*/
             [[noreturn]] void error(const std::string &msg)
             {
-                throw TemplateSyntaxError(_file_name, line, line_offset(), msg);
+                throw TemplateSyntaxError(_file_name, _line, line_offset(), msg);
             }
         };
     }

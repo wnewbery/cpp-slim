@@ -308,6 +308,100 @@ BOOST_AUTO_TEST_CASE(syntax_error_info)
         BOOST_CHECK_EQUAL(2, e.line());
         BOOST_CHECK_EQUAL(1, e.offset());
     }
+    //in code
+    try
+    {
+        parse_str(
+            "p\n"
+            "= error )\n"
+        );
+        BOOST_FAIL("Expected SyntaxError");
+    }
+    catch (const TemplateSyntaxError &)
+    {
+        BOOST_FAIL("Expected SyntaxError not TemplateSyntaxError");
+    }
+    catch (const SyntaxError &e)
+    {
+        BOOST_CHECK_EQUAL(2, e.line());
+        BOOST_CHECK_EQUAL(9, e.offset());
+    }
+    //in code with offset
+    try
+    {
+        parse_str(
+            "p\n"
+            "  = error )\n"
+        );
+        BOOST_FAIL("Expected SyntaxError");
+    }
+    catch (const TemplateSyntaxError &)
+    {
+        BOOST_FAIL("Expected SyntaxError not TemplateSyntaxError");
+    }
+    catch (const SyntaxError &e)
+    {
+        BOOST_CHECK_EQUAL(2, e.line());
+        BOOST_CHECK_EQUAL(11, e.offset());
+    }
+    //in tag with offset
+    try
+    {
+        parse_str(
+            "p\n"
+            "p = error )\n"
+        );
+        BOOST_FAIL("Expected SyntaxError");
+    }
+    catch (const TemplateSyntaxError &)
+    {
+        BOOST_FAIL("Expected SyntaxError not TemplateSyntaxError");
+    }
+    catch (const SyntaxError &e)
+    {
+        BOOST_CHECK_EQUAL(2, e.line());
+        BOOST_CHECK_EQUAL(11, e.offset());
+    }
+    //in multiline tag
+    try
+    {
+        parse_str(
+            "p\n"
+            "p = error\\\n"
+            "   !\n"
+        );
+        BOOST_FAIL("Expected SyntaxError");
+    }
+    catch (const TemplateSyntaxError &)
+    {
+        BOOST_FAIL("Expected SyntaxError not TemplateSyntaxError");
+    }
+    catch (const SyntaxError &e)
+    {
+        BOOST_CHECK_EQUAL(3, e.line());
+        BOOST_CHECK_EQUAL(4, e.offset());
+    }
+    //in multiline do
+    try
+    {
+        parse_str(
+            "p\n"
+            "= content_for x\\\n"
+            "    do |x, !|\n"
+            "  p Hello\n"
+        );
+        BOOST_FAIL("Expected SyntaxError");
+    }
+    catch (const TemplateSyntaxError &)
+    {
+        BOOST_FAIL("Expected SyntaxError not TemplateSyntaxError");
+    }
+    catch (const SyntaxError &e)
+    {
+        BOOST_CHECK_EQUAL(3, e.line());
+        BOOST_CHECK_EQUAL(12, e.offset());
+    }
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()

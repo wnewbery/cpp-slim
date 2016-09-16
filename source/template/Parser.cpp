@@ -252,6 +252,7 @@ namespace slim
             {
 
                 expr::Lexer expr_lexer(lexer.get_pos(), lexer.get_end());
+                expr_lexer.set_reported_pos(lexer.line(), lexer.line_offset());
                 expr::Parser expr_parser(local_vars, expr_lexer); //TODO: Allow custom functions
 
 
@@ -342,6 +343,8 @@ namespace slim
         void Parser::parse_code_line(int base_indent, OutputFrame &output)
         {
             auto ws = parse_ws_control();
+            auto line = current_token.line;
+            auto offset = current_token.offset;
             auto src = parse_code_src();
 
             std::vector<SymPtr> params;
@@ -361,7 +364,7 @@ namespace slim
                 else if(src[p + 1] == '|')
                 {   //Expect a second '|' after this, and then only whitespace
                     auto p2 = src.find('|', p + 2);
-                    if (p2 != std::string::npos && src.find_first_not_of(' ', p2 + 1) == std::string::npos)
+                    if (p2 != std::string::npos && src.find_first_not_of(" \t\r\n", p2 + 1) == std::string::npos)
                     { 
                         had_do = true;
                     }
@@ -371,9 +374,23 @@ namespace slim
                 {
                     had_do = true;
                     auto left = src.size() - do_pos;
-                    auto end = src.data() + src.size();
+                    auto start = src.data() + do_pos + 3;
+                    auto end = src.data() + src.find_last_not_of("\n\r") + 1;
 
-                    expr::Lexer expr_lexer(src.data() + do_pos + 3, end);
+                    auto do_line = line;
+                    auto do_offset = offset;
+                    auto line_count = (int)std::count(src.data(), start, '\n');
+                    if (line_count)
+                    {
+                        do_line += line_count;
+                        auto last_line_start = src.find_last_of("\n\r", do_pos);
+                        assert(last_line_start != std::string::npos);
+                        ++last_line_start;
+                        do_offset = (int)(do_pos - last_line_start + 3 + 1); //3 for " do", +1 because 1-based
+                    }
+
+                    expr::Lexer expr_lexer(start, end);
+                    expr_lexer.set_reported_pos(do_line, do_offset);
                     expr::Parser expr_parser(local_vars, expr_lexer);
                     params = expr_parser.param_list();
 
@@ -388,6 +405,7 @@ namespace slim
 
             //parse code
             expr::Lexer expr_lexer(src);
+            expr_lexer.set_reported_pos(line, offset);
             expr::Parser expr_parser(local_vars, expr_lexer);
             auto expr = expr_parser.full_expression();
 
@@ -487,8 +505,11 @@ namespace slim
 
         std::unique_ptr<expr::ExpressionNode> Parser::parse_code_expr()
         {
+            auto line = lexer.line();
+            auto offset = lexer.line_offset();
             auto script_src = parse_code_src();
             expr::Lexer expr_lexer(script_src);
+            expr_lexer.set_reported_pos(line, offset);
             expr::Parser expr_parser(local_vars, expr_lexer);
             return expr_parser.full_expression();
         }
@@ -498,17 +519,20 @@ namespace slim
             std::string script_src;
             while (true)
             {
-                current_token = lexer.next_text_content();
-                if (current_token.str.empty()) error("Expected expression");
+                current_token = lexer.next_text_line();
+                if (current_token.str.find_first_not_of(" \t\r\n") == std::string::npos) error("Expected expression");
                 script_src += current_token.str;
 
-                if (script_src.back() == ',')
+                auto line_end = script_src.find_last_not_of("\n\r");
+                if (line_end != std::string::npos && script_src[line_end] == ',')
                 {
                     continue;
                 }
-                else if (script_src.back() == '\\')
+                else if (line_end != std::string::npos && script_src[line_end] == '\\')
                 {
-                    script_src.pop_back();
+                    //TODO: Backslashed lines will be part of the script syntax when it has multiple statement support
+                    //Replace with space for now rather than strip, so keep position correct
+                    script_src[line_end] = ' ';
                     continue;
                 }
                 else break;

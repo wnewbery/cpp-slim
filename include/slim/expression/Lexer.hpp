@@ -27,7 +27,7 @@ namespace slim
             /**Throw SyntaxError at current position.*/
             [[noreturn]] void error(const std::string &msg)
             {
-                throw SyntaxError(_file_name, line, line_offset(), msg);
+                throw SyntaxError(_file_name, _line, line_offset(), msg);
             }
         };
     }
