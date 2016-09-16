@@ -283,6 +283,54 @@ BOOST_AUTO_TEST_CASE(basic_syntax_errors)
     BOOST_CHECK_THROW(parse("{5 => 6,}"), SyntaxError);
 }
 
+BOOST_AUTO_TEST_CASE(syntax_error_info)
+{
+    //start
+    try
+    {
+        parse("");
+        BOOST_FAIL("Expected SyntaxError");
+    }
+    catch (const SyntaxError &e)
+    {
+        BOOST_CHECK_EQUAL(1, e.line());
+        BOOST_CHECK_EQUAL(1, e.offset());
+    }
+    //offset, syntax
+    try
+    {
+        auto str = parse("5 + 6 + #");
+        BOOST_FAIL("Expected SyntaxError");
+    }
+    catch (const SyntaxError &e)
+    {
+        BOOST_CHECK_EQUAL(1, e.line());
+        BOOST_CHECK_EQUAL(9, e.offset());
+    }
+    //lines, syntax
+    try
+    {
+        parse("5 + 6\n + #");
+        BOOST_FAIL("Expected SyntaxError");
+    }
+    catch (const SyntaxError &e)
+    {
+        BOOST_CHECK_EQUAL(2, e.line());
+        BOOST_CHECK_EQUAL(4, e.offset());
+    }
+    //parser
+    try
+    {
+        parse("5 + \n (1 + 2) (4)");
+        BOOST_FAIL("Expected SyntaxError");
+    }
+    catch (const SyntaxError &e)
+    {
+        BOOST_CHECK_EQUAL(2, e.line());
+        BOOST_CHECK_EQUAL(10, e.offset());
+    }
+}
+
 BOOST_AUTO_TEST_CASE(partial_expression)
 {
     BOOST_CHECK_EQUAL("(5 - 5)", parse_part("5 - 5"));

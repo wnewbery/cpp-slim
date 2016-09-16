@@ -262,4 +262,52 @@ BOOST_AUTO_TEST_CASE(cond)
     BOOST_CHECK_THROW(parse_str("-if true\n  p\n-else x\n  p\n"), TemplateSyntaxError);
 }
 
+BOOST_AUTO_TEST_CASE(syntax_error_info)
+{
+    //start
+    try
+    {
+        parse_str("\t");
+        BOOST_FAIL("Expected SyntaxError");
+    }
+    catch (const TemplateSyntaxError &e)
+    {
+        BOOST_CHECK_EQUAL(1, e.line());
+        BOOST_CHECK_EQUAL(1, e.offset());
+    }
+    //offset, syntax
+    try
+    {
+        auto str = parse_str("p.");
+        BOOST_FAIL("Expected SyntaxError");
+    }
+    catch (const TemplateSyntaxError &e)
+    {
+        BOOST_CHECK_EQUAL(1, e.line());
+        BOOST_CHECK_EQUAL(3, e.offset());
+    }
+    //lines, syntax
+    try
+    {
+        parse_str("p Hello World\np Hello #{@name");
+        BOOST_FAIL("Expected SyntaxError");
+    }
+    catch (const TemplateSyntaxError &e)
+    {
+        BOOST_CHECK_EQUAL(2, e.line());
+        BOOST_CHECK_EQUAL(3, e.offset());
+    }
+    //parser
+    try
+    {
+        parse_str("= testing \\\n");
+        BOOST_FAIL("Expected SyntaxError");
+    }
+    catch (const TemplateSyntaxError &e)
+    {
+        BOOST_CHECK_EQUAL(2, e.line());
+        BOOST_CHECK_EQUAL(1, e.offset());
+    }
+}
+
 BOOST_AUTO_TEST_SUITE_END()
