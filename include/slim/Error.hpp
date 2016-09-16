@@ -27,14 +27,14 @@ namespace slim
     public:
         //TODO: Be useful to add the source file and position
 
-        SyntaxError(const std::string &filename, int line, int offset, const std::string &message);
+        SyntaxError(const std::string &file_name, int line, int offset, const std::string &message);
 
-        const std::string &filename()const { return _filename; }
+        const std::string &file_name()const { return _file_name; }
         const std::string &message()const { return _message; }
         int line()const { return _line; }
         int offset()const { return _offset; }
     private:
-        std::string _filename, _message;
+        std::string _file_name, _message;
         int _line, _offset;
     };
     class TemplateSyntaxError : public SyntaxError

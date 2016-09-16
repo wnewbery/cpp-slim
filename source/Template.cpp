@@ -28,6 +28,9 @@ namespace slim
 
         if (is.tellg() != (std::streampos)size) throw std::runtime_error("Failed to load " + path);
 
-        return parse_template(str.get(), size);
+        tpl::Lexer lexer(str.get(), str.get() + size);
+        lexer.file_name(path);
+        tpl::Parser parser(lexer);
+        return parser.parse();
     }
 }

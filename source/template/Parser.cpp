@@ -252,6 +252,7 @@ namespace slim
             {
 
                 expr::Lexer expr_lexer(lexer.get_pos(), lexer.get_end());
+                expr_lexer.file_name(lexer.file_name());
                 expr_lexer.set_reported_pos(lexer.line(), lexer.line_offset());
                 expr::Parser expr_parser(local_vars, expr_lexer); //TODO: Allow custom functions
 
@@ -390,6 +391,7 @@ namespace slim
                     }
 
                     expr::Lexer expr_lexer(start, end);
+                    expr_lexer.file_name(lexer.file_name());
                     expr_lexer.set_reported_pos(do_line, do_offset);
                     expr::Parser expr_parser(local_vars, expr_lexer);
                     params = expr_parser.param_list();
@@ -405,6 +407,7 @@ namespace slim
 
             //parse code
             expr::Lexer expr_lexer(src);
+            expr_lexer.file_name(lexer.file_name());
             expr_lexer.set_reported_pos(line, offset);
             expr::Parser expr_parser(local_vars, expr_lexer);
             auto expr = expr_parser.full_expression();
@@ -510,6 +513,7 @@ namespace slim
             auto script_src = parse_code_src();
             expr::Lexer expr_lexer(script_src);
             expr_lexer.set_reported_pos(line, offset);
+            expr_lexer.file_name(lexer.file_name());
             expr::Parser expr_parser(local_vars, expr_lexer);
             return expr_parser.full_expression();
         }
@@ -582,6 +586,7 @@ namespace slim
                 {   //Parse interpolation
                     output << text.substr(start, p2 - start);
                     expr::Lexer expr_lexer(text.data() + p, end);
+                    expr_lexer.file_name(lexer.file_name());
                     expr::Parser expr_parser(local_vars, expr_lexer);
                     auto expr = expr_parser.expression();
                     if (expr_parser.get_last_token().type != expr::Token::R_CURLY_BRACKET)

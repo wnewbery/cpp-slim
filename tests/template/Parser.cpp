@@ -11,6 +11,7 @@ BOOST_AUTO_TEST_SUITE(TestTplParser)
 std::string parse_str(const char *str)
 {
     Lexer lexer(str, str + strlen(str));
+    lexer.file_name("inline_test.html.slim");
     Parser parser(lexer);
     return parser.parse().to_string();
 }
@@ -274,6 +275,7 @@ BOOST_AUTO_TEST_CASE(syntax_error_info)
     {
         BOOST_CHECK_EQUAL(1, e.line());
         BOOST_CHECK_EQUAL(1, e.offset());
+        BOOST_CHECK_EQUAL("inline_test.html.slim", e.file_name());
     }
     //offset, syntax
     try
@@ -285,6 +287,7 @@ BOOST_AUTO_TEST_CASE(syntax_error_info)
     {
         BOOST_CHECK_EQUAL(1, e.line());
         BOOST_CHECK_EQUAL(3, e.offset());
+        BOOST_CHECK_EQUAL("inline_test.html.slim", e.file_name());
     }
     //lines, syntax
     try
@@ -296,6 +299,7 @@ BOOST_AUTO_TEST_CASE(syntax_error_info)
     {
         BOOST_CHECK_EQUAL(2, e.line());
         BOOST_CHECK_EQUAL(3, e.offset());
+        BOOST_CHECK_EQUAL("inline_test.html.slim", e.file_name());
     }
     //parser
     try
@@ -307,6 +311,7 @@ BOOST_AUTO_TEST_CASE(syntax_error_info)
     {
         BOOST_CHECK_EQUAL(2, e.line());
         BOOST_CHECK_EQUAL(1, e.offset());
+        BOOST_CHECK_EQUAL("inline_test.html.slim", e.file_name());
     }
     //in code
     try
@@ -325,6 +330,7 @@ BOOST_AUTO_TEST_CASE(syntax_error_info)
     {
         BOOST_CHECK_EQUAL(2, e.line());
         BOOST_CHECK_EQUAL(9, e.offset());
+        BOOST_CHECK_EQUAL("inline_test.html.slim", e.file_name());
     }
     //in code with offset
     try
@@ -343,6 +349,7 @@ BOOST_AUTO_TEST_CASE(syntax_error_info)
     {
         BOOST_CHECK_EQUAL(2, e.line());
         BOOST_CHECK_EQUAL(11, e.offset());
+        BOOST_CHECK_EQUAL("inline_test.html.slim", e.file_name());
     }
     //in tag with offset
     try
@@ -361,6 +368,7 @@ BOOST_AUTO_TEST_CASE(syntax_error_info)
     {
         BOOST_CHECK_EQUAL(2, e.line());
         BOOST_CHECK_EQUAL(11, e.offset());
+        BOOST_CHECK_EQUAL("inline_test.html.slim", e.file_name());
     }
     //in multiline tag
     try
@@ -380,6 +388,7 @@ BOOST_AUTO_TEST_CASE(syntax_error_info)
     {
         BOOST_CHECK_EQUAL(3, e.line());
         BOOST_CHECK_EQUAL(4, e.offset());
+        BOOST_CHECK_EQUAL("inline_test.html.slim", e.file_name());
     }
     //in multiline do
     try
@@ -400,8 +409,8 @@ BOOST_AUTO_TEST_CASE(syntax_error_info)
     {
         BOOST_CHECK_EQUAL(3, e.line());
         BOOST_CHECK_EQUAL(12, e.offset());
+        BOOST_CHECK_EQUAL("inline_test.html.slim", e.file_name());
     }
-
 }
 
 BOOST_AUTO_TEST_SUITE_END()

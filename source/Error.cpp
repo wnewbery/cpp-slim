@@ -5,15 +5,15 @@
 #include <cassert>
 namespace slim
 {
-    std::string syntax_error_str(const std::string &filename, int line, int offset, const std::string &message)
+    std::string syntax_error_str(const std::string &file_name, int line, int offset, const std::string &message)
     {
         std::stringstream ss;
-        ss << filename << "(" << line << ":" << offset << "): " << message;
+        ss << file_name << "(" << line << ":" << offset << "): " << message;
         return ss.str();
     }
-    SyntaxError::SyntaxError(const std::string &filename, int line, int offset, const std::string &message)
-        : ScriptError(syntax_error_str(filename, line, offset, message))
-        , _filename(filename), _message(message), _line(line), _offset(offset)
+    SyntaxError::SyntaxError(const std::string &file_name, int line, int offset, const std::string &message)
+        : ScriptError(syntax_error_str(file_name, line, offset, message))
+        , _file_name(file_name), _message(message), _line(line), _offset(offset)
     {
     }
 

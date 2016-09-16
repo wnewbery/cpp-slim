@@ -36,6 +36,11 @@ namespace slim
         explicit BaseLexer(const std::string &str) : BaseLexer(str.data(), str.size()) {}
 
         const std::string& file_name()const { return _file_name; }
+        /**Set the file name for error reporting.*/
+        void file_name(const std::string &file_name)
+        {
+            _file_name = file_name;
+        }
 
         /**Override the reported position.
          * Useful when parsing embedded languages (e.g. scripts in templates) and already
