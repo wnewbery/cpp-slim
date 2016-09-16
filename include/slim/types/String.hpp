@@ -20,7 +20,6 @@ namespace slim
         {
             return std::static_pointer_cast<String>(shared_from_this());
         }
-        virtual bool is_true()const override { return !v.empty(); }
         virtual bool eq(const Object *rhs)const override
         {
             return v == ((const String*)rhs)->v;

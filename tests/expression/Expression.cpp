@@ -68,12 +68,14 @@ BOOST_AUTO_TEST_CASE(operators)
     //binary
     BOOST_CHECK_EQUAL("10", eval("55 && 10"));
     BOOST_CHECK_EQUAL("0", eval("55 && 0"));
-    BOOST_CHECK_EQUAL("0", eval("0 && 10"));
+    BOOST_CHECK_EQUAL("10", eval("0 && 10"));
     BOOST_CHECK_EQUAL("0", eval("0 && 0"));
     BOOST_CHECK_EQUAL("55", eval("55 || 10"));
     BOOST_CHECK_EQUAL("55", eval("55 || 0"));
-    BOOST_CHECK_EQUAL("10", eval("0 || 10"));
+    BOOST_CHECK_EQUAL("0", eval("0 || 10"));
     BOOST_CHECK_EQUAL("0", eval("0 || 0"));
+    BOOST_CHECK_EQUAL("false", eval("false && 10"));
+    BOOST_CHECK_EQUAL("10", eval("false || 10"));
 
     BOOST_CHECK_EQUAL("false", eval("55 == 10"));
     BOOST_CHECK_EQUAL("true", eval("10 == 10"));
@@ -157,7 +159,7 @@ BOOST_AUTO_TEST_CASE(runtime_error)
 BOOST_AUTO_TEST_CASE(short_circuit)
 {
     //the operations on the right will cause an error if executed
-    BOOST_CHECK_EQUAL("0", eval("0 && 5 + 'str'"));
+    BOOST_CHECK_EQUAL("false", eval("false && 5 + 'str'"));
     BOOST_CHECK_EQUAL("5", eval("5 || 5 + 'str'"));
 }
 

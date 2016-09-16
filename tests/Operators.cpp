@@ -188,9 +188,9 @@ BOOST_AUTO_TEST_CASE(unary)
 
     //not
     BOOST_CHECK(!op_not(a.get())->is_true());
-    BOOST_CHECK(op_not(b.get())->is_true());
+    BOOST_CHECK(!op_not(b.get())->is_true());
     BOOST_CHECK(!op_not(c.get())->is_true());
-    BOOST_CHECK(op_not(d.get())->is_true());
+    BOOST_CHECK(!op_not(d.get())->is_true());
     BOOST_CHECK(!op_not(TRUE_VALUE.get())->is_true());
     BOOST_CHECK(op_not(FALSE_VALUE.get())->is_true());
 

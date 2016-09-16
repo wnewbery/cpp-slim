@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(number)
     BOOST_CHECK_EQUAL("0", b->to_string());
     BOOST_CHECK_EQUAL("-0.5", c->to_string());
     BOOST_CHECK_EQUAL(true, a->is_true());
-    BOOST_CHECK_EQUAL(false, b->is_true());
+    BOOST_CHECK_EQUAL(true, b->is_true());
     BOOST_CHECK_EQUAL(true, c->is_true());
     BOOST_CHECK_THROW(eval("5[0]"), NoSuchMethod);
 }
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(string)
     BOOST_CHECK_EQUAL("\"\"", a->inspect());
     BOOST_CHECK_EQUAL("\"a\"", b->inspect());
     BOOST_CHECK_EQUAL("\"test\"", c->inspect());
-    BOOST_CHECK_EQUAL(false, a->is_true());
+    BOOST_CHECK_EQUAL(true, a->is_true());
     BOOST_CHECK_EQUAL(true, b->is_true());
     BOOST_CHECK_EQUAL(true, c->is_true());
     BOOST_CHECK_EQUAL("\"t\"", eval("'test'[0]"));
