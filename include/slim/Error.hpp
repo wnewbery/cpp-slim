@@ -25,8 +25,17 @@ namespace slim
     class SyntaxError : public ScriptError
     {
     public:
-        using ScriptError::ScriptError;
         //TODO: Be useful to add the source file and position
+
+        SyntaxError(const std::string &filename, int line, int offset, const std::string &message);
+
+        const std::string &filename()const { return _filename; }
+        const std::string &message()const { return _message; }
+        int line()const { return _line; }
+        int offset()const { return _offset; }
+    private:
+        std::string _filename, _message;
+        int _line, _offset;
     };
     class TemplateSyntaxError : public SyntaxError
     {

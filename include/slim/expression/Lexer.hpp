@@ -1,17 +1,16 @@
 #pragma once
 #include <string>
+#include "Token.hpp"
 namespace slim
 {
     namespace expr
     {
         struct Token;
         /**@brief Reads tokens from source code for use by the Parser.*/
-        class Lexer
+        class Lexer : public BaseLexer<Token>
         {
         public:
-            Lexer(const char *str, size_t len) : start(str), p(str), end(str + len) {}
-            Lexer(const std::string &str) : Lexer(str.data(), str.size()) {}
-            Lexer(const char *str, const char *end) : start(str), p(str), end(end) {}
+            using BaseLexer::BaseLexer;
 
             Token next();
             /**STRING_TEXT, STRING_INTERP_START, STRING_TERM*/
@@ -20,13 +19,16 @@ namespace slim
             /**Get current position.*/
             const char *get_pos() { return p; }
         private:
-            const char *start, *p, *end;
-
-            [[noreturn]] void error(const std::string &msg);
             void skip_ws();
             Token symbol(const char *start);
             std::string symbol_str();
             Token number(const char *start, bool negative);
+
+            /**Throw SyntaxError at current position.*/
+            [[noreturn]] void error(const std::string &msg)
+            {
+                throw SyntaxError(_file_name, line, line_offset(), msg);
+            }
         };
     }
 }

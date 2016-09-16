@@ -24,24 +24,8 @@ namespace slim
 {
     namespace expr
     {
-        namespace
-        {
-            double parse_num(const std::string &str)
-            {
-                size_t count = 0;
-                double ret;
-                try
-                {
-                    ret = std::stod(str, &count);
-                }
-                catch (const std::exception &) { count = 0; }
-
-                if (!count || count != str.size()) throw SyntaxError("Invalid number: " + str);
-                return ret;
-            }
-        }
         Parser::Parser(const LocalVarNames &vars, Lexer &lexer)
-            : lexer(lexer), current_token(nullptr, Token::END), vars(vars)
+            : lexer(lexer), current_token(), vars(vars)
         {
             next();
         }
@@ -49,7 +33,7 @@ namespace slim
         ExpressionNodePtr Parser::full_expression()
         {
             auto ret = expression();
-            if (current_token.type != Token::END) throw SyntaxError("Expected end");
+            if (current_token.type != Token::END) error("Expected end");
             return ret;
         }
         void Parser::next()
@@ -79,7 +63,7 @@ namespace slim
                 {
                     while (true)
                     {
-                        if (current_token.type != Token::SYMBOL) throw SyntaxError("Expected symbol");
+                        if (current_token.type != Token::SYMBOL) error("Expected symbol");
                         out.push_back(symbol(current_token.str));
                         next();
 
@@ -93,7 +77,7 @@ namespace slim
                             next();
                             continue;
                         }
-                        else throw SyntaxError("Expected ',' or '|'");
+                        else error("Expected ',' or '|'");
                     }
                 }
             }
@@ -103,10 +87,10 @@ namespace slim
 
         ExpressionNodePtr Parser::sub_expression()
         {
-            if (current_token.type != Token::LPAREN) throw SyntaxError("Expected '('");
+            if (current_token.type != Token::LPAREN) error("Expected '('");
             next();
             auto ret = expression();
-            if (current_token.type != Token::RPAREN) throw SyntaxError("Expected ')'");
+            if (current_token.type != Token::RPAREN) error("Expected ')'");
             next();
             return ret;
         }
@@ -116,7 +100,7 @@ namespace slim
             switch (current_token.type)
             {
             case Token::STRING_DELIM: return interp_string();
-            case Token::NUMBER: return lit(make_value(parse_num(current_token.str)));
+            case Token::NUMBER: return lit(make_value(parse_num()));
             case Token::SYMBOL:
                 if (current_token.str == "true") return lit(TRUE_VALUE);
                 else if (current_token.str == "false") return lit(FALSE_VALUE);
@@ -157,9 +141,9 @@ namespace slim
             case Token::L_CURLY_BRACKET: return hash_literal();
             case Token::COLON:
                 next();
-                if (current_token.type != Token::SYMBOL) throw SyntaxError("Expected symbol");
+                if (current_token.type != Token::SYMBOL) error("Expected symbol");
                 return lit(symbol(current_token.str));
-            default: throw SyntaxError("Expected value");
+            default: error("Expected value");
             }
         }
 
@@ -184,11 +168,11 @@ namespace slim
                     interp = true;
                     next();
                     auto expr = expression();
-                    if (current_token.type != Token::R_CURLY_BRACKET) throw SyntaxError("Expected '}'");
+                    if (current_token.type != Token::R_CURLY_BRACKET) error("Expected '}'");
                     parts.emplace_back(std::move(expr));
                     break;
                 }
-                default: throw SyntaxError("Unexpected token in interpolated string");
+                default: error("Unexpected token in interpolated string");
                 }
             }
             while (current_token.type != Token::STRING_DELIM);
@@ -227,7 +211,7 @@ namespace slim
                     next();
                     return slim::make_unique<ArrayLiteral>(std::move(args));
                 }
-                else throw SyntaxError("Expected ']'");
+                else error("Expected ']'");
             }
         }
 
@@ -253,7 +237,7 @@ namespace slim
                 else
                 {
                     args.push_back(expression());
-                    if (current_token.type != Token::HASH_KEY_VALUE_SEP) throw SyntaxError("Expected =>");
+                    if (current_token.type != Token::HASH_KEY_VALUE_SEP) error("Expected =>");
                     next();
                 }
                 //value
@@ -265,7 +249,7 @@ namespace slim
                     next();
                     return slim::make_unique<HashLiteral>(std::move(args));
                 }
-                else throw SyntaxError("Expected '}'");
+                else error("Expected '}'");
             }
         }
 
@@ -299,7 +283,7 @@ namespace slim
             }
             else if (in_cond_op)
             {
-                throw SyntaxError(
+                error(
                     "Function calls within a conditional operators right side "
                     "expression must use parenthesis");
             }
@@ -312,7 +296,7 @@ namespace slim
                 if (parens) 
                 {
                     if (current_token.type != Token::RPAREN)
-                        throw SyntaxError("Expected ')'");
+                        error("Expected ')'");
                     next();
                 }
             }
@@ -367,7 +351,7 @@ namespace slim
                 else
                 {
                     args.push_back(expression());
-                    if (current_token.type != Token::HASH_KEY_VALUE_SEP) throw SyntaxError("Expected =>");
+                    if (current_token.type != Token::HASH_KEY_VALUE_SEP) error("Expected =>");
                     next();
                 }
                 //value
@@ -388,7 +372,7 @@ namespace slim
 
             auto expr = expression();
 
-            if (current_token.type != Token::R_CURLY_BRACKET) throw SyntaxError("Expected '}'");
+            if (current_token.type != Token::R_CURLY_BRACKET) error("Expected '}'");
             next();
 
             vars = old_vars; //Remove any variables from within the block
@@ -411,7 +395,7 @@ namespace slim
                 next();
                 auto true_expr = logical_or_op(true);
 
-                if (current_token.type != Token::COLON) throw SyntaxError("Expected ':'");
+                if (current_token.type != Token::COLON) error("Expected ':'");
                 next();
 
                 auto false_expr = conditional_op();
@@ -591,7 +575,7 @@ namespace slim
                 if (current_token.type == Token::DOT)
                 {
                     next();
-                    if (current_token.type != Token::SYMBOL) throw SyntaxError("Expected symbol");
+                    if (current_token.type != Token::SYMBOL) error("Expected symbol");
                     auto name = symbol(current_token.str);
 
                     next();
@@ -601,7 +585,7 @@ namespace slim
                 else if (current_token.type == Token::SAFE_NAV)
                 {
                     next();
-                    if (current_token.type != Token::SYMBOL) throw SyntaxError("Expected symbol");
+                    if (current_token.type != Token::SYMBOL) error("Expected symbol");
                     auto name = symbol(current_token.str);
 
                     next();
@@ -613,7 +597,7 @@ namespace slim
                     next();
                     FuncCall::Args args = func_args_inner();
                     if (current_token.type != Token::R_SQ_BRACKET)
-                        throw SyntaxError("Expected ']'");
+                        error("Expected ']'");
 
                     next();
                     lhs = slim::make_unique<ElementRefOp>(std::move(lhs), std::move(args));
@@ -622,13 +606,31 @@ namespace slim
                 {
                     next();
                     if (current_token.type != Token::SYMBOL || !is_constant(current_token.str))
-                        throw SyntaxError("Expected constant name");
+                        error("Expected constant name");
                     lhs = slim::make_unique<ConstantNav>(std::move(lhs), symbol(current_token.str));
                     next();
                 }
                 else break;
             }
             return lhs;
+        }
+
+        void Parser::error(const std::string &msg)
+        {
+            throw SyntaxError(lexer.file_name(), current_token.line, current_token.offset, msg);
+        }
+        double Parser::parse_num()
+        {
+            size_t count = 0;
+            double ret;
+            try
+            {
+                ret = std::stod(current_token.str, &count);
+            }
+            catch (const std::exception &) { count = 0; }
+
+            if (!count || count != current_token.str.size()) error("Invalid number: " + current_token.str);
+            return ret;
         }
     }
 }

@@ -160,7 +160,7 @@ namespace slim
                 case Token::CONTROL_LINE:
                     parse_control_code(my_indent, output);
                     break;
-                default: throw TemplateSyntaxError("Unexpected symbol");
+                default: error("Unexpected symbol");
                 }
             }
         }
@@ -182,7 +182,7 @@ namespace slim
                     if (current_indent() <= base_indent) return buf;
                     leading_spaces = current_indent() - base_indent - 2;
                     break;
-                default: throw TemplateSyntaxError("Unexpected token");
+                default: error("Unexpected token");
                 }
             }
         }
@@ -325,7 +325,7 @@ namespace slim
             }
             else if (current_token.type != Token::END)
             {
-                throw TemplateSyntaxError("Unexpected token after tag line");
+                error("Unexpected token after tag line");
             }
 
             bool void_el = VOID_ELEMENTS.count(tag_name) > 0;
@@ -335,7 +335,7 @@ namespace slim
                 output << "/>";
             }
             else if (!void_el) output << "</" + tag_name + ">";
-            else throw TemplateSyntaxError("HTML void elements can not have content");
+            else error("HTML void elements can not have content");
             if (trailing_space) output << ' ';
         }
 
@@ -379,7 +379,7 @@ namespace slim
 
                     if (expr_parser.get_last_token().pos != end)
                     {
-                        throw TemplateSyntaxError("Unexpected contents after block param list");
+                        error("Unexpected contents after block param list");
                     }
 
                     src.resize(src.size() - left);
@@ -395,7 +395,7 @@ namespace slim
             if (current_token.type == Token::INDENT && current_indent() > base_indent)
             {
                 auto func_call = dynamic_cast<expr::FuncCall*>(expr.get());
-                if (!func_call) throw TemplateSyntaxError("Indented block after code line, but no method call to pass block to");
+                if (!func_call) error("Indented block after code line, but no method call to pass block to");
                 //add new local variables for block call
                 auto old_vars = local_vars;
                 for (auto &param : params)
@@ -412,7 +412,7 @@ namespace slim
                 //Add it as a block param to the function call
                 func_call->args.push_back(std::move(expr));
             }
-            else if (had_do) throw TemplateSyntaxError("Previous code line started 'do' block, but has no content");
+            else if (had_do) error("Previous code line started 'do' block, but has no content");
 
             //Output
             if (ws.leading_space) output << ' ';
@@ -454,7 +454,7 @@ namespace slim
                         {
                             current_token = lexer.next_text_content();
                             if (!current_token.str.empty())
-                                throw TemplateSyntaxError("Unexpected content after 'else'");
+                                error("Unexpected content after 'else'");
 
                             OutputFrame frame;
 
@@ -480,7 +480,7 @@ namespace slim
                 else
                 {
                     //In case of "each do |a, b, c|" block, update local_vars within this scope only
-                    throw TemplateSyntaxError("Unexpected control code start");
+                    error("Unexpected control code start");
                 }
             }
         }
@@ -499,7 +499,7 @@ namespace slim
             while (true)
             {
                 current_token = lexer.next_text_content();
-                if (current_token.str.empty()) throw TemplateSyntaxError("Expected expression");
+                if (current_token.str.empty()) error("Expected expression");
                 script_src += current_token.str;
 
                 if (script_src.back() == ',')
@@ -561,8 +561,8 @@ namespace slim
                     expr::Parser expr_parser(local_vars, expr_lexer);
                     auto expr = expr_parser.expression();
                     if (expr_parser.get_last_token().type != expr::Token::R_CURLY_BRACKET)
-                        throw TemplateSyntaxError("Expected '}' to end interpolated text");
-                    
+                        error("Expected '}' to end interpolated text");
+
                     output << std::move(expr);
 
                     p = expr_lexer.get_pos() - text.data();
@@ -570,6 +570,11 @@ namespace slim
                 }
             }
             if (p < text.size()) output << text.substr(p);
+        }
+
+        void Parser::error(const std::string &msg)
+        {
+            throw TemplateSyntaxError(lexer.file_name(), current_token.line, current_token.offset, msg);
         }
     }
 }

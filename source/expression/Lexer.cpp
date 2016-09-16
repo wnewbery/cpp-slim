@@ -8,10 +8,6 @@ namespace slim
     {
         namespace
         {
-            bool is_ws_chr(char c)
-            {
-                return c == ' ' || c == '\t' || c == '\r' || c == '\n';
-            }
             bool is_digit(char c)
             {
                 return c >= '0' && c <= '9';
@@ -25,109 +21,112 @@ namespace slim
                 return is_symbol_start_chr(c) || is_digit(c);
             }
         }
-        
-        void Lexer::error(const std::string &msg)
-        {
-            throw SyntaxError(msg);
-        }
 
         Token Lexer::next()
         {
             auto start = p;
-            auto make_tok = [this, start](Token::Type t)
-            {
-                return ++p, Token(start, t);
-            };
-
             skip_ws();
-            if (p == end) return ++p, make_tok(Token::END);
+
+            auto t = token(Token::UNKNOWN);
+            t.pos = start;
+            auto make_tok = [this, start, &t](size_t size, Token::Type type)
+            {
+                return p += size, t.type = type, t;
+            };
+            if (p == end) return make_tok(1, Token::END);
             else if (p > end) error("Unexpected end");
 
             char peek = *p;
             switch (peek)
             {
-            case '(': return make_tok(Token::LPAREN);
-            case ')': return make_tok(Token::RPAREN);
-            case '[': return make_tok(Token::L_SQ_BRACKET);
-            case ']': return make_tok(Token::R_SQ_BRACKET);
-            case '{': return make_tok(Token::L_CURLY_BRACKET);
-            case '}': return make_tok(Token::R_CURLY_BRACKET);
-            case ',': return make_tok(Token::COMMA);
-            case '.': return make_tok(Token::DOT);
-            case '+': return make_tok(Token::PLUS);
-            case '/': return make_tok(Token::DIV);
-            case '%': return make_tok(Token::MOD);
-            case '~': return make_tok(Token::NOT);
-            case '^': return make_tok(Token::XOR);
+            case '(': return make_tok(1, Token::LPAREN);
+            case ')': return make_tok(1, Token::RPAREN);
+            case '[': return make_tok(1, Token::L_SQ_BRACKET);
+            case ']': return make_tok(1, Token::R_SQ_BRACKET);
+            case '{': return make_tok(1, Token::L_CURLY_BRACKET);
+            case '}': return make_tok(1, Token::R_CURLY_BRACKET);
+            case ',': return make_tok(1, Token::COMMA);
+            case '.': return make_tok(1, Token::DOT);
+            case '+': return make_tok(1, Token::PLUS);
+            case '/': return make_tok(1, Token::DIV);
+            case '%': return make_tok(1, Token::MOD);
+            case '~': return make_tok(1, Token::NOT);
+            case '^': return make_tok(1, Token::XOR);
             case ':':
-                if (p + 1 < end && p[1] == ':') return p += 2, Token(start, Token::CONST_NAV);
-                else return make_tok(Token::COLON);
-            case '?': return make_tok(Token::CONDITIONAL);
+                if (p + 1 < end && p[1] == ':') return make_tok(2, Token::CONST_NAV);
+                else return make_tok(1, Token::COLON);
+            case '?': return make_tok(1, Token::CONDITIONAL);
             case '\'':
             case '\"':
                 ++p;
-                return {start, Token::STRING_DELIM, { p - 1, 1 }};
+                t.str = { p - 1, 1 };
+                t.type = Token::STRING_DELIM;
+                return t;
             case '*':
                 if (p + 1 >= end) error("Unexpected end");
-                if (p[1] == '*') return p += 2, Token(start, Token::POW);
-                else return make_tok(Token::MUL);
+                if (p[1] == '*') return make_tok(2, Token::POW);
+                else return make_tok(1, Token::MUL);
             case '-':
                 ++p;
                 if (p >= end) error("Unexpected end");
                 else if (is_digit(p[0])) return number(start, true);
-                else return {start, Token::MINUS};
+                else return make_tok(0, Token::MINUS);
             case '&':
                 if (p + 1 >= end) error("Unexpected end");
-                if (p[1] == '&') return p += 2, Token(start, Token::LOGICAL_AND);
-                if (p[1] == '.') return p += 2, Token(start, Token::SAFE_NAV);
-                else return make_tok(Token::AND);
+                if (p[1] == '&') return make_tok(2, Token::LOGICAL_AND);
+                if (p[1] == '.') return make_tok(2, Token::SAFE_NAV);
+                else return make_tok(1, Token::AND);
             case '|':
-                if (p + 1 < end && p[1] == '|') return p += 2, Token(start, Token::LOGICAL_OR);
-                else return make_tok(Token::OR);
+                if (p + 1 < end && p[1] == '|') return make_tok(2, Token::LOGICAL_OR);
+                else return make_tok(1, Token::OR);
             case '!':
                 if (p + 1 >= end) error("Unexpected end");
-                if (p[1] == '=') return p += 2, Token(start, Token::CMP_NE);
-                else return make_tok(Token::LOGICAL_NOT);
+                if (p[1] == '=') return make_tok(2, Token::CMP_NE);
+                else return make_tok(1, Token::LOGICAL_NOT);
             case '=':
                 if (p + 1 >= end) error("Unexpected end");
-                if (p[1] == '=') return p += 2, Token(start, Token::CMP_EQ);
-                if (p[1] == '>') return p += 2, Token(start, Token::HASH_KEY_VALUE_SEP);
-                else return make_tok(Token::UNKNOWN);
+                if (p[1] == '=') return make_tok(2, Token::CMP_EQ);
+                if (p[1] == '>') return make_tok(2, Token::HASH_KEY_VALUE_SEP);
+                else return make_tok(1, Token::UNKNOWN);
             case '<':
                 if (p + 1 >= end) error("Unexpected end");
-                if (p[1] == '<') return p += 2, Token(start, Token::LSHIFT);
+                if (p[1] == '<') return make_tok(2, Token::LSHIFT);
                 if (p[1] == '=')
                 {
                     if (p + 2 >= end) error("Unexpected end");
-                    if (p[2] == '>') return p += 3, Token(start, Token::CMP);
-                    else return p += 2, Token(start, Token::CMP_LE);
+                    if (p[2] == '>') return make_tok(3, Token::CMP);
+                    else return make_tok(2, Token::CMP_LE);
                 }
-                else return make_tok(Token::CMP_LT);
+                else return make_tok(1, Token::CMP_LT);
             case '>':
                 if (p + 1 >= end) error("Unexpected end");
-                if (p[1] == '>') return p += 2, Token(start, Token::RSHIFT);
-                if (p[1] == '=') return p += 2, Token(start, Token::CMP_GE);
-                else return make_tok(Token::CMP_GT);
+                if (p[1] == '>') return make_tok(2, Token::RSHIFT);
+                if (p[1] == '=') return make_tok(2, Token::CMP_GE);
+                else return make_tok(1, Token::CMP_GT);
             case '@':
                 ++p;
-                return Token(start, Token::ATTR_NAME, symbol_str());
+                t.str = symbol_str();
+                t.type = Token::ATTR_NAME;
+                return t;
             default:
                 if (is_symbol_start_chr(peek)) return symbol(start);
                 else if (is_digit(peek)) return number(start, false);
-                else return {start, Token::UNKNOWN};
+                else return t.type = Token::UNKNOWN, t;
             }
         }
         Token Lexer::next_str_interp(char delim)
         {
+            auto t = token(Token::END);
             auto start = p;
-            if (p == end) return ++p, Token(start, Token::END);
+            if (p == end) return ++p, t;
             else if (p > end) error("Unexpected end");
 
-            if (*p == delim) return ++p, Token(start, Token::STRING_DELIM);
+            if (*p == delim) return ++p, t.type = Token::STRING_DELIM, t;
             if (p + 1 < end && p[0] == '#' && p[1] == '{')
             {
                 p += 2;
-                return {start, Token::STRING_INTERP_START};
+                t.type = Token::STRING_INTERP_START;
+                return t;
             }
 
             std::string str;
@@ -164,33 +163,42 @@ namespace slim
                 }
             }
 
-            return{ start, Token::STRING_TEXT, str };
+            t.type = Token::STRING_TEXT;
+            t.str = std::move(str);
+            return t;
         }
         void Lexer::skip_ws()
         {
-            while (p < end && is_ws_chr(*p)) ++p;
+            while (p < end)
+            {
+                if (try_newline()) continue;
+                if (*p == ' ' || *p == '\t') ++p;
+                else break;
+            }
         }
         
         Token Lexer::symbol(const char *start)
         {
             assert(is_symbol_start_chr(*p));
-            auto name = symbol_str();
-            auto type = Token::SYMBOL;
+            auto t = token(Token::SYMBOL);
+            t.pos = start;
+            t.str = symbol_str();
 
             if (p < end)
             {
                 if (*p == ':' && (p + 1 >= end || p[1] != ':')) //symbol:: is SYMBOL + CONST_NAV
                 {
                     ++p;
-                    type = Token::HASH_SYMBOL;
+                    t.type = Token::HASH_SYMBOL;
                 }
                 else if(*p == '?') //trailing '?' is part of method symbols
                 {
-                    name += '?';
+                    t.str += '?';
                     ++p;
                 }
             }
-            return { start, type, name };
+            
+            return t;
         }
         std::string Lexer::symbol_str()
         {
@@ -203,6 +211,9 @@ namespace slim
         Token Lexer::number(const char *tok_start, bool negative)
         {
             assert((is_digit(*p) && !negative) || (p[-1] =='-' && negative));
+            auto t = token(Token::NUMBER);
+            t.pos = tok_start;
+
             auto start = negative ? p - 1 : p;
             while (p < end && is_digit(*p)) ++p;
 
@@ -211,8 +222,8 @@ namespace slim
                 p += 2;
                 while (p < end && is_digit(*p)) ++p;
             }
-
-            return{ tok_start, Token::NUMBER, std::string(start, p - start) };
+            t.str = std::string(start, p - start);
+            return t;
         }
 
     }

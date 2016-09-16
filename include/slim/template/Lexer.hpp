@@ -1,5 +1,7 @@
 #pragma once
 #include <string>
+#include "Token.hpp"
+#include "../BaseLexer.hpp"
 namespace slim
 {
     namespace tpl
@@ -9,10 +11,10 @@ namespace slim
          * Unfortunately the template syntax has a lot of context, so publically exposed seperate
          * token readers.
          */
-        class Lexer
+        class Lexer : public BaseLexer<Token>
         {
         public:
-            Lexer(const char *begin, const char *end);
+            using BaseLexer::BaseLexer;
 
             /**The number of spaces at the start of the next line.
              * Empty lines are skiped and ignored, tabs are banned (SyntaxError)
@@ -78,17 +80,16 @@ namespace slim
              */
             void set_pos(const char *p);
         private:
-            const char *begin, *p, *end;
-            int line;
-
-            /**If next is a newline (\r, \n, or \r\n), consume it and return true.*/
-            bool try_newline();
             /**If next matches str, return true and advance p by strlen(str).*/
             bool starts_with(const std::string &str);
             /**Skip any ' ' or '\t'.*/
             void skip_spaces();
 
-            [[noreturn]] void error(const std::string &msg);
+            /**Throw SyntaxError at current position.*/
+            [[noreturn]] void error(const std::string &msg)
+            {
+                throw TemplateSyntaxError(_file_name, line, line_offset(), msg);
+            }
         };
     }
 }

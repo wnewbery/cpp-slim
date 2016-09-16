@@ -144,6 +144,9 @@
     <ClInclude Include="include\slim\types\ViewModel.hpp">
       <Filter>include\types</Filter>
     </ClInclude>
+    <ClInclude Include="include\slim\BaseLexer.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\types\Object.cpp">
@@ -154,9 +157,6 @@
     </ClCompile>
     <ClCompile Include="source\Error.cpp">
       <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="source\expression\Expression.cpp">
-      <Filter>source\expression</Filter>
     </ClCompile>
     <ClCompile Include="source\expression\AstOp.cpp">
       <Filter>source\expression</Filter>

@@ -78,6 +78,9 @@ namespace slim
              * Used for "|" test lines, literal HTML and tag text content.
              */
             void add_interpolated_text(const std::string &text, OutputFrame &output);
+            
+            /**Throw syntax error at current position.*/
+            [[noreturn]] void error(const std::string &msg);
         };
     }
 }

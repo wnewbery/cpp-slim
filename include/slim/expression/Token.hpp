@@ -1,5 +1,5 @@
 #pragma once
-#include <string>
+#include "../BaseLexer.hpp"
 namespace slim
 {
     namespace expr
@@ -7,7 +7,7 @@ namespace slim
         /**@brief Token read by Lexer.
          * Each token has a type, and possibly an associated source string (e.g. number).
          */
-        struct Token
+        struct Token : public BaseToken
         {
             enum Type
             {
@@ -78,18 +78,12 @@ namespace slim
                 /**Empty token for unknown content.*/
                 UNKNOWN
             };
-
-            Token(const char *pos, Type type)
-                : pos(pos), type(type), str()
-            {}
-            Token(const char *pos, Type type, const std::string &str)
-                : pos(pos), type(type), str(str)
-            {}
-
-            /**Position in source.*/
-            const char *pos;
             Type type;
-            std::string str;
+
+            Token() {}
+            Token(int line, int offset, const char *pos, std::string &&str, Type type)
+                : BaseToken(line, offset, pos, std::move(str)), type(type)
+            {}
         };
     }
 }

@@ -5,6 +5,18 @@
 #include <cassert>
 namespace slim
 {
+    std::string syntax_error_str(const std::string &filename, int line, int offset, const std::string &message)
+    {
+        std::stringstream ss;
+        ss << filename << "(" << line << ":" << offset << "): " << message;
+        return ss.str();
+    }
+    SyntaxError::SyntaxError(const std::string &filename, int line, int offset, const std::string &message)
+        : ScriptError(syntax_error_str(filename, line, offset, message))
+        , _filename(filename), _message(message), _line(line), _offset(offset)
+    {
+    }
+
     TypeError::TypeError(const Object *type, const std::string &type_name)
         : RuntimeError(type->type_name() + " can not be converted to " + type_name)
     {

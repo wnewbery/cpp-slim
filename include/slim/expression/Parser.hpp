@@ -143,6 +143,11 @@ namespace slim
             /** .func(args) */
             ExpressionNodePtr member_func(bool in_cond_op);
 
+
+            /**Throw syntax error at current position.*/
+            [[noreturn]] void error(const std::string &msg);
+            /**Parse current token as a number.*/
+            double parse_num();
         };
     }
 }

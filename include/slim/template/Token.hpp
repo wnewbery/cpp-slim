@@ -1,11 +1,11 @@
 #pragma once
-#include <string>
+#include "../BaseLexer.hpp"
 namespace slim
 {
     namespace tpl
     {
         /**A token in the template source, as read by Lexer. */
-        struct Token
+        struct Token : public BaseToken
         {
             enum Type
             {
@@ -61,13 +61,12 @@ namespace slim
                 /** '' */
                 EACH_START
             };
+            Type type;
 
             Token() {}
-            Token(Type type) : type(type), str() {}
-            Token(Type type, const std::string &str) : type(type), str(str) {}
-
-            Type type;
-            std::string str;
+            Token(int line, int offset, const char *pos, std::string &&str, Type type)
+                : BaseToken(line, offset, pos, std::move(str)), type(type)
+            {}
         };
     }
 }

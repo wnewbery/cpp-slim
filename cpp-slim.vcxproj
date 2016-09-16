@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\slim\BaseLexer.hpp" />
     <ClInclude Include="include\slim\Error.hpp" />
     <ClInclude Include="include\slim\expression\ArithmeticOp.hpp" />
     <ClInclude Include="include\slim\expression\Ast.hpp" />
@@ -64,7 +65,6 @@
     <ClCompile Include="source\expression\ArithmeticOp.cpp" />
     <ClCompile Include="source\expression\AstOp.cpp" />
     <ClCompile Include="source\expression\CmpOp.cpp" />
-    <ClCompile Include="source\expression\Expression.cpp" />
     <ClCompile Include="source\expression\Lexer.cpp" />
     <ClCompile Include="source\expression\Parser.cpp" />
     <ClCompile Include="source\expression\LogicalOp.cpp" />
