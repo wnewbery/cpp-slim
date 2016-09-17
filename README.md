@@ -29,10 +29,10 @@ C++:
     //Render to a HTML string
     auto html = page_tpl->render_layout(layout_tpl, model);
 
-# [Template Syntax](Template.md)
+# [Template Syntax](docs/Template.md)
 The template syntax is based on the Ruby [Slim](http://slim-lang.com/) templating engine.
 
-# [Script/Expression Syntax](Script.md)
+# [Script/Expression Syntax](docs/Script.md)
 The templates can include simple Ruby-like script expression for the creation of dynamic content.
 
 This is supported by a C++ object hierarchy (starting with `slim::Object`) and a Ruby based source text syntax.
