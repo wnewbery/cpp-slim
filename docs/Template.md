@@ -28,7 +28,7 @@ The output line is supported and may contain a single script expression. As with
 # HTML comment /!
 Comments are supported.
 
-# IE conditional comment /[...] (Not supported)
+# IE conditional comment /\[...] (Not supported)
 IE conditional comments are not supported. If they are really needed, use the inlne HTML syntax.
 
     <!--[if IE]>conditional<![endif]-->
