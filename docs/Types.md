@@ -7,6 +7,7 @@ These provide most of the script functionality, and use the same method names an
    * Hash
    * HtmlSafeString
    * [Math](types/Math.md)
+   * Nil
    * Number
    * Object
    * [String](types/String.md)
@@ -25,7 +26,7 @@ The `Boolean` class has two instances, `true` and `false` and performs a similar
 `true` returns `1.0` and `false` returns `0.0`.
 
 ### `to_s`, `inspect`
-`true` or `false`
+Returns `"true"` or `"false"`.
 
 #Hash
 The `Hash` object stores an ordered set of key-value pairs. The order is the order in which each unique key was added to the array.
@@ -73,6 +74,14 @@ Implemented by `Object::eq`. The default implementation compares object identity
 
 ### `<`, `<=`, `>`, `>=`, `<=>`
 Implemented by `Object::cmp`. The default implementation throws `UnorderableTypeError`.
+
+# Nil
+
+The `nil` class.
+
+## Methods
+### `to_s`, `inspect`
+Returns `"nil"`.
 
 # Number
 
