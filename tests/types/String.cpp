@@ -263,6 +263,8 @@ BOOST_AUTO_TEST_CASE(lines)
     BOOST_CHECK_EQUAL("[\"hello \", \"world\\n\\nlines\\n\"]", eval("'hello world\\n\\nlines\\n'.lines ' '"));
 
     BOOST_CHECK_EQUAL("[\"hello\\nworld\\n\\n\", \"lines\\n\"]", eval("'hello\\nworld\\n\\nlines\\n'.lines ''"));
+
+    BOOST_CHECK_EQUAL("[\"hello\\nworld\\n\\n\\n\", \"lines\\n\"]", eval("'hello\\nworld\\n\\n\\nlines\\n'.lines ''"));
 }
 
 BOOST_AUTO_TEST_CASE(each_line)
@@ -292,8 +294,39 @@ BOOST_AUTO_TEST_CASE(each_line)
     BOOST_CHECK_EQUAL("\"test\"", eval(scope, "'test'.each_line{|x| test x}"));
     BOOST_REQUIRE_EQUAL(1, test->lines.size());
     BOOST_CHECK_EQUAL("test", test->lines[0]);
+    test->lines.clear();
 
-    //BOOST_CHECK_EQUAL("[\"hello\\n\", \"world\\n\", \"\\n\", \"lines\"]", eval("'hello\\nworld\\n\\nlines'.lines"));
+    BOOST_CHECK_EQUAL("\"test\\nline\"", eval(scope, "'test\\nline'.each_line{|x| test x}"));
+    BOOST_REQUIRE_EQUAL(2, test->lines.size());
+    BOOST_CHECK_EQUAL("test\n", test->lines[0]);
+    BOOST_CHECK_EQUAL("line", test->lines[1]);
+    test->lines.clear();
+
+
+    BOOST_CHECK_EQUAL("\"test\\nline\"", eval(scope, "'test\\nline'.each_line ',' {|x| test x}"));
+    BOOST_REQUIRE_EQUAL(1, test->lines.size());
+    BOOST_CHECK_EQUAL("test\nline", test->lines[0]);
+    test->lines.clear();
+
+
+    BOOST_CHECK_EQUAL("\"test\\nline\"", eval(scope, "'test\\nline'.each_line '' {|x| test x}"));
+    BOOST_REQUIRE_EQUAL(1, test->lines.size());
+    BOOST_CHECK_EQUAL("test\nline", test->lines[0]);
+    test->lines.clear();
+
+
+    BOOST_CHECK_EQUAL("\"test\\n\\n\\nline\"", eval(scope, "'test\\n\\n\\nline'.each_line '' {|x| test x}"));
+    BOOST_REQUIRE_EQUAL(2, test->lines.size());
+    BOOST_CHECK_EQUAL("test\n\n\n", test->lines[0]);
+    BOOST_CHECK_EQUAL("line", test->lines[1]);
+    test->lines.clear();
+
+
+    BOOST_CHECK_EQUAL("\"test,line\"", eval(scope, "'test,line'.each_line ',' {|x| test x}"));
+    BOOST_REQUIRE_EQUAL(2, test->lines.size());
+    BOOST_CHECK_EQUAL("test,", test->lines[0]);
+    BOOST_CHECK_EQUAL("line", test->lines[1]);
+    test->lines.clear();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

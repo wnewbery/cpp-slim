@@ -219,9 +219,19 @@ namespace slim
     ObjectPtr String::each_line(const FunctionArgs & args)
     {
         Proc *proc;
-        std::string sep = "\n";
-        unpack<1>(args, &proc, &sep);
-        std::vector<std::string> lines = split_lines(sep);
+        std::vector<std::string> lines;
+        if (args.size() == 1)
+        {
+            proc = coerce<Proc>(args[0].get());
+            lines = split_lines("\n");
+        }
+        else if (args.size() == 2)
+        {
+            std::string sep;
+            unpack(args, &sep, &proc);
+            lines = split_lines(sep);
+        }
+        else throw InvalidArgument(this, "each_line");
 
         for (auto &i : lines) proc->call({ make_value(i) });
 
