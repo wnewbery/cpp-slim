@@ -6,6 +6,7 @@ These provide most of the script functionality, and use the same method names an
    * Boolean
    * Hash
    * HtmlSafeString
+   * [Math](types/Math.md)
    * Number
    * Object
    * [String](types/String.md)
