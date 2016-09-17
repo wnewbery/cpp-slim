@@ -2,6 +2,7 @@
 #include "types/String.hpp"
 #include "Function.hpp"
 #include <unordered_map>
+#include <mutex>
 
 namespace slim
 {
@@ -10,7 +11,8 @@ namespace slim
     SymPtr symbol(const std::string & str)
     {
         static std::unordered_map<std::string, std::shared_ptr<Symbol>> map;
-
+        static std::mutex mutex;
+        std::unique_lock<std::mutex> lock(mutex);
         auto x = map.emplace(str, nullptr);
         if (x.second)
         {
