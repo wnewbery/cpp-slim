@@ -2,6 +2,10 @@
 #include "Object.hpp"
 namespace slim
 {
+    /**Number script type.
+     * Currently this is the only numeric type, taking the place of Ruby Numeric class and all its
+     * subtypes. The number is stored as a double.
+     */
     class Number : public Object
     {
     public:

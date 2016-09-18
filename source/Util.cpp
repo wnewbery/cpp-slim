@@ -2,7 +2,7 @@
 #include "types/HtmlSafeString.hpp"
 namespace slim
 {
-    std::string html_encode(const std::string &str)
+    std::string html_escape(const std::string &str)
     {
         std::string buf;
         buf.reserve(str.size());
@@ -21,7 +21,7 @@ namespace slim
         return buf;
     }
 
-    std::string html_encode(const Object *obj)
+    std::string html_escape(const Object *obj)
     {
         if (auto safe = dynamic_cast<const HtmlSafeString*>(obj))
         {
@@ -29,7 +29,7 @@ namespace slim
         }
         else
         {
-            return html_encode(obj->to_string());
+            return html_escape(obj->to_string());
         }
     }
 }

@@ -2,6 +2,9 @@
 #include "String.hpp"
 namespace slim
 {
+    /**Script HtmlSafeString type.
+     * This is a String but is detected by RTTI by html_escape and assumed to already be escaped.
+     */
     class HtmlSafeString : public String
     {
     public:

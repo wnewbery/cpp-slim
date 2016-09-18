@@ -28,7 +28,7 @@ namespace slim
     {
         auto it = constants.find(name);
         if (it != constants.end()) return it->second;
-        else throw NoSuchConstant(this, name);
+        else throw NoConstantError(this, name);
     }
 
     void ViewModel::add_constant(SymPtr name, ObjectPtr constant)

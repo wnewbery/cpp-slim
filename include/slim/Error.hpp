@@ -1,6 +1,7 @@
 #pragma once
-#include <stdexcept>
 #include <memory>
+#include <stdexcept>
+#include <string>
 namespace slim
 {
     class Object;
@@ -8,25 +9,26 @@ namespace slim
     typedef std::shared_ptr<Object> ObjectPtr;
     typedef std::shared_ptr<Symbol> SymPtr;
 
+    /**Base type for all exceptions.*/
     class Error : public std::runtime_error
     {
     public:
         using std::runtime_error::runtime_error;
     };
 
-    /**Base type for all errors thrown by the script interpreter.*/
+    /**Base type for all errors thrown at runtime by the script interpreter.*/
     class ScriptError : public Error
     {
     public:
         using Error::Error;
         virtual ~ScriptError() {}
     };
-    /**Errors from the lexer or parser.*/
-    class SyntaxError : public ScriptError
+    /**Errors from the source lexer or parser.
+     * As well as an error message, the class includes the source position where the error occurred.
+     */
+    class SyntaxError : public Error
     {
     public:
-        //TODO: Be useful to add the source file and position
-
         SyntaxError(const std::string &file_name, int line, int offset, const std::string &message);
 
         const std::string &file_name()const { return _file_name; }
@@ -37,69 +39,89 @@ namespace slim
         std::string _file_name, _message;
         int _line, _offset;
     };
+    /**SyntaxError from template code, rather than embedded scripts.*/
     class TemplateSyntaxError : public SyntaxError
     {
     public:
         using SyntaxError::SyntaxError;
     };
 
-    class RuntimeError : public ScriptError
+    /**An error used when an instance has an invalid type for some operation.
+     * Mostly used in the same places Ruby uses its TypeError.
+     */
+    class TypeError : public ScriptError
     {
     public:
-        using ScriptError::ScriptError;
-        //TODO: Be useful to add the script stack trace here
-    };
-    class TypeError : public RuntimeError
-    {
-    public:
-        TypeError(const std::string &msg) : RuntimeError(msg) {}
+        TypeError(const std::string &msg) : ScriptError(msg) {}
         TypeError(const Object *type, const std::string &type_name);
     };
+    /**Error used when accessing a container index that does not exist.*/
     class IndexError : public ScriptError
     {
     public:
         using ScriptError::ScriptError;
     };
-    class KeyError : public ScriptError
+    /**Error used when accessing a map key that does not exist.*/
+    class KeyError : public IndexError
     {
     public:
         explicit KeyError(ObjectPtr key);
     };
+    /**Error used when using an ordered comparision operator with types that are not ordered.
+     * Such as: "string" < true.
+     */
     class UnorderableTypeError : public TypeError
     {
     public:
         UnorderableTypeError(const Object *lhs, const char *op, const Object *rhs);
     };
-    class NoSuchMethod : public ScriptError
-    {
-    public:
-        NoSuchMethod(const Object *obj, const std::string &method_name);
-        NoSuchMethod(const Object *obj, const Symbol *method_name);
-        explicit NoSuchMethod(const Symbol *method_name);
-    };
+
+    /**Attempted to call a method or get a constant that does not exist.*/
     class NameError : public ScriptError
     {
     public:
         using ScriptError::ScriptError;
     };
-    class NoSuchConstant : public NameError
+    /**Attempted to call a method on an object, but the object has no method by that name.*/
+    class NoMethodError : public NameError
     {
     public:
-        NoSuchConstant(const Object *self, SymPtr name);
+        NoMethodError(const Object *obj, const std::string &method_name);
+        NoMethodError(const Object *obj, const Symbol *method_name);
+        explicit NoMethodError(const Symbol *method_name);
     };
-    class InvalidArgument : public ScriptError
+    /**Attempted to access a constant in an object, but the object has no constant by that name.*/
+    class NoConstantError : public NameError
     {
     public:
-        InvalidArgument() : ScriptError("InvalidArgument") {}
-        InvalidArgument(const std::string &method_name);
-        InvalidArgument(const Object *obj, const std::string &method_name);
-        InvalidArgument(const Object *obj, const std::string &method_name, const std::string &msg);
+        NoConstantError(const Object *self, SymPtr name);
     };
 
-    class InvalidArgumentCount : public ScriptError
+    /**Used when the arguments used to call a method is wrong.
+     * Note that exceptions such as TypeError may also be thrown depending on the methods
+     * implementation.
+     * 
+     * The occurance of such exceptions is a programming error caused by violating a methods
+     * contract that should be fixed and their existance is as a developer aid. Programs should
+     * not depend on these exceptions for input validation or flow control, unless such validation
+     * is explicitly documented by the method.
+     */
+    class ArgumentError : public ScriptError
     {
     public:
-        InvalidArgumentCount(size_t given, size_t min, size_t max);
+        ArgumentError() : ScriptError("InvalidArgument") {}
+        ArgumentError(const std::string &method_name);
+        ArgumentError(const Object *obj, const std::string &method_name);
+        ArgumentError(const Object *obj, const std::string &method_name, const std::string &msg);
+    };
+
+    //TODO: Remove, use ArgumentError. Can have utility functions handle the message formatting of
+    //the various ArgumentError cases.
+    /**Used in most cases where a method is passed a number of arguments that it does not support.*/
+    class ArgumentCountError : public ScriptError
+    {
+    public:
+        ArgumentCountError(size_t given, size_t min, size_t max);
     protected:
         static std::string make_message(size_t given, size_t min, size_t max);
     };

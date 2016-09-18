@@ -97,7 +97,7 @@ namespace slim
     std::shared_ptr<Number> Array::count(const FunctionArgs & args)
     {
         if (args.empty()) return size();
-        else if (args.size() > 1) throw InvalidArgument(this, "count");
+        else if (args.size() > 1) throw ArgumentError(this, "count");
         //TODO: if block
         
         int c = 0;
@@ -122,7 +122,7 @@ namespace slim
         {
             return make_enumerator(this, { &Array::each, "each" });
         }
-        else throw InvalidArgument(this, "each");
+        else throw ArgumentError(this, "each");
     }
     std::shared_ptr<Boolean> Array::empty_q()
     {
@@ -130,7 +130,7 @@ namespace slim
     }
     std::shared_ptr<Object> Array::fetch(const FunctionArgs & args)
     {
-        if (args.empty() || args.size() > 2) throw InvalidArgument(this, "fetch");
+        if (args.empty() || args.size() > 2) throw ArgumentError(this, "fetch");
         int i = (int)as_number(args[0]);
         if (i >= 0 && i < (int)arr.size()) return arr[(size_t)i];
         else if (args.size() == 2) return args[1];
@@ -145,12 +145,12 @@ namespace slim
         else if (args.size() == 1)
         {
             auto count = (int)as_number(args[0].get());
-            if (count < 0) throw InvalidArgument(this, "first");
+            if (count < 0) throw ArgumentError(this, "first");
             std::vector<ObjectPtr> out;
             for (int i = 0; i < count && i < (int)arr.size(); ++i) out.push_back(arr[i]);
             return make_value(std::move(out));
         }
-        else throw InvalidArgument(this, "first");
+        else throw ArgumentError(this, "first");
     }
     std::shared_ptr<Array> Array::flatten(const FunctionArgs & args)
     {
@@ -161,7 +161,7 @@ namespace slim
             auto level = (int)as_number(args[0].get());
             flatten_imp(out, level);
         }
-        else throw InvalidArgument(this, "flatten");
+        else throw ArgumentError(this, "flatten");
         return make_value(std::move(out));
     }
     void Array::flatten_imp(std::vector<ObjectPtr> &out, int level)
@@ -214,14 +214,14 @@ namespace slim
         else if (args.size() == 1)
         {
             auto count = (int)as_number(args[0].get());
-            if (count < 0) throw InvalidArgument(this, "last");
+            if (count < 0) throw ArgumentError(this, "last");
             std::vector<ObjectPtr> out;
             int start = (int)arr.size() - count;
             if (start < 0) start = 0;
             for (int i = start; i < (int)arr.size(); ++i) out.push_back(arr[i]);
             return make_value(std::move(out));
         }
-        else throw InvalidArgument(this, "last");
+        else throw ArgumentError(this, "last");
     }
     std::shared_ptr<Number> Array::size()
     {
@@ -256,7 +256,7 @@ namespace slim
     {
         int start = 1;
         if (args.size() == 1) start = (int)as_number(args[0]);
-        else if (args.size() > 1) throw InvalidArgument(this, "rotate");
+        else if (args.size() > 1) throw ArgumentError(this, "rotate");
         
         if (arr.empty()) return std::static_pointer_cast<Array>(shared_from_this());
 
@@ -297,7 +297,7 @@ namespace slim
             else if (start == (int)arr.size()) return make_array({});
             else return NIL_VALUE;
         }
-        else throw InvalidArgument(this, "slice");
+        else throw ArgumentError(this, "slice");
     }
     std::shared_ptr<Array> Array::sort()
     {

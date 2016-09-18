@@ -222,7 +222,7 @@ BOOST_AUTO_TEST_CASE(chomp)
     BOOST_CHECK_EQUAL("\"test\"", eval("'test\\n\\n'.chomp ''"));
     BOOST_CHECK_EQUAL("\"test\"", eval("'test\\n\\n\\r'.chomp ''"));
 
-    BOOST_CHECK_THROW(eval("''.chomp 1, 2"), InvalidArgument);
+    BOOST_CHECK_THROW(eval("''.chomp 1, 2"), ArgumentError);
 }
 
 BOOST_AUTO_TEST_CASE(strip)

@@ -15,14 +15,23 @@ namespace slim { namespace expr
     public:
         typedef std::unordered_map<SymPtr, ObjectPtr, ObjHash, ObjEquals> Map;
 
+        /**Constructs the root scope, with no variables except "self".*/
         explicit Scope(ViewModelPtr self)
             : parent(nullptr), _self(self), map()
         {
             map[symbol("self")] = _self;
         }
+        /**Constructs an inner scope (such as the one created by a "{|params| expr}" block.
+         * The new scope includes all of the variables from the parent, but new variables are not
+         * added to the parent.
+         */
         explicit Scope(Scope &parent)
             : parent(&parent), _self(parent._self), map() {}
 
+        /**Sets the value of a variable.
+         * Note that currently this is only used for block "|params|", and will never set a
+         * variable on the parent, even if it was already defined.
+         */
         void set(const SymPtr &name, ObjectPtr val)
         {
             map[name] = val;
@@ -31,20 +40,28 @@ namespace slim { namespace expr
         {
             set(symbol(name), val);
         }
+        /**Gets a variable from this or any parent scope.*/
         ObjectPtr get(const SymPtr &name)
         {
             auto it = map.find(name);
             if (it !=  map.end()) return it->second;
             else if (parent) return parent->get(name);
-            else return NIL_VALUE;
+            else
+            {
+                //Since the script parser uses the existance of variables to call a method if a
+                //variable does not exist, this should really never happen.
+                throw std::runtime_error("Attempted to access an undefined variable");
+            }
         }
 
-        /**Get the "self" variable.
-         * In most situations, "self" should be set to a non-nil value.
-         */
+        /**Get the "self" variable. */
         ViewModelPtr self() { return _self; }
 
+        /**Begin iterator for all variables in this scope (not including parents).
+         * Used for tests and debugging.
+         */
         Map::iterator begin() { return map.begin(); }
+        /**End iterator. See begin.*/
         Map::iterator end() { return map.end(); }
     private:
         Scope *parent;

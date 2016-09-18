@@ -5,6 +5,7 @@ namespace slim
     class Boolean;
     extern const std::shared_ptr<Boolean> TRUE_VALUE;
     extern const std::shared_ptr<Boolean> FALSE_VALUE;
+    /**Script Boolean type.*/
     class Boolean : public Object
     {
     public:

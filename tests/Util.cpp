@@ -3,11 +3,11 @@
 
 BOOST_AUTO_TEST_SUITE(TestUtil)
 
-BOOST_AUTO_TEST_CASE(html_encode)
+BOOST_AUTO_TEST_CASE(html_escape)
 {
     BOOST_CHECK_EQUAL(
         "&amp; &lt; &gt; &quot; &#39;",
-        slim::html_encode("& < > \" '"));
+        slim::html_escape("& < > \" '"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

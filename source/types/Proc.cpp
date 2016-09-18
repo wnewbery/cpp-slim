@@ -25,7 +25,7 @@ namespace slim
         {
             std::stringstream ss;
             ss << "wrong number of arguments (" << args.size() << " for " << param_names.size() << ")";
-            throw InvalidArgument(this, "call", ss.str());
+            throw ArgumentError(this, "call", ss.str());
         }
         
         expr::Scope new_scope(scope);

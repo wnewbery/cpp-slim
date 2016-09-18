@@ -4,7 +4,7 @@
 #include <functional>
 namespace slim
 {
-     
+    /**Script Enumerator type.*/
     class Enumerator : public Object
     {
     public:

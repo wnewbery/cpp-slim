@@ -41,60 +41,60 @@ namespace slim
 
     ObjectPtr Object::el_ref(const FunctionArgs & args)
     {
-        throw NoSuchMethod(this, "[]");
+        throw NoMethodError(this, "[]");
     }
 
     ObjectPtr Object::mul(Object * rhs)
     {
-        throw NoSuchMethod(this, "*");
+        throw NoMethodError(this, "*");
     }
     ObjectPtr Object::div(Object * rhs)
     {
-        throw NoSuchMethod(this, "/");
+        throw NoMethodError(this, "/");
     }
     ObjectPtr Object::mod(Object * rhs)
     {
-        throw NoSuchMethod(this, "%");
+        throw NoMethodError(this, "%");
     }
     ObjectPtr Object::pow(Object * rhs)
     {
-        throw NoSuchMethod(this, "**");
+        throw NoMethodError(this, "**");
     }
     ObjectPtr Object::add(Object * rhs)
     {
-        throw NoSuchMethod(this, "+");
+        throw NoMethodError(this, "+");
     }
     ObjectPtr Object::sub(Object * rhs)
     {
-        throw NoSuchMethod(this, "-");
+        throw NoMethodError(this, "-");
     }
     ObjectPtr Object::negate()
     {
-        throw NoSuchMethod(this, "-negate");
+        throw NoMethodError(this, "-negate");
     }
     ObjectPtr Object::bit_lshift(Object *rhs)
     {
-        throw NoSuchMethod(this, "<<");
+        throw NoMethodError(this, "<<");
     }
     ObjectPtr Object::bit_rshift(Object *rhs)
     {
-        throw NoSuchMethod(this, ">>");
+        throw NoMethodError(this, ">>");
     }
     ObjectPtr Object::bit_and(Object *rhs)
     {
-        throw NoSuchMethod(this, "&");
+        throw NoMethodError(this, "&");
     }
     ObjectPtr Object::bit_or(Object *rhs)
     {
-        throw NoSuchMethod(this, "|");
+        throw NoMethodError(this, "|");
     }
     ObjectPtr Object::bit_xor(Object *rhs)
     {
-        throw NoSuchMethod(this, "^");
+        throw NoMethodError(this, "^");
     }
     ObjectPtr Object::bit_not()
     {
-        throw NoSuchMethod(this, "~");
+        throw NoMethodError(this, "~");
     }
 
     const Method *Object::find_method(SymPtr name)const
@@ -105,7 +105,7 @@ namespace slim
     {
         auto method = find_method(name);
         if (method) return (*method)(this, args);
-        else throw NoSuchMethod(this, name.get());
+        else throw NoMethodError(this, name.get());
     }
     ObjectPtr Object::get_constant(SymPtr)
     {

@@ -4,6 +4,10 @@ namespace slim
 {
     class Nil;
     extern const std::shared_ptr<Nil> NIL_VALUE;
+    /**The "nil" singleton type.
+     * Additional instances should not be created, only the global slim::NIL_VALUE instance should
+     * be used.
+     */
     class Nil : public Object
     {
     public:

@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(test_unpack)
     double n2 = 60;
     std::string str = "Test";
     //missing arg
-    BOOST_CHECK_THROW(unpack(args, &n, &str, &n2), InvalidArgumentCount);
+    BOOST_CHECK_THROW(unpack(args, &n, &str, &n2), ArgumentCountError);
     BOOST_CHECK_EQUAL(30, n);
     BOOST_CHECK_EQUAL(60, n2);
     BOOST_CHECK_EQUAL("Test", str);
@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE(test_unpack)
     //right count, but one is wrong type
     n = 30;
     n2 = 55;
-    BOOST_CHECK_THROW(unpack<1>(args, &n, &n2), InvalidArgument);
+    BOOST_CHECK_THROW(unpack<1>(args, &n, &n2), ArgumentError);
     BOOST_CHECK_EQUAL(30, n);
     BOOST_CHECK_EQUAL(55, n2);
 }

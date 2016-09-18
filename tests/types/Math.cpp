@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(basic_methods)
 
     BOOST_CHECK_CLOSE(2.718281828459045, eval("Math::E"), 0.0001);
     BOOST_CHECK_CLOSE(3.141592653589793, eval("Math::PI"), 0.0001);
-    BOOST_CHECK_THROW(eval("X"), NoSuchConstant);
+    BOOST_CHECK_THROW(eval("X"), NoConstantError);
 
     BOOST_CHECK_CLOSE(1.5707963267948966, eval("Math.acos(0)"), 0.0001);
     BOOST_CHECK_CLOSE(1.5707963267948966, eval("Math.asin(1)"), 0.0001);

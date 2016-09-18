@@ -84,7 +84,7 @@ namespace slim
                 if (v.find(match_str->v) != std::string::npos) return match_str;
                 else return NIL_VALUE;
             }
-            throw InvalidArgument(this, "slice");
+            throw ArgumentError(this, "slice");
         }
         else if (args.size() == 2)
         {
@@ -93,7 +93,7 @@ namespace slim
             auto length = (int)coerce<Number>(args[1])->get_value();
             return do_slice(start, length);
         }
-        else throw InvalidArgument(this, "slice");
+        else throw ArgumentError(this, "slice");
     }
     ObjectPtr String::do_slice(int start, int length)
     {
@@ -137,7 +137,7 @@ namespace slim
         std::string padstr = " ";
         unpack<1>(args, &width, &padstr);
 
-        if (padstr.empty()) throw InvalidArgument(this, "ljust");
+        if (padstr.empty()) throw ArgumentError(this, "ljust");
         if (width <= (int)v.size()) return make_value(v);
         
         auto left = (width - v.size()) / 2;
@@ -155,7 +155,7 @@ namespace slim
         std::string padstr = " ";
         unpack<1>(args, &width, &padstr);
 
-        if (padstr.empty()) throw InvalidArgument(this, "ljust");
+        if (padstr.empty()) throw ArgumentError(this, "ljust");
         if (width <= (int)v.size()) return make_value(v);
 
         std::string ret = v;
@@ -168,7 +168,7 @@ namespace slim
         std::string padstr = " ";
         unpack<1>(args, &width, &padstr);
 
-        if (padstr.empty()) throw InvalidArgument(this, "rjust");
+        if (padstr.empty()) throw ArgumentError(this, "rjust");
         if (width <= (int)v.size()) return make_value(v);
 
         std::string ret;
@@ -206,7 +206,7 @@ namespace slim
             }
             else return coerce<String>(shared_from_this());
         }
-        else throw InvalidArgument(this, "chomp");
+        else throw ArgumentError(this, "chomp");
     }
 
     std::shared_ptr<String> String::downcase()
@@ -231,7 +231,7 @@ namespace slim
             unpack(args, &sep, &proc);
             lines = split_lines(sep);
         }
-        else throw InvalidArgument(this, "each_line");
+        else throw ArgumentError(this, "each_line");
 
         for (auto &i : lines) proc->call({ make_value(i) });
 
@@ -310,7 +310,7 @@ namespace slim
 
     std::shared_ptr<Number> String::ord()
     {
-        if (v.empty()) throw InvalidArgument(this, "ord");
+        if (v.empty()) throw ArgumentError(this, "ord");
         else return make_value((double)v[0]);
     }
 
@@ -333,7 +333,7 @@ namespace slim
 
     ObjectPtr String::rindex(const FunctionArgs & args)
     {
-        if (args.size() < 1 && args.size() > 2) throw InvalidArgument(this, "index");
+        if (args.size() < 1 && args.size() > 2) throw ArgumentError(this, "index");
         auto pattern = coerce<String>(args[0]);
         int offset = (int)v.size();
         if (args.size() == 2)

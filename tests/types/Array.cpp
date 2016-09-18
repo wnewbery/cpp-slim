@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE(basic_access)
     BOOST_CHECK_EQUAL("1", eval("a.first", scope));
     BOOST_CHECK_EQUAL("nil", eval("b.first", scope));
     
-    BOOST_CHECK_THROW(eval("[].first 1, 1"), InvalidArgument);
+    BOOST_CHECK_THROW(eval("[].first 1, 1"), ArgumentError);
     //first(n)
     BOOST_CHECK_EQUAL("[1, 2, 3]", eval("a.first(3)", scope));
     BOOST_CHECK_EQUAL("[1, 2, 3, 5, 8, 11]", eval("a.first(8)", scope));
@@ -158,14 +158,14 @@ BOOST_AUTO_TEST_CASE(basic_access)
     BOOST_CHECK_EQUAL("11", eval("a.last", scope));
     BOOST_CHECK_EQUAL("nil", eval("b.last", scope));
     
-    BOOST_CHECK_THROW(eval("[].last 1, 1"), InvalidArgument);
+    BOOST_CHECK_THROW(eval("[].last 1, 1"), ArgumentError);
     //last(n)
     BOOST_CHECK_EQUAL("[5, 8, 11]", eval("a.last(3)", scope));
     BOOST_CHECK_EQUAL("[1, 2, 3, 5, 8, 11]", eval("a.last(8)", scope));
     BOOST_CHECK_EQUAL("[]", eval("b.last(3)", scope));
 
     //slice(index)
-    BOOST_CHECK_THROW(eval("[].slice 1, 1, 1"), InvalidArgument);
+    BOOST_CHECK_THROW(eval("[].slice 1, 1, 1"), ArgumentError);
     
     BOOST_CHECK_EQUAL("2", eval("a.slice(1)", scope));
     BOOST_CHECK_EQUAL("11", eval("a.slice(-1)", scope));
@@ -222,7 +222,7 @@ BOOST_AUTO_TEST_CASE(flatten)
     BOOST_CHECK_EQUAL("[1, 2, 3]", eval("[1, 2, 3].flatten"));
     BOOST_CHECK_EQUAL("[1, 2, 3]", eval("[[1, [2, 3]]].flatten"));
     BOOST_CHECK_EQUAL("[1, [2, 3]]", eval("[[1, [2, 3]]].flatten 1"));
-    BOOST_CHECK_THROW(eval("[1, 2, 3].flatten 1,1"), InvalidArgument);
+    BOOST_CHECK_THROW(eval("[1, 2, 3].flatten 1,1"), ArgumentError);
 }
 
 BOOST_AUTO_TEST_CASE(compact)
@@ -273,7 +273,7 @@ BOOST_AUTO_TEST_CASE(rotate)
     BOOST_CHECK_EQUAL("[2, 3, 1]", eval("a.rotate(-2)", scope));
     BOOST_CHECK_EQUAL("[2, 3, 1]", eval("a.rotate(-5)", scope));
     
-    BOOST_CHECK_THROW(eval("[].rotate 1, 1"), InvalidArgument);
+    BOOST_CHECK_THROW(eval("[].rotate 1, 1"), ArgumentError);
 }
 
 BOOST_AUTO_TEST_CASE(uniq)
@@ -311,7 +311,7 @@ BOOST_AUTO_TEST_CASE(enumerate)
     BOOST_CHECK_EQUAL(0, test->sum);
     BOOST_CHECK_EQUAL("[1, 2, 3]", eval("[1, 2, 3].each{|x| test x}", scope));
     BOOST_CHECK_EQUAL(6, test->sum);
-    BOOST_CHECK_THROW(eval("[].each 1, 1"), InvalidArgument);
+    BOOST_CHECK_THROW(eval("[].each 1, 1"), ArgumentError);
 
     auto enumerator = eval_obj("[5, 6, 9].each", scope);
     scope.set("e", enumerator);

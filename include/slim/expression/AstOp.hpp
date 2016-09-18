@@ -10,6 +10,10 @@ namespace slim
     namespace expr
     {
         //Some misc nodes
+        /**Literal values created at compile time such as true/false, nil and basic strings.
+         * Note that arrays, hash, interpolated strings, etc. do not use this node, as they require
+         * runtime execution to fully construct.
+         */
         class Literal : public ExpressionNode
         {
         public:
@@ -18,6 +22,7 @@ namespace slim
             virtual ObjectPtr eval(Scope &scope)const override;
             ObjectPtr value;
         };
+        /**Gets a variable value.*/
         class Variable : public ExpressionNode
         {
         public:
@@ -26,6 +31,7 @@ namespace slim
             virtual ObjectPtr eval(Scope &scope)const override;
             SymPtr name;
         };
+        /**Gets an attribute value (on "self").*/
         class Attribute : public ExpressionNode
         {
         public:
@@ -34,6 +40,7 @@ namespace slim
             virtual ObjectPtr eval(Scope &scope)const override;
             SymPtr name;
         };
+        /**Gets a constant value (on "self").*/
         class GlobalConstant : public ExpressionNode
         {
         public:
@@ -42,6 +49,7 @@ namespace slim
             virtual ObjectPtr eval(Scope &scope)const override;
             SymPtr name;
         };
+        /**"::" binary operator.*/
         class ConstantNav : public ExpressionNode
         {
         public:
@@ -54,40 +62,49 @@ namespace slim
             ExpressionNodePtr lhs;
             SymPtr name;
         };
+        /**Abstract base for function calls. Handles the function arguments.*/
         class FuncCall : public ExpressionNode
         {
         public:
+            /**Array of expression that evalutes to an array of values (FunctionArgs).*/
             typedef std::vector<std::unique_ptr<ExpressionNode>> Args;
+
             FuncCall(Args &&args) : args(std::move(args)) {}
             virtual std::string to_string()const override;
             FunctionArgs eval_args(Scope &scope)const;
 
             Args args;
         };
-        class NamedFuncCall : public FuncCall
+        /**Abstract base class for calling methods by their name.*/
+        class MethodCall : public FuncCall
         {
         public:
-            NamedFuncCall(const SymPtr &name, Args &&args) : FuncCall(std::move(args)), name(name) {}
+            MethodCall(const SymPtr &name, Args &&args) : FuncCall(std::move(args)), name(name) {}
             SymPtr name;
         };
-        class GlobalFuncCall : public NamedFuncCall
+        /**Calls a method without an explicit context (will use "self").*/
+        class GlobalFuncCall : public MethodCall
         {
         public:
-            using NamedFuncCall::NamedFuncCall;
+            using MethodCall::MethodCall;
             virtual std::string to_string()const override;
             virtual ObjectPtr eval(Scope &scope)const override;
         };
-        class MemberFuncCall : public NamedFuncCall
+        /**Calls a method on some dynamic value.*/
+        class MemberFuncCall : public MethodCall
         {
         public:
             MemberFuncCall(ExpressionNodePtr &&lhs, const SymPtr &name, Args &&args)
-                : NamedFuncCall(name, std::move(args)), lhs(std::move(lhs))
+                : MethodCall(name, std::move(args)), lhs(std::move(lhs))
             {}
             virtual std::string to_string()const override;
             virtual ObjectPtr eval(Scope &scope)const override;
 
             ExpressionNodePtr lhs;
         };
+        /**Calls a method on some dynamic value, unless that value is "nil", in which case the
+         * function arguments are not evaulated, no method call is attempted, and "nil" is returned.
+         */
         class SafeNavMemberFuncCall : public MemberFuncCall
         {
         public:
@@ -107,6 +124,8 @@ namespace slim
 
             ExpressionNodePtr lhs;
         };
+        
+        /**[...] array literal. Each argument becomes an array element.*/
         class ArrayLiteral : public FuncCall
         {
         public:
@@ -114,6 +133,7 @@ namespace slim
             virtual std::string to_string()const override;
             virtual ObjectPtr eval(Scope &scope)const override;
         };
+        /**{...} hash literal. Each pair of arguments becomes a key-value pair.*/
         class HashLiteral : public FuncCall
         {
         public:
@@ -122,6 +142,7 @@ namespace slim
             virtual ObjectPtr eval(Scope &scope)const override;
         };
 
+        /**A code block that creates a Proc which captures the local variables in the blocks scope.*/
         class Block : public ExpressionNode
         {
         public:

@@ -5,6 +5,7 @@ namespace slim
     class Array;
     class Boolean;
     class Number;
+    /**String script object.*/
     class String : public Object
     {
     public:

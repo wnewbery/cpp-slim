@@ -6,7 +6,7 @@ namespace slim
     class Boolean;
     class Number;
     typedef std::shared_ptr<Number> NumberPtr;
-    /**The Math module.*/
+    /**The Math module. Implements the static math methods and constants.*/
     class Math : public Type
     {
     public:

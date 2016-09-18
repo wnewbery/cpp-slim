@@ -72,8 +72,8 @@ BOOST_AUTO_TEST_CASE(test)
     BOOST_CHECK_THROW(eval("self <=> @b"), UnorderableTypeError);
     BOOST_CHECK_THROW(eval("self < @b"), UnorderableTypeError);
     BOOST_CHECK_THROW(eval("self > @b"), UnorderableTypeError);
-    BOOST_CHECK_THROW(eval("self[0]"), NoSuchMethod);
-    BOOST_CHECK_THROW(eval("self + @b"), NoSuchMethod);
+    BOOST_CHECK_THROW(eval("self[0]"), NoMethodError);
+    BOOST_CHECK_THROW(eval("self + @b"), NoMethodError);
     BOOST_CHECK_THROW(as_number(obj), TypeError);
 
     //All objects work as hash keys

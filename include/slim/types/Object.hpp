@@ -19,12 +19,13 @@ namespace slim
     class Method;
     class MethodTable;
 
+    /**Gets the symbol instance for a string. See Symbol.*/
     SymPtr symbol(const std::string &str);
 
     class Object;
     class String;
 
-    /**Base abstract object for the expression interpreter.*/
+    /**Base abstract object for the expression script interpreter.*/
     class Object : public std::enable_shared_from_this<Object>
     {
     public:

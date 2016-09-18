@@ -24,7 +24,7 @@ namespace slim
                  * May be a value such as 'true', a variable name, function name, etc.
                  */
                 SYMBOL,
-                /**An attribute name, using @symbol.*/
+                /**An attribute name, using \@symbol.*/
                 ATTR_NAME,
                 /**A symbol followed directly by a colon. Used for hashes. e.g:
                  * key: "value"

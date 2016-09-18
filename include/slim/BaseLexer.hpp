@@ -67,7 +67,7 @@ namespace slim
         }
 
 
-        /**If next is a newline (\r, \n, or \r\n), consume it and return true.*/
+        /**If next is a newline (\\r, \\n, or \\r\\n), consume it and return true.*/
         bool try_newline()
         {
             if (*p == '\n')

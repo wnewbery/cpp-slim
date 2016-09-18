@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(variables)
     scope.set("test", make_value(55.0));
     scope.set("self", NIL_VALUE);
     BOOST_CHECK_EQUAL("55", eval("test", scope));
-    BOOST_CHECK_THROW(eval("unset", scope), NoSuchMethod); //not a variable, so considered a function
+    BOOST_CHECK_THROW(eval("unset", scope), NoMethodError); //not a variable, so considered a function
 }
 
 BOOST_AUTO_TEST_CASE(operators)
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(member_func)
     BOOST_CHECK_EQUAL("1", eval("[5]&.size"));
     BOOST_CHECK_EQUAL("nil", eval("nil&.size"));
 
-    BOOST_CHECK_THROW(eval("'x'.invalid"), NoSuchMethod);
+    BOOST_CHECK_THROW(eval("'x'.invalid"), NoMethodError);
 }
 
 BOOST_AUTO_TEST_CASE(runtime_error)
@@ -146,9 +146,9 @@ BOOST_AUTO_TEST_CASE(runtime_error)
     BOOST_CHECK_THROW(eval("5 < '5'"), UnorderableTypeError);
     BOOST_CHECK_THROW(eval("nil < nil"), UnorderableTypeError);
 
-    BOOST_CHECK_THROW(eval("nil + nil"), NoSuchMethod);
-    BOOST_CHECK_THROW(eval("nil - nil"), NoSuchMethod);
-    BOOST_CHECK_THROW(eval("- nil"), NoSuchMethod);
+    BOOST_CHECK_THROW(eval("nil + nil"), NoMethodError);
+    BOOST_CHECK_THROW(eval("nil - nil"), NoMethodError);
+    BOOST_CHECK_THROW(eval("- nil"), NoMethodError);
 
     BOOST_CHECK_THROW(eval("5 + nil"), TypeError);
     BOOST_CHECK_THROW(eval("5 + true"), TypeError);

@@ -12,13 +12,13 @@ namespace slim
         return ss.str();
     }
     SyntaxError::SyntaxError(const std::string &file_name, int line, int offset, const std::string &message)
-        : ScriptError(syntax_error_str(file_name, line, offset, message))
+        : Error(syntax_error_str(file_name, line, offset, message))
         , _file_name(file_name), _message(message), _line(line), _offset(offset)
     {
     }
 
     TypeError::TypeError(const Object *type, const std::string &type_name)
-        : RuntimeError(type->type_name() + " can not be converted to " + type_name)
+        : ScriptError(type->type_name() + " can not be converted to " + type_name)
     {
     }
     UnorderableTypeError::UnorderableTypeError(const Object *lhs, const char *op, const Object *rhs)
@@ -26,44 +26,44 @@ namespace slim
     {
     }
     
-    NoSuchMethod::NoSuchMethod(const Object *obj, const std::string &method_name)
-        : ScriptError(obj->type_name() + " has no method " + method_name)
+    NoMethodError::NoMethodError(const Object *obj, const std::string &method_name)
+        : NameError(obj->type_name() + " has no method " + method_name)
     {
     }
-    NoSuchMethod::NoSuchMethod(const Object * obj, const Symbol *method_name)
-        : ScriptError(obj->type_name() + " has no method " + method_name->str())
+    NoMethodError::NoMethodError(const Object * obj, const Symbol *method_name)
+        : NameError(obj->type_name() + " has no method " + method_name->str())
     {
     }
-    NoSuchMethod::NoSuchMethod(const Symbol *method_name)
-        : ScriptError("No global function " + method_name->str())
+    NoMethodError::NoMethodError(const Symbol *method_name)
+        : NameError("No global function " + method_name->str())
     {
     }
-    NoSuchConstant::NoSuchConstant(const Object *self, SymPtr name)
+    NoConstantError::NoConstantError(const Object *self, SymPtr name)
         : NameError(self->type_name() + " has no constant " + name->str())
     {
     }
-    InvalidArgument::InvalidArgument(const std::string &method_name)
+    ArgumentError::ArgumentError(const std::string &method_name)
         : ScriptError("Invalid argument for " + method_name)
     {
     }
-    InvalidArgument::InvalidArgument(const Object *obj, const std::string &method_name)
+    ArgumentError::ArgumentError(const Object *obj, const std::string &method_name)
         : ScriptError("Invalid argument for " + obj->type_name() + "." + method_name)
     {
     }
-    InvalidArgument::InvalidArgument(const Object *obj, const std::string &method_name, const std::string &msg)
+    ArgumentError::ArgumentError(const Object *obj, const std::string &method_name, const std::string &msg)
         : ScriptError("InvalidArgument: " + obj->type_name() + "." + method_name + " " + msg)
     {
     }
     KeyError::KeyError(ObjectPtr key)
-        : ScriptError("Key not found: " + key->to_string())
+        : IndexError("Key not found: " + key->to_string())
     {
     }
 
-    InvalidArgumentCount::InvalidArgumentCount(size_t given, size_t min, size_t max)
+    ArgumentCountError::ArgumentCountError(size_t given, size_t min, size_t max)
         : ScriptError(make_message(given, min, max))
     {
     }
-    std::string InvalidArgumentCount::make_message(size_t given, size_t min, size_t max)
+    std::string ArgumentCountError::make_message(size_t given, size_t min, size_t max)
     {
         assert(min <= max);
         std::stringstream ss;

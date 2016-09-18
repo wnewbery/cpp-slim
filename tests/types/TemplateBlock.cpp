@@ -34,7 +34,7 @@ public:
     {
         std::stringstream ss;
         ss << '<' << name->get_value() << '>';
-        ss << html_encode(content->call({}));
+        ss << html_escape(content->call({}));
         ss << "</" << name->get_value() << '>';
         return create_object<HtmlSafeString>(ss.str());
     }

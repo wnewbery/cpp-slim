@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(number)
     BOOST_CHECK_EQUAL(true, a->is_true());
     BOOST_CHECK_EQUAL(true, b->is_true());
     BOOST_CHECK_EQUAL(true, c->is_true());
-    BOOST_CHECK_THROW(eval("5[0]"), NoSuchMethod);
+    BOOST_CHECK_THROW(eval("5[0]"), NoMethodError);
 }
 
 BOOST_AUTO_TEST_CASE(string)

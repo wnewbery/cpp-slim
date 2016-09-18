@@ -14,12 +14,12 @@ namespace slim
     }
 
     /**Encodes '&', '<', '>', '"' and '\'' to entities.*/
-    std::string html_encode(const std::string &str);
+    std::string html_escape(const std::string &str);
     /**Encodes if not a HtmlSafeString.*/
-    std::string html_encode(const Object *obj);
-    inline std::string html_encode(const std::shared_ptr<Object> &obj)
+    std::string html_escape(const Object *obj);
+    inline std::string html_escape(const std::shared_ptr<Object> &obj)
     {
-        return html_encode(obj.get());
+        return html_escape(obj.get());
     }
 }
 

@@ -37,7 +37,6 @@ namespace slim
                 return std::string("(") + symbol() + arg->to_string() + ")";
             }
             virtual const char *symbol()const = 0;
-            virtual ObjectPtr eval(Scope &scope)const = 0;
         protected:
             ExpressionNodePtr arg;
         };
@@ -53,7 +52,6 @@ namespace slim
                 return "(" + lhs->to_string() + " " + symbol() + " " + rhs->to_string() + ")";
             }
             virtual const char *symbol()const = 0;
-            virtual ObjectPtr eval(Scope &scope)const = 0;
         protected:
             ExpressionNodePtr lhs, rhs;
         };

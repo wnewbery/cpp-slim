@@ -8,6 +8,7 @@ namespace slim
     class Boolean;
     class Number;
     class String;
+    /**Script Hash type.*/
     class Hash : public Object
     {
     public:

@@ -10,6 +10,7 @@ namespace slim
         class ExpressionNode;
         class Scope;
     }
+    /**Proc script object. This is as callable object used for blocks.*/
     class Proc : public Object
     {
     public:

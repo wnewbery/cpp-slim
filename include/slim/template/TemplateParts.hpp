@@ -6,8 +6,7 @@ namespace slim
     class Symbol;
     namespace tpl
     {
-
-        /**@brief List of parts within a single block for sequential evaluation. */
+        /**List of parts within a single block for sequential evaluation. */
         class TemplatePartsList : public TemplatePart
         {
         public:
@@ -29,7 +28,7 @@ namespace slim
             std::vector<std::unique_ptr<TemplatePart>> parts;
         };
 
-        /**@brief Literal text to output directly.*/
+        /**Literal text to output directly.*/
         class TemplateText : public TemplatePart
         {
         public:
@@ -42,7 +41,7 @@ namespace slim
         private:
             std::string text;
         };
-        /**@brief A script expression to evaulate and write the result. */
+        /**A script expression to evaulate and write the result. */
         class TemplateOutputExpr : public TemplatePart
         {
         public:
@@ -54,7 +53,8 @@ namespace slim
         protected:
             std::unique_ptr<Expression> expression;
         };
-        /**@brief Attribute with dynamic value.
+        /**Attribute with dynamic value.
+         *
          * Handles boolean as well as string attributes.
          */
         class TemplateTagAttr : public TemplatePart
@@ -73,7 +73,7 @@ namespace slim
             std::vector<std::string> static_values;
             std::vector<std::unique_ptr<Expression>> dynamic_values;
         };
-        /**@brief A script for loop, containing a template body.*/
+        /**A script for loop, containing a template body.*/
         class TemplateForExpr : public TemplatePart
         {
         public:
@@ -101,7 +101,10 @@ namespace slim
             TemplateCondExpr(TemplateCondExpr &&) = default;
             TemplateCondExpr& operator =(TemplateCondExpr &&) = default;
         };
-        /**@brief A script if, elsif, else sequence with a template body.*/
+        /**A script if, elsif, else sequence with a template body.
+         * The "if" expression is mandatory, then there may be zero or more "elseif" expressions
+         * and a single optional "else" expression.
+         */
         class TemplateIfExpr : public TemplatePart
         {
         public:

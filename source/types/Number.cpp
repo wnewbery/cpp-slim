@@ -137,7 +137,7 @@ namespace slim
     {
         double ndigits = 0;
         if (args.size() == 1) ndigits = as_number(args[0]);
-        else if (args.size() > 1) throw InvalidArgument(this, "round");
+        else if (args.size() > 1) throw ArgumentError(this, "round");
 
         if (v == 0) return std::static_pointer_cast<Number>(shared_from_this());
         if (ndigits == 0) return make_value(std::round(v));

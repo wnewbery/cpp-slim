@@ -11,13 +11,9 @@
 #include "FunctionHelpers.hpp"
 namespace slim
 {
-    class Object;
-    typedef std::shared_ptr<Object> ObjectPtr;
-    typedef std::function<ObjectPtr(Object *self, const FunctionArgs &args)> Method2;
-
-    typedef ObjectPtr(*RawFunction)(Object *self, const FunctionArgs &args);
     namespace detail
     {
+        /**Used to determine some aspects of a member function pointer.*/
         template<class T> struct MethodTraits;
         template<class RetType, class SelfType, class... Args>
         struct MethodTraits<RetType(SelfType::*)(Args...)>
@@ -62,7 +58,8 @@ namespace slim
         {
             return (self->*func)(std::forward<Args>(args)...);
         }
-        /**Call a function with the correct self (C++ this) type with already correct arguments.*/
+ 
+        /**Call a function with the correct self (C++ this) type given already correct arguments.*/
         template<class Func, class... Args>
         ObjectPtr do_call(Object *self, Func func, Args &&... args)
         {
@@ -73,56 +70,57 @@ namespace slim
               typename Traits::is_void_result(),
               std::forward<Args>(args)...);
         }
-        /**Call a varargs function.*/
-        template<class Func> ObjectPtr call_varargs(Object *self, Func func, const FunctionArgs &args)
-        {
-            return do_call(self, func, args);
-        }
-        /**Implementation detail of call_typed. Has a matching pack of argument types and indices for them.*/
+
+        /**Implementation detail of call with fixed types.
+         * Has a matching pack of argument types and indices for calling func.
+         */
         template<class... Args, class Func, size_t ...indices>
         ObjectPtr do_call_typed(Object *self, Func func, const FunctionArgs &args, Indices<indices...>)
         {
             return do_call(self, func, slim::unpack_arg<Args>(args[indices])...);
         }
+
+        /**Call a varargs function.*/
+        template<class RetType, class SelfType>
+        ObjectPtr call(Object *self, RetType(SelfType::*func)(const FunctionArgs &args), const FunctionArgs &args)
+        {
+            return do_call(self, func, args);
+        }
         /**Call func by converting each element of args to the appropriate type.*/
         template<class RetType, class SelfType, class... Args>
-        ObjectPtr call_typed(Object *self, RetType(SelfType::*func)(Args...), const FunctionArgs &args)
+        ObjectPtr call(Object *self, RetType(SelfType::*func)(Args...), const FunctionArgs &args)
         {
             if (args.size() != sizeof...(Args))
             {
-                throw InvalidArgumentCount(args.size(), sizeof...(Args), sizeof...(Args));
+                throw ArgumentCountError(args.size(), sizeof...(Args), sizeof...(Args));
             }
             return do_call_typed<Args...>(self, func, args, BuildIndices<sizeof...(Args)>{});
         }
 
-        template<class RetType, class SelfType>
-        ObjectPtr call(Object *self, RetType(SelfType::*func)(const FunctionArgs &args), const FunctionArgs &args)
-        {
-            return call_varargs(self, func, args);
-        }
-        template<class RetType, class SelfType, class... Args>
-        ObjectPtr call(Object *self, RetType(SelfType::*func)(Args...), const FunctionArgs &args)
-        {
-            return call_typed(self, func, args);
-        }
-
+        /**Storage for all method pointers, but with an incorrect self type and parameter list.*/
         typedef ObjectPtr(Object::*RawMethod)(const FunctionArgs &args);
         
+        /**Call a method with the correct member function pointer type.
+         * The function signature does not include the template type, allowing a pointer to
+         * instantiations to be stored in the non-template Method class.
+         */
         template<class Func>
         ObjectPtr wrapped_call(Object *self, RawMethod func, const FunctionArgs &args)
         {
+            static_assert(sizeof(Func) == sizeof(RawMethod), "Cast assumes RawMethod was the correct storage size.");
             return call(self, (Func)func, args);
         }
     }
 
+    /**A member method of a script type.*/
     class Method
     {
     public:
-        const SymPtr name;
+        Method() {}
 
         template<class Func>
         Method(Func func, const SymPtr &name)
-            : name(name)
+            : _name(name)
             , method((detail::RawMethod)func)
             , caller(&detail::wrapped_call<Func>)
         {}
@@ -131,45 +129,65 @@ namespace slim
             : Method(func, symbol(name))
         {}
 
+        /**Call the method.
+         * @param self The this pointer for the method call. It is assumed that this is of the correct
+         * type for the provided function pointer.
+         * @param args The list of method arguments for the call, which may be any of the script
+         * types and may not be correct for the call. The method checks the number of types and
+         * throws an exception if they are wrong. Arguments may not be nullptr, use NIL_VALUE.
+         *
+         * If the underlying function has specific types rather than FunctionArgs, then args is 
+         * converted in a manner similar to slim::unpack, calling try_unpack_arg for each one with
+         * ADL.
+         *
+         * @return The object returned by the method call.
+         */
         ObjectPtr operator()(Object *self, const FunctionArgs &args)const
         {
             return caller(self, method, args);
         }
+
+        /**The name of the method, as referenced by scripts.*/
+        const SymPtr &name()const { return _name; }
     private:
+        SymPtr _name;
         detail::RawMethod method;
         ObjectPtr(*caller)(Object *, detail::RawMethod, const FunctionArgs &);
     };
 
+    /**The table of named methods for a type.*/
     class MethodTable
     {
     public:
         typedef std::unordered_map<SymPtr, Method, ObjHash, ObjEquals> Map;
 
+        /**Constructs an empty method table.*/
         MethodTable() : map() {}
-        MethodTable(std::initializer_list<Method> functions)
+
+        /**Constructs a method table using the methods in the initializer_list.*/
+        MethodTable(std::initializer_list<Method> methods)
         {
-            for (auto &f : functions) add(f);
+            for (auto &f : methods) add(f);
         }
-        MethodTable(const MethodTable &table, std::initializer_list<Method> functions)
+        /**Duplicates an existing method table, then adds additional methods to it.
+         * Useful when extending types.
+         */
+        MethodTable(const MethodTable &table, std::initializer_list<Method> methods)
             : map(table.map)
         {
-            for (auto &f : functions) add(f);
+            for (auto &f : methods) add(f);
         }
 
+        /**Adds a method to the table. Overrwrites any existing method with that name.*/
         void add(const Method &func)
         {
-            map.emplace(func.name, func);
+            map[func.name()] = func;
         }
+        /**Find a method. Returns nullptr if the method is not found.*/
         const Method *find(SymPtr name)const
         {
             auto it = map.find(name);
             return it != map.end() ? &it->second : nullptr;
-        }
-        const Method& get(SymPtr name)const
-        {
-            auto f = find(name);
-            if (f) return *f;
-            else throw NoSuchMethod(name.get());
         }
     private:
         Map map;

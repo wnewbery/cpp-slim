@@ -82,7 +82,7 @@ namespace slim
 
     ObjectPtr Hash::el_ref(const FunctionArgs &args)
     {
-        if (args.size() != 1) throw InvalidArgument(this, "[]");
+        if (args.size() != 1) throw ArgumentError(this, "[]");
         auto it = map.find(args[0]);
         if (it != map.end()) return list[it->second].second;
         else return def_value;
@@ -95,7 +95,7 @@ namespace slim
 
     ObjectPtr Hash::fetch(const FunctionArgs &args)
     {
-        if (args.empty()) throw InvalidArgument(this, "fetch");
+        if (args.empty()) throw ArgumentError(this, "fetch");
         auto it = map.find(args[0]);
         if (it != map.end()) return list[it->second].second;
 
@@ -107,7 +107,7 @@ namespace slim
     {
         int level = 0;
         if (args.size() == 1) level = (int)as_number(args[0]);
-        else if (args.size() > 1) throw InvalidArgument(this, "flatten");
+        else if (args.size() > 1) throw ArgumentError(this, "flatten");
 
         std::vector<ObjectPtr> out;
         for (auto &i : list)
