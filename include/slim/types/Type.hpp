@@ -1,7 +1,7 @@
 #pragma once
 #include "Object.hpp"
 #include "Symbol.hpp"
-#include "Error.hpp"
+#include "../Error.hpp"
 namespace slim
 {
     /**Class/Module type object helper.*/

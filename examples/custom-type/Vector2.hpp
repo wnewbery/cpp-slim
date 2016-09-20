@@ -1,0 +1,77 @@
+#pragma once
+#include <slim/Value.hpp>
+#include <slim/Function.hpp>
+#include <sstream>
+
+class Vector2 : public slim::Object
+{
+public:
+    static const std::string TYPE_NAME;
+    //Constructors
+    Vector2(double x, double y) : x(x), y(y) {}
+
+    //core utilities
+    virtual const std::string& type_name()const override { return TYPE_NAME; }
+    virtual std::string inspect()const override
+    {
+        std::stringstream ss;
+        ss << "(" << x << ", " << y << ")";
+        return ss.str();
+    }
+
+    //operators
+    virtual bool eq(const slim::Object *rhs)const override
+    {
+        auto rhs2 = slim::coerce<Vector2>(rhs);
+        return x == rhs2->x && y == rhs2->y;
+    }
+    virtual slim::ObjectPtr add(slim::Object *rhs)override
+    {
+        auto rhs2 = slim::coerce<Vector2>(rhs);
+        return slim::create_object<Vector2>(x + rhs2->x, y + rhs2->y);
+    }
+    virtual slim::ObjectPtr sub(slim::Object *rhs)override
+    {
+        auto rhs2 = slim::coerce<Vector2>(rhs);
+        return slim::create_object<Vector2>(x - rhs2->x, y - rhs2->y);
+    }
+    std::shared_ptr<slim::Number> dot(Vector2 *rhs)
+    {
+        return slim::make_value(x * rhs->x + y * rhs->y);
+    }
+
+    slim::ObjectPtr get_x() { return slim::make_value(x); }
+    slim::ObjectPtr get_y() { return slim::make_value(y); }
+protected:
+    virtual const slim::MethodTable &method_table()const
+    {
+        static const slim::MethodTable table(slim::Object::method_table(),
+        {
+            { &Vector2::get_x, "x" },
+            { &Vector2::get_y, "y" },
+            { &Vector2::dot, "dot" }
+        });
+        return table;
+    }
+private:
+    double x, y;
+};
+class Vector2Type : public slim::Type
+{
+public:
+    static const std::string TYPE_NAME;
+    virtual const std::string& type_name()const override { return TYPE_NAME; }
+
+    std::shared_ptr<Vector2> new_instance(slim::Number *x, slim::Number *y)
+    {
+        return slim::create_object<Vector2>(x->get_value(), y->get_value());
+    }
+    virtual const slim::MethodTable &method_table()const
+    {
+        static const slim::MethodTable table(slim::Object::method_table(),
+        {
+            { &Vector2Type::new_instance, "new" }
+        });
+        return table;
+    }
+};

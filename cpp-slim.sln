@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cpp-slim", "cpp-slim.vcxproj", "{1DD2F697-0EE9-43B0-BEAB-4FCEE1B35CD3}"
 EndProject
@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cpp-slim-ut", "cpp-slim-ut.
 	ProjectSection(ProjectDependencies) = postProject
 		{1DD2F697-0EE9-43B0-BEAB-4FCEE1B35CD3} = {1DD2F697-0EE9-43B0-BEAB-4FCEE1B35CD3}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "custom-type", "examples\custom-type\custom-type.vcxproj", "{98DEA833-E9EA-42CB-A059-B950133B4882}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +36,14 @@ Global
 		{D0794B51-E058-4EC2-9464-A72EAC875130}.Release|x64.Build.0 = Release|x64
 		{D0794B51-E058-4EC2-9464-A72EAC875130}.Release|x86.ActiveCfg = Release|Win32
 		{D0794B51-E058-4EC2-9464-A72EAC875130}.Release|x86.Build.0 = Release|Win32
+		{98DEA833-E9EA-42CB-A059-B950133B4882}.Debug|x64.ActiveCfg = Debug|x64
+		{98DEA833-E9EA-42CB-A059-B950133B4882}.Debug|x64.Build.0 = Debug|x64
+		{98DEA833-E9EA-42CB-A059-B950133B4882}.Debug|x86.ActiveCfg = Debug|Win32
+		{98DEA833-E9EA-42CB-A059-B950133B4882}.Debug|x86.Build.0 = Debug|Win32
+		{98DEA833-E9EA-42CB-A059-B950133B4882}.Release|x64.ActiveCfg = Release|x64
+		{98DEA833-E9EA-42CB-A059-B950133B4882}.Release|x64.Build.0 = Release|x64
+		{98DEA833-E9EA-42CB-A059-B950133B4882}.Release|x86.ActiveCfg = Release|Win32
+		{98DEA833-E9EA-42CB-A059-B950133B4882}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

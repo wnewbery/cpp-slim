@@ -7,3 +7,4 @@
 #include "types/Nil.hpp"
 #include "types/Number.hpp"
 #include "types/String.hpp"
+#include "types/Type.hpp"
