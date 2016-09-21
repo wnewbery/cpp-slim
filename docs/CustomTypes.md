@@ -4,6 +4,8 @@ adding an instance to the `slim::ViewModel` (either as a module/class Constant o
 data model) used to render the template.
 In the case of helper methods, you might also choose to derived `ViewModel` itself.
 
+Full example code can be found in `examples/custom-type`.
+
 ## Minimal type
 All types must ultimately derive `slim::Object` and have their own type name.
 
@@ -13,14 +15,17 @@ Header:
 class Vector2 : public slim::Object
 {
 public:
-    static const std::string TYPE_NAME;
-    virtual const std::string& type_name()const override { return TYPE_NAME; }
-    
-    //
-    Vector2(float x, float y) : x(x), y(y) {}
-    
+    //Constructor
+    Vector2(double x, double y) : x(x), y(y) {}
+    //Required static and override
+    static const std::string &name()
+    {
+        static const std::string TYPE_NAME = "Vector2";
+        return TYPE_NAME;
+    }
+    virtual const std::string& type_name()const override { return type_name(); }
 private:
-    float x, y;
+    double x, y;
 };
 ```
 Source:
@@ -35,17 +40,34 @@ of the `slim::Object` class, and so custom types override those C++ methods, rat
 methods to the types method table.
 
 ```C++
-ObjectPtr Vector2::add(slim::Object *rhs)
+
+class Vector2 : public slim::Object
 {
-    auto rhs2 = slim::coerce<Vector2>(rhs);
-    return slim::create_object<Vector2>(x + rhs2->x, y + rhs2->y);
-}
+public:
+    ...
+    virtual std::string inspect()const override
+    {
+        std::stringstream ss;
+        ss << "(" << x << ", " << y << ")";
+        return ss.str();
+    }
+    virtual ObjectPtr add(slim::Object *rhs)override
+    {
+        auto rhs2 = slim::coerce<Vector2>(rhs);
+        return slim::create_object<Vector2>(x + rhs2->x, y + rhs2->y);
+    }
+    virtual slim::ObjectPtr sub(slim::Object *rhs)override
+    {
+        auto rhs2 = slim::coerce<Vector2>(rhs);
+        return slim::create_object<Vector2>(x - rhs2->x, y - rhs2->y);
+    }
 ```
 
 ## Adding custom methods
 
 New member methods can easily be added to a type as long as they follow certain rules:
 
+   * Methods may be C++ instance functions, or static/global functions.
    * The method should not be overloaded, the method table implementation itself currently
      has no means to do runtime overload resolution.
    * The method should not have default parameters, as C++ function pointer types do not
@@ -61,40 +83,47 @@ New member methods can easily be added to a type as long as they follow certain 
      (they will be mapped 1 to 1 by the script) that follow the rules for
      `slim::unpack(args, &arg1, &arg2, etc)`.
 
+Additionally getters may be automatically created from a member variable pointer using `Method::getter`
+for any type for which a `make_value` overload (including ADL) is defined.
+
 If it is desired to have overloading or default values for the methods paramters, it is suggested
 to used the `const FunctionArgs &` parameter list, and then determine them within the method, such
 as by using `slim::try_unpack` and `slim::unpack`.
 
 ```C++
-//Getters
-std::shared_ptr<slim::Number> Vector2::get_x() { return slim::make_value(x); }
-std::shared_ptr<slim::Number> Vector2::get_y() { return slim::make_value(y); }
-//Dot product
-std::shared_ptr<slim::Number> Vector2::dot(Vector2 *rhs)
+class Vector2 : public slim::Object
 {
-    return slim::make_value(x * rhs->x + y * rhs->y);
-}
+public:
+    ...
+    //Dot product
+    std::shared_ptr<slim::Number> dot(Vector2 *rhs)
+    {
+        return slim::make_value(x * rhs->x + y * rhs->y);
+    }
 ```
 
 The `Object::method_table` method can then be overriden to make those C++ member methods available
 to the script when the method calls `self` object is an instance of `Vector2`.
 
 ```C++
-const MethodTable &Vector2::method_table()const
+class Vector2 : public slim::Object
 {
-    static const MethodTable table(Object::method_table(),
+protected:
+    virtual const MethodTable &Vector2::method_table()const override
     {
-        { &Vector2::get_x, "x" },
-        { &Vector2::get_y, "y" },
-        { &Vector2::dot, "dot" }
-    });
-    return table;
-}
+        static const slim::MethodTable table(slim::Object::method_table(),
+        {
+            slim::Method::getter(&Vector2::x, "x"),
+            slim::Method::getter(&Vector2::y, "y"),
+            { &Vector2::dot, "dot" }
+        });
+        return table;
+    }
 ```
 
-Because the C++ method signatures are a form that `slim::Method` understands, no additional effort
-is required, and the checking of argument counts and types when the method is called is done by
-`slim::Method::call`.
+Because the C++ member method and variable signatures are a form that `slim::Method` understands,
+no additional effort is required, and the checking of argument counts and types when the method is
+called is done by `slim::Method::call`.
 
 ## Making it creatable in scripts
 

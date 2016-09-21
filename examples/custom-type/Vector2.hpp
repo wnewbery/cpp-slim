@@ -49,7 +49,7 @@ public:
     }
 
 protected:
-    virtual const slim::MethodTable &method_table()const
+    virtual const slim::MethodTable &method_table()const override
     {
         static const slim::MethodTable table(slim::Object::method_table(),
         {
