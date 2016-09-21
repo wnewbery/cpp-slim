@@ -78,5 +78,8 @@
     <ClCompile Include="tests\template\Layout.cpp">
       <Filter>tests\template</Filter>
     </ClCompile>
+    <ClCompile Include="tests\Unicode.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

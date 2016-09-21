@@ -59,6 +59,7 @@
     <ClInclude Include="include\slim\Util.hpp" />
     <ClInclude Include="include\slim\Value.hpp" />
     <ClInclude Include="source\template\TemplateBlock.hpp" />
+    <ClInclude Include="source\Unicode.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Error.cpp" />
@@ -85,6 +86,7 @@
     <ClCompile Include="source\types\Object.cpp" />
     <ClCompile Include="source\types\Proc.cpp" />
     <ClCompile Include="source\types\ViewModel.cpp" />
+    <ClCompile Include="source\Unicode.cpp" />
     <ClCompile Include="source\Util.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -147,6 +147,9 @@
     <ClInclude Include="include\slim\BaseLexer.hpp">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="source\Unicode.hpp">
+      <Filter>source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\types\Object.cpp">
@@ -223,6 +226,9 @@
     </ClCompile>
     <ClCompile Include="source\types\ViewModel.cpp">
       <Filter>source\types</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Unicode.cpp">
+      <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
