@@ -24,7 +24,11 @@ namespace slim
         ObjectMap constants;
     };
 
-    /**Provides a single Class instance with a "new" method to create instances of type T.*/
+    /**Provides a single Class instance with a "new" method to create instances of type T.
+     *
+     * The "new" method uses T::new_instance as an implementation, and so that static function
+     * must exist, and follow the slim::Method rules regarding parameters.
+     */
     template<class T> class SimpleClass : public Type
     {
     public:

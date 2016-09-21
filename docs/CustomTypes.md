@@ -130,8 +130,22 @@ called is done by `slim::Method::call`.
 If it is desired that scripts are able to create new instances of this type, e.g. by `Vector2.new x, y`,
 then a `Vector2` constant also needs to be set for that template/script, with a method `new`.
 
-This is done by creating another type derived from `slim::Object` (e.g. `class Vector2Type : public Object`),
-this time with a `new` method, where the implementation of that method creates the new instance. The
-same can be done for any other desired static/class methods.
+In the simplest cases where only the static `new` method is required, an instance of `SimpleClass<T>`
+can be used, which requires that the type has a `new_instance` static function with no overloads,
+following the same function argument restrictions as methods for `method_table`.
 
-You then assign an instance of this "type class" as a constant.
+In more complex cases, a full new type can be created, containing all the desired static methods.
+
+    class Vector2 : public slim::Objkect
+    {
+    public:
+        ...
+        //Used by slim::SimpleClass<Vector2>. Can not be overloaded, unlike the constructor.
+        static std::shared_ptr<Vector2> new_instance(slim::Number *x, slim::Number *y)
+        {
+            return slim::create_object<Vector2>(x->get_value(), y->get_value());
+        }
+    };
+    
+    //Assign an instance of SimpleClass as a constant for the scripts
+    view_model->add_constant("Vector2", slim::create_object<slim::SimpleClass<Vector2>>());
