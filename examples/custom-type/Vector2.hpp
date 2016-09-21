@@ -6,7 +6,6 @@
 class Vector2 : public slim::Object
 {
 public:
-    static const std::string TYPE_NAME;
     //Constructors
     Vector2(double x, double y) : x(x), y(y) {}
     static std::shared_ptr<Vector2> new_instance(slim::Number *x, slim::Number *y)
@@ -15,7 +14,12 @@ public:
     }
 
     //core utilities
-    virtual const std::string& type_name()const override { return TYPE_NAME; }
+    static const std::string &name()
+    {
+        static const std::string TYPE_NAME = "Vector2";
+        return TYPE_NAME;
+    }
+    virtual const std::string& type_name()const override { return name(); }
     virtual std::string inspect()const override
     {
         std::stringstream ss;

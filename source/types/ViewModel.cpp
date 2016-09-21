@@ -8,8 +8,6 @@
 
 namespace slim
 {
-    const std::string ViewModel::TYPE_NAME = "ViewModel";
-
     ViewModel::ViewModel() {}
     ViewModel::~ViewModel() {}
 

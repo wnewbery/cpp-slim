@@ -10,8 +10,6 @@
 
 namespace slim
 {
-    const std::string Array::TYPE_NAME = "Array";
-
     std::string Array::inspect() const
     {
         std::stringstream ss;

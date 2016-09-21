@@ -6,8 +6,6 @@
 
 namespace slim
 {
-    const std::string Proc::TYPE_NAME = "Proc";
-
     Proc::Proc(
         const expr::ExpressionNode &code,
         const std::vector<SymPtr> &param_names,

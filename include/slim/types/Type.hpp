@@ -28,7 +28,8 @@ namespace slim
     template<class T> class SimpleClass : public Type
     {
     public:
-        virtual const std::string& type_name()const override { return T::TYPE_NAME; }
+        static const std::string &name() { return T::name(); }
+        virtual const std::string& type_name()const override { return T::name(); }
         virtual const slim::MethodTable &method_table()const
         {
             static const slim::MethodTable table(slim::Object::method_table(),

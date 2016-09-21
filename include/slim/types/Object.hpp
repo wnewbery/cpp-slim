@@ -122,25 +122,25 @@ namespace slim
     {
         auto obj2 = dynamic_cast<T*>(obj);
         if (obj2) return obj2;
-        else throw TypeError(obj, T::TYPE_NAME);
+        else throw TypeError(obj, T::name());
     }
     template<class T> const T *coerce(const Object *obj)
     {
         auto obj2 = dynamic_cast<const T*>(obj);
         if (obj2) return obj2;
-        else throw TypeError(obj, T::TYPE_NAME);
+        else throw TypeError(obj, T::name());
     }
     template<class T> std::shared_ptr<T>coerce(const std::shared_ptr<Object> &obj)
     {
         auto obj2 = std::dynamic_pointer_cast<T>(obj);
         if (obj2) return obj2;
-        else throw TypeError(obj.get(), T::TYPE_NAME);
+        else throw TypeError(obj.get(), T::name());
     }
     template<class T> std::shared_ptr<const T> coerce(const std::shared_ptr<const Object> &obj)
     {
         auto obj2 = std::dynamic_pointer_cast<const T>(obj);
         if (obj2) return obj2;
-        else throw TypeError(obj.get(), T::TYPE_NAME);
+        else throw TypeError(obj.get(), T::name());
     }
 
     namespace detail

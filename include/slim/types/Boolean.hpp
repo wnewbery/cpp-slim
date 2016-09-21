@@ -9,8 +9,6 @@ namespace slim
     class Boolean : public Object
     {
     public:
-        static const std::string TYPE_NAME;
-
         template<class T>
         static std::shared_ptr<T> create(bool b)
         {
@@ -19,7 +17,13 @@ namespace slim
 
         explicit Boolean(bool b) : b(b) {}
 
-        virtual const std::string& type_name()const override { return TYPE_NAME; }
+        static const std::string &name()
+        {
+            static const std::string TYPE_NAME = "Boolean";
+            return TYPE_NAME;
+        }
+        virtual const std::string& type_name()const override { return name(); }
+
         virtual std::string to_string()const override { return b ? "true" : "false"; }
         virtual std::string inspect()const override { return to_string(); }
         virtual bool is_true()const override { return b; }

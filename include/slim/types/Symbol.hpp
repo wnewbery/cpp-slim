@@ -29,10 +29,14 @@ namespace slim
     class Symbol : public Object
     {
     public:
-        static const std::string TYPE_NAME;
         ~Symbol();
 
-        virtual const std::string& type_name()const override { return TYPE_NAME; }
+        static const std::string &name()
+        {
+            static const std::string TYPE_NAME = "Symbol";
+            return TYPE_NAME;
+        }
+        virtual const std::string& type_name()const override { return name(); }
         virtual std::string to_string()const override;
         virtual std::string inspect()const override;
         virtual bool eq(const Object *rhs)const override { return this == rhs; }

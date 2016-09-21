@@ -11,12 +11,15 @@ namespace slim
     class ViewModel : public Object
     {
     public:
-        static const std::string TYPE_NAME;
-
         ViewModel();
         ~ViewModel();
 
-        virtual const std::string& type_name()const override { return TYPE_NAME; }
+        static const std::string &name()
+        {
+            static const std::string TYPE_NAME = "ViewModel";
+            return TYPE_NAME;
+        }
+        virtual const std::string& type_name()const override { return name(); }
 
 
         virtual ObjectPtr get_constant(SymPtr name)override;

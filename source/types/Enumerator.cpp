@@ -3,9 +3,6 @@
 
 namespace slim
 {
-    const std::string Enumerator::TYPE_NAME = "Enumerator";
-    
-
     std::shared_ptr<Object> Enumerator::each(const FunctionArgs & args)
     {
         return forward(forward_self.get(), args);

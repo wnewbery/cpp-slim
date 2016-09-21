@@ -76,7 +76,6 @@
     <ClCompile Include="source\template\TemplateBlock.cpp" />
     <ClCompile Include="source\template\TemplateParts.cpp" />
     <ClCompile Include="source\types\Array.cpp" />
-    <ClCompile Include="source\types\HtmlSafeString.cpp" />
     <ClCompile Include="source\types\Math.cpp" />
     <ClCompile Include="source\types\String.cpp" />
     <ClCompile Include="source\types\Symbol.cpp" />

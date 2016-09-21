@@ -8,12 +8,16 @@ namespace slim
     class Enumerator : public Object
     {
     public:
-        static const std::string TYPE_NAME;
         Enumerator(ObjectPtr forward_self, Method forward)
             : forward_self(forward_self), forward(forward)
         {}
 
-        virtual const std::string& type_name()const override { return TYPE_NAME; }
+        static const std::string &name()
+        {
+            static const std::string TYPE_NAME = "Enumerator";
+            return TYPE_NAME;
+        }
+        virtual const std::string& type_name()const override { return name(); }
 
         std::shared_ptr<Object> each(const FunctionArgs &args);
     protected:

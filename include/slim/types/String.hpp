@@ -9,12 +9,16 @@ namespace slim
     class String : public Object
     {
     public:
-        static const std::string TYPE_NAME;
         explicit String(std::string &&v) : v(std::move(v)) {}
         explicit String(const std::string &v) : v(v) {}
         explicit String() : v() {}
 
-        virtual const std::string& type_name()const override { return TYPE_NAME; }
+        static const std::string &name()
+        {
+            static const std::string TYPE_NAME = "String";
+            return TYPE_NAME;
+        }
+        virtual const std::string& type_name()const override { return name(); }
         virtual std::string to_string()const override { return v; }
         virtual std::string inspect()const override;
         virtual std::shared_ptr<String> to_string_obj()override

@@ -9,10 +9,14 @@ namespace slim
     class Number : public Object
     {
     public:
-        static const std::string TYPE_NAME;
         explicit Number(double v) : v(v) {}
 
-        virtual const std::string& type_name()const override { return TYPE_NAME; }
+        static const std::string &name()
+        {
+            static const std::string TYPE_NAME = "Number";
+            return TYPE_NAME;
+        }
+        virtual const std::string& type_name()const override { return name(); }
         virtual std::string to_string()const override;
         virtual std::string inspect()const { return to_string(); }
         virtual bool eq(const Object *rhs)const override

@@ -11,8 +11,6 @@ namespace slim
     class Nil : public Object
     {
     public:
-        static const std::string TYPE_NAME;
-
         template<class T>
         static std::shared_ptr<T> create()
         {
@@ -21,7 +19,12 @@ namespace slim
 
         explicit Nil() {}
 
-        virtual const std::string& type_name()const override { return TYPE_NAME; }
+        static const std::string &name()
+        {
+            static const std::string TYPE_NAME = "Nil";
+            return TYPE_NAME;
+        }
+        virtual const std::string& type_name()const override { return name(); }
         virtual std::string to_string()const override { return ""; }
         virtual std::string inspect()const override  { return "nil"; }
         virtual bool is_true()const override { return false; }

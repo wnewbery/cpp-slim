@@ -10,10 +10,14 @@ namespace slim
     class Math : public Type
     {
     public:
-        static const std::string TYPE_NAME;
         Math();
 
-        virtual const std::string& type_name()const override { return TYPE_NAME; }
+        static const std::string &name()
+        {
+            static const std::string TYPE_NAME = "Math";
+            return TYPE_NAME;
+        }
+        virtual const std::string& type_name()const override { return name(); }
 
         NumberPtr acos(Number *n);
         NumberPtr asin(Number *n);

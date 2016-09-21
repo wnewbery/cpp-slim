@@ -22,8 +22,6 @@ namespace slim
         }
     }
 
-    const std::string String::TYPE_NAME = "String";
-
     std::string String::inspect()const
     {
         std::string out = "\"";

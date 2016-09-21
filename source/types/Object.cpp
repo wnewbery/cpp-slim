@@ -10,9 +10,6 @@
 
 namespace slim
 {
-    const std::string Boolean::TYPE_NAME = "Boolean";
-    const std::string Nil::TYPE_NAME = "Nil";
-
     const std::shared_ptr<Nil> NIL_VALUE = std::make_shared<Nil>();
     const std::shared_ptr<Boolean> TRUE_VALUE = std::make_shared<Boolean>(true);
     const std::shared_ptr<Boolean> FALSE_VALUE = std::make_shared<Boolean>(false);

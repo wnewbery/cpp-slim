@@ -6,8 +6,6 @@
 
 namespace slim
 {
-    const std::string Number::TYPE_NAME = "Number";
-
     std::string Number::to_string()const
     {
         std::stringstream ss;

@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(boolean)
     BOOST_CHECK_EQUAL(1, TRUE_VALUE->hash());
     BOOST_CHECK_EQUAL(0, FALSE_VALUE->hash());
 
-    BOOST_CHECK_EQUAL("Boolean", Boolean::TYPE_NAME);
+    BOOST_CHECK_EQUAL("Boolean", Boolean::name());
     BOOST_CHECK_EQUAL("Boolean", true_val->type_name());
     BOOST_CHECK_EQUAL("true", true_val->to_string());
     BOOST_CHECK_EQUAL("false", false_val->to_string());
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(nil)
     BOOST_CHECK_EQUAL(nil_val, NIL_VALUE);
     BOOST_CHECK_EQUAL(0, NIL_VALUE->hash());
 
-    BOOST_CHECK_EQUAL("Nil", Nil::TYPE_NAME);
+    BOOST_CHECK_EQUAL("Nil", Nil::name());
     BOOST_CHECK_EQUAL("Nil", nil_val->type_name());
     BOOST_CHECK_EQUAL("", nil_val->to_string());
     BOOST_CHECK_EQUAL(false, nil_val->is_true());
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(number)
     auto b = make_value(0.0);
     auto c = make_value(-0.5);
 
-    BOOST_CHECK_EQUAL("Number", Number::TYPE_NAME);
+    BOOST_CHECK_EQUAL("Number", Number::name());
     BOOST_CHECK_EQUAL("Number", a->type_name());
     BOOST_CHECK_EQUAL("5.5", a->to_string());
     BOOST_CHECK_EQUAL("0", b->to_string());
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(string)
     auto b = make_value("a");
     auto c = make_value("test");
 
-    BOOST_CHECK_EQUAL("String", String::TYPE_NAME);
+    BOOST_CHECK_EQUAL("String", String::name());
     BOOST_CHECK_EQUAL("String", a->type_name());
     BOOST_CHECK_EQUAL("", a->to_string());
     BOOST_CHECK_EQUAL("a", b->to_string());

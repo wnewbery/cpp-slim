@@ -9,8 +9,6 @@
 
 namespace slim
 {
-    const std::string Hash::TYPE_NAME = "Hash";
-
     Hash::Hash()
         : def_value(NIL_VALUE), map(), list()
     {}

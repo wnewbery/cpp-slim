@@ -12,7 +12,6 @@ namespace slim
     class Hash : public Object
     {
     public:
-        static const std::string TYPE_NAME;
         typedef std::vector<std::pair<ObjectPtr, ObjectPtr>> List;
         typedef List::iterator const_iterator;
 
@@ -21,7 +20,13 @@ namespace slim
             : def_value(), map(), list()
         {}
 
-        virtual const std::string& type_name()const override { return TYPE_NAME; }
+        static const std::string &name()
+        {
+            static const std::string TYPE_NAME = "Hash";
+            return TYPE_NAME;
+        }
+        virtual const std::string& type_name()const override { return name(); }
+
         virtual std::string to_string()const override { return inspect(); }
         virtual std::string inspect()const override;
         virtual size_t hash()const;

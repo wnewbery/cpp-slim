@@ -6,8 +6,6 @@
 #include <cmath>
 namespace slim
 {
-    const std::string Math::TYPE_NAME = "Math";
-
     Math::Math()
     {
         constants[symbol("E")]  = make_value(2.718281828459045);

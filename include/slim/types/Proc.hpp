@@ -14,14 +14,18 @@ namespace slim
     class Proc : public Object
     {
     public:
-        static const std::string TYPE_NAME;
         Proc(
             const expr::ExpressionNode &code,
             const std::vector<SymPtr> &param_names,
             expr::Scope &scope);
         ~Proc();
 
-        virtual const std::string& type_name()const override { return TYPE_NAME; }
+        static const std::string &name()
+        {
+            static const std::string TYPE_NAME = "Proc";
+            return TYPE_NAME;
+        }
+        virtual const std::string& type_name()const override { return name(); }
 
         ObjectPtr call(const FunctionArgs &args);
     protected:

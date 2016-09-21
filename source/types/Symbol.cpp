@@ -6,8 +6,6 @@
 
 namespace slim
 {
-    const std::string Symbol::TYPE_NAME = "Symbol";
-
     SymPtr symbol(const std::string & str)
     {
         static std::unordered_map<std::string, std::shared_ptr<Symbol>> map;

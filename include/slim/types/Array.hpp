@@ -10,7 +10,6 @@ namespace slim
     class Array : public Object
     {
     public:
-        static const std::string TYPE_NAME;
         typedef std::vector<ObjectPtr> List;
         typedef List::iterator iterator;
 
@@ -18,7 +17,13 @@ namespace slim
         explicit Array(std::vector<ObjectPtr> &&arr) : arr(std::move(arr)) {}
         explicit Array(const std::vector<ObjectPtr> &arr) : arr(arr) {}
 
-        virtual const std::string& type_name()const override { return TYPE_NAME; }
+        static const std::string &name()
+        {
+            static const std::string TYPE_NAME = "Array";
+            return TYPE_NAME;
+        }
+        virtual const std::string& type_name()const override { return name(); }
+
         virtual std::string to_string()const override { return inspect(); }
         virtual std::string inspect()const override;
         virtual bool eq(const Object *rhs)const override { return cmp(rhs) == 0; }
