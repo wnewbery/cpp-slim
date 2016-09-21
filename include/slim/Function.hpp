@@ -50,6 +50,12 @@ namespace slim
             (self->*func)(std::forward<Args>(args)...);
             return NIL_VALUE;
         }
+        template<class Func, class... Args>
+        static ObjectPtr do_call_void_ret(Func func, std::true_type, Args &&... args)
+        {
+            func(std::forward<Args>(args)...);
+            return NIL_VALUE;
+        }
         /**Call and handle void returns. For std::false_type return result of func implicitly
          * converted to ObjectPtr.
          */
@@ -57,6 +63,11 @@ namespace slim
         static ObjectPtr do_call_void_ret(SelfType *self, Func func, std::false_type, Args &&... args)
         {
             return (self->*func)(std::forward<Args>(args)...);
+        }
+        template<class Func, class... Args>
+        static ObjectPtr do_call_void_ret(Func func, std::false_type, Args &&... args)
+        {
+            return func(std::forward<Args>(args)...);
         }
  
         /**Call a function with the correct self (C++ this) type given already correct arguments.*/
@@ -67,8 +78,17 @@ namespace slim
             auto self_typed = static_cast<typename Traits::self_type*>(self);
             assert(self_typed == dynamic_cast<typename Traits::self_type*>(self));
             return do_call_void_ret(self_typed, func,
-              typename Traits::is_void_result(),
-              std::forward<Args>(args)...);
+                typename Traits::is_void_result(),
+                std::forward<Args>(args)...);
+        }
+        
+        /**Call a static/global function with correct arguments, but unconverted return type.*/
+        template<class RetType, class... Args>
+        ObjectPtr do_static_call(RetType(*func)(Args...), Args &&... args)
+        {
+            return do_call_void_ret(func,
+                std::is_void<RetType>::type(),
+                std::forward<Args>(args)...);
         }
 
         /**Implementation detail of call with fixed types.
@@ -79,8 +99,13 @@ namespace slim
         {
             return do_call(self, func, slim::unpack_arg<Args>(args[indices])...);
         }
+        template<class... Args, class Func, size_t ...indices>
+        ObjectPtr do_call_static_typed(Func func, const FunctionArgs &args, Indices<indices...>)
+        {
+            return do_static_call(func, slim::unpack_arg<Args>(args[indices])...);
+        }
 
-        /**Call a varargs function.*/
+        /**Call a varargs member method.*/
         template<class RetType, class SelfType>
         ObjectPtr call(Object *self, RetType(SelfType::*func)(const FunctionArgs &args), const FunctionArgs &args)
         {
@@ -96,20 +121,41 @@ namespace slim
             }
             return do_call_typed<Args...>(self, func, args, BuildIndices<sizeof...(Args)>{});
         }
+        /**Call a static/global varargs function.*/
+        template<class RetType>
+        ObjectPtr call(Object*, RetType(*func)(const FunctionArgs &args), const FunctionArgs &args)
+        {
+            return do_call(func, args);
+        }
+        /**Call a static/global typed args function.*/
+        template<class RetType, class... Args>
+        ObjectPtr call_static(Object *, RetType(*func)(Args...), const FunctionArgs &args)
+        {
+            if (args.size() != sizeof...(Args))
+            {
+                throw ArgumentCountError(args.size(), sizeof...(Args), sizeof...(Args));
+            }
+            return do_call_static_typed<Args...>(func, args, BuildIndices<sizeof...(Args)>{});
+        }
+
 
         /**Storage for all member method pointers, but with an incorrect self type and parameter list.*/
-        typedef ObjectPtr(Object::*RawFunc)(const FunctionArgs &args);
+        typedef ObjectPtr(Object::*RawMethod)(const FunctionArgs &args);
+        /**Storage for all global/static method pointers, but an incorrect parameter list and return type.*/
+        typedef ObjectPtr(*RawFunc)(const FunctionArgs &args);
         /**Storage for all member variable pointers, but with an incorrect self and result type.*/
         typedef int Object::*RawProp;
 
-        union RawMethod
+        union RawMember
         {
-            RawFunc method;
+            RawFunc func;
+            RawMethod method;
             RawProp prop;
 
-            RawMethod() {}
-            RawMethod(RawFunc method) : method(method) {}
-            RawMethod(RawProp prop) : prop(prop) {}
+            RawMember() {}
+            RawMember(RawFunc func) : func(func) {}
+            RawMember(RawMethod method) : method(method) {}
+            RawMember(RawProp prop) : prop(prop) {}
         };
         
         /**Call a method with the correct member function pointer type.
@@ -117,10 +163,16 @@ namespace slim
          * instantiations to be stored in the non-template Method class.
          */
         template<class Func>
-        ObjectPtr wrapped_call(Object *self, RawMethod func, const FunctionArgs &args)
+        ObjectPtr wrapped_call(Object *self, RawMember func, const FunctionArgs &args)
         {
             static_assert(sizeof(Func) == sizeof(RawMethod), "Cast assumes RawMethod was the correct storage size.");
             return call(self, (Func)func.method, args);
+        }
+        template<class Func>
+        ObjectPtr wrapped_static_call(Object *self, RawMember func, const FunctionArgs &args)
+        {
+            static_assert(sizeof(Func) == sizeof(RawFunc), "Cast assumes RawMethod was the correct storage size.");
+            return call_static(self, (Func)func.func, args);
         }
     }
 
@@ -128,18 +180,24 @@ namespace slim
     class Method
     {
     public:
-        typedef ObjectPtr(*Caller)(Object *, detail::RawMethod, const FunctionArgs &);
+        typedef ObjectPtr(*Caller)(Object *, detail::RawMember, const FunctionArgs &);
 
         Method() {}
 
-        Method(detail::RawMethod raw, Caller caller, const SymPtr &name)
+        Method(detail::RawMember raw, Caller caller, const SymPtr &name)
             : raw(raw), caller(caller), _name(name)
         {}
 
-        template<class Func>
-        Method(Func func, const SymPtr &name)
+        template<class Ret, class Self, class...Args>
+        Method(Ret(Self::*method)(Args...), const SymPtr &name)
+            : raw((detail::RawMethod)method)
+            , caller(&detail::wrapped_call<decltype(method)>)
+            , _name(name)
+        {}
+        template<class Ret, class...Args>
+        Method(Ret(*func)(Args...), const SymPtr &name)
             : raw((detail::RawFunc)func)
-            , caller(&detail::wrapped_call<Func>)
+            , caller(&detail::wrapped_static_call<decltype(func)>)
             , _name(name)
         {}
         template<class Func>
@@ -152,7 +210,7 @@ namespace slim
         {
 
             auto raw  = (detail::RawProp)prop;
-            Caller caller = [](Object *self, detail::RawMethod raw, const FunctionArgs &args) -> ObjectPtr
+            Caller caller = [](Object *self, detail::RawMember raw, const FunctionArgs &args) -> ObjectPtr
             {
                 if (!args.empty()) throw ArgumentCountError(args.size(), 0, 0);
                 auto prop = (T Self::*)raw.prop;
@@ -188,7 +246,7 @@ namespace slim
         /**The name of the method, as referenced by scripts.*/
         const SymPtr &name()const { return _name; }
     private:
-        detail::RawMethod raw;
+        detail::RawMember raw;
         Caller caller;
         SymPtr _name;
     };

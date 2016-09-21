@@ -23,4 +23,20 @@ namespace slim
     protected:
         ObjectMap constants;
     };
+
+    /**Provides a single Class instance with a "new" method to create instances of type T.*/
+    template<class T> class SimpleClass : public Type
+    {
+    public:
+        virtual const std::string& type_name()const override { return T::TYPE_NAME; }
+        virtual const slim::MethodTable &method_table()const
+        {
+            static const slim::MethodTable table(slim::Object::method_table(),
+            {
+                { &T::new_instance, "new" }
+            });
+            return table;
+        }
+    private:
+    };
 }

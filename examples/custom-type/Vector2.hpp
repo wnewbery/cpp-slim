@@ -9,6 +9,10 @@ public:
     static const std::string TYPE_NAME;
     //Constructors
     Vector2(double x, double y) : x(x), y(y) {}
+    static std::shared_ptr<Vector2> new_instance(slim::Number *x, slim::Number *y)
+    {
+        return slim::create_object<Vector2>(x->get_value(), y->get_value());
+    }
 
     //core utilities
     virtual const std::string& type_name()const override { return TYPE_NAME; }
@@ -53,23 +57,4 @@ protected:
     }
 private:
     double x, y;
-};
-class Vector2Type : public slim::Type
-{
-public:
-    static const std::string TYPE_NAME;
-    virtual const std::string& type_name()const override { return TYPE_NAME; }
-
-    std::shared_ptr<Vector2> new_instance(slim::Number *x, slim::Number *y)
-    {
-        return slim::create_object<Vector2>(x->get_value(), y->get_value());
-    }
-    virtual const slim::MethodTable &method_table()const
-    {
-        static const slim::MethodTable table(slim::Object::method_table(),
-        {
-            { &Vector2Type::new_instance, "new" }
-        });
-        return table;
-    }
 };
