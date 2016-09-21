@@ -97,8 +97,20 @@ namespace slim
             return do_call_typed<Args...>(self, func, args, BuildIndices<sizeof...(Args)>{});
         }
 
-        /**Storage for all method pointers, but with an incorrect self type and parameter list.*/
-        typedef ObjectPtr(Object::*RawMethod)(const FunctionArgs &args);
+        /**Storage for all member method pointers, but with an incorrect self type and parameter list.*/
+        typedef ObjectPtr(Object::*RawFunc)(const FunctionArgs &args);
+        /**Storage for all member variable pointers, but with an incorrect self and result type.*/
+        typedef int Object::*RawProp;
+
+        union RawMethod
+        {
+            RawFunc method;
+            RawProp prop;
+
+            RawMethod() {}
+            RawMethod(RawFunc method) : method(method) {}
+            RawMethod(RawProp prop) : prop(prop) {}
+        };
         
         /**Call a method with the correct member function pointer type.
          * The function signature does not include the template type, allowing a pointer to
@@ -108,7 +120,7 @@ namespace slim
         ObjectPtr wrapped_call(Object *self, RawMethod func, const FunctionArgs &args)
         {
             static_assert(sizeof(Func) == sizeof(RawMethod), "Cast assumes RawMethod was the correct storage size.");
-            return call(self, (Func)func, args);
+            return call(self, (Func)func.method, args);
         }
     }
 
@@ -116,18 +128,44 @@ namespace slim
     class Method
     {
     public:
+        typedef ObjectPtr(*Caller)(Object *, detail::RawMethod, const FunctionArgs &);
+
         Method() {}
+
+        Method(detail::RawMethod raw, Caller caller, const SymPtr &name)
+            : raw(raw), caller(caller), _name(name)
+        {}
 
         template<class Func>
         Method(Func func, const SymPtr &name)
-            : _name(name)
-            , method((detail::RawMethod)func)
+            : raw((detail::RawFunc)func)
             , caller(&detail::wrapped_call<Func>)
+            , _name(name)
         {}
         template<class Func>
         Method(Func func, const std::string &name)
             : Method(func, symbol(name))
         {}
+
+        template<class Self, class T>
+        static Method getter(T Self::*prop, const SymPtr &name)
+        {
+
+            auto raw  = (detail::RawProp)prop;
+            Caller caller = [](Object *self, detail::RawMethod raw, const FunctionArgs &args) -> ObjectPtr
+            {
+                if (!args.empty()) throw ArgumentCountError(args.size(), 0, 0);
+                auto prop = (T Self::*)raw.prop;
+                return make_value(((Self*)self)->*prop);
+            };
+
+            return Method(raw, caller, name);
+        }
+        template<class Self, class T>
+        static Method getter(T Self::*prop, const std::string &name)
+        {
+            return getter(prop, symbol(name));
+        }
 
         /**Call the method.
          * @param self The this pointer for the method call. It is assumed that this is of the correct
@@ -144,15 +182,15 @@ namespace slim
          */
         ObjectPtr operator()(Object *self, const FunctionArgs &args)const
         {
-            return caller(self, method, args);
+            return caller(self, raw, args);
         }
 
         /**The name of the method, as referenced by scripts.*/
         const SymPtr &name()const { return _name; }
     private:
+        detail::RawMethod raw;
+        Caller caller;
         SymPtr _name;
-        detail::RawMethod method;
-        ObjectPtr(*caller)(Object *, detail::RawMethod, const FunctionArgs &);
     };
 
     /**The table of named methods for a type.*/

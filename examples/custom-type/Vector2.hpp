@@ -40,15 +40,13 @@ public:
         return slim::make_value(x * rhs->x + y * rhs->y);
     }
 
-    slim::ObjectPtr get_x() { return slim::make_value(x); }
-    slim::ObjectPtr get_y() { return slim::make_value(y); }
 protected:
     virtual const slim::MethodTable &method_table()const
     {
         static const slim::MethodTable table(slim::Object::method_table(),
         {
-            { &Vector2::get_x, "x" },
-            { &Vector2::get_y, "y" },
+            slim::Method::getter(&Vector2::x, "x"),
+            slim::Method::getter(&Vector2::y, "y"),
             { &Vector2::dot, "dot" }
         });
         return table;
