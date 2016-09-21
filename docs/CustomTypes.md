@@ -136,16 +136,18 @@ following the same function argument restrictions as methods for `method_table`.
 
 In more complex cases, a full new type can be created, containing all the desired static methods.
 
-    class Vector2 : public slim::Objkect
+```C++
+class Vector2 : public slim::Objkect
+{
+public:
+    ...
+    //Used by slim::SimpleClass<Vector2>. Can not be overloaded, unlike the constructor.
+    static std::shared_ptr<Vector2> new_instance(slim::Number *x, slim::Number *y)
     {
-    public:
-        ...
-        //Used by slim::SimpleClass<Vector2>. Can not be overloaded, unlike the constructor.
-        static std::shared_ptr<Vector2> new_instance(slim::Number *x, slim::Number *y)
-        {
-            return slim::create_object<Vector2>(x->get_value(), y->get_value());
-        }
-    };
-    
-    //Assign an instance of SimpleClass as a constant for the scripts
-    view_model->add_constant("Vector2", slim::create_object<slim::SimpleClass<Vector2>>());
+        return slim::create_object<Vector2>(x->get_value(), y->get_value());
+    }
+};
+
+//Assign an instance of SimpleClass as a constant for the scripts
+view_model->add_constant("Vector2", slim::create_object<slim::SimpleClass<Vector2>>());
+```
