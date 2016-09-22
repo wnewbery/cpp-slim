@@ -4,31 +4,31 @@ This is a C++ implementation of a subset of the Ruby [Slim](http://slim-lang.com
 engine syntax, and Ruby programming language scripts for dynamic content.
 
 Slim:
-
-    html
-      head
-        title #{@page_title} - C++ Slim
-        =yield :head
-      body
-        header
-          h1 = @page_title
-        = yield
-        footer
-          | Copyright &copy; #{year} #{@authors.join ', '}
-
+```Slim
+html
+  head
+    title #{@page_title} - C++ Slim
+    =yield :head
+  body
+    header
+      h1 = @page_title
+    = yield
+    footer
+      | Copyright &copy; #{year} #{@authors.join ', '}
+```
 C++:
+```c++
+//Parse the template files. Templates can be re-used and are thread-safe.
+auto page_tpl = slim::parse_template_file("example.html.slim")
+auto layout_tpl = slim::parse_template_file("layout.html.slim")
 
-    //Parse the template files. Templates can be re-used and are thread-safe.
-    auto page_tpl = slim::parse_template_file("example.html.slim")
-    auto layout_tpl = slim::parse_template_file("layout.html.slim")
-    
-    //ViewModel contains all the methods and instance data for "self" in the template/scripts.
-    auto model = std::make_shared<MyViewModel>();
-    model->set("page_title", slim::make_value("Example"));
-    
-    //Render to a HTML string
-    auto html = page_tpl->render_layout(layout_tpl, model);
+//ViewModel contains all the methods and instance data for "self" in the template/scripts.
+auto model = std::make_shared<MyViewModel>();
+model->set("page_title", slim::make_value("Example"));
 
+//Render to a HTML string
+auto html = page_tpl->render_layout(layout_tpl, model);
+```
 # [Template Syntax](docs/Template.md)
 The template syntax is based on the Ruby [Slim](http://slim-lang.com/) templating engine.
 
