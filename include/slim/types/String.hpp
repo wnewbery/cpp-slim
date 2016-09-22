@@ -47,29 +47,36 @@ namespace slim
         /** Return a copy as a HtmlSafeString. */
         std::shared_ptr<String> html_safe();
 
-        //Encoding functions not supported. String is just UTF-8.
-        //b, bytes, bytesize, byteslice
-        //chars
-        //codepoints
-        //each_byte, each_char, cache_codepoint
-        //force_encoding
-        //getbyte, setbyte
+        //static try_convert
 
-        //try_convert
+        //Encoding functions not fully supported. String is just UTF-8.
+        //b, force_encoding, encode, encoding
+        //each_byte, each_char, each_codepoint
+        //setbyte
         std::shared_ptr<Boolean> ascii_only_q();
+        Ptr<Array> bytes();
+        Ptr<Object> byteslice(const FunctionArgs &args);
+        Ptr<Array> chars();
+        Ptr<String> chop();
+        Ptr<String> chr();
+        Ptr<Array> codepoints();
+        Ptr<Object> getbyte(Number *index);
+        Ptr<String> scrub(const FunctionArgs &args);
+        //scrub!
+
         std::shared_ptr<String> capitalize();
         //capitalize!
         ObjectPtr casecmp(String *rhs);
         std::shared_ptr<String> center(const FunctionArgs &args);
         std::shared_ptr<String> chomp(const FunctionArgs &args);
         //chomp!
-        //chop, chop!
-        //chr
+        //chop!
         //clear
         //concat
-        //std::shared_ptr<Number> count(const FunctionArgs &args);
+        //count
         //crypt
-        //delete, delete!
+        //Ptr<String> delete
+        //delete!
         std::shared_ptr<String> downcase();
         //downcase!
         //dump
@@ -99,11 +106,10 @@ namespace slim
         std::shared_ptr<Array> rpartition(String *obj);
         std::shared_ptr<String> rstrip();
         //rstrip!
-        //scan
-        //scrub, scrub!
-
         //reverse!
         ObjectPtr rindex(const FunctionArgs &args);
+        //scan
+
         /** Also length */
         std::shared_ptr<Number> size();
         //slice!
@@ -111,7 +117,7 @@ namespace slim
         //std::shared_ptr<String> squeeze(const FunctionArgs &args);
         std::shared_ptr<Boolean> start_with_q(const FunctionArgs &args);
         std::shared_ptr<String> strip();
-        //strib!
+        //strip!
         //sub, sub!
         //succ, succ!
         //sum

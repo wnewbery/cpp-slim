@@ -27,11 +27,78 @@ std::string eval(const std::string &str)
     return eval(scope, str);
 }
 
+//Encoding/unicode
 BOOST_AUTO_TEST_CASE(ascii_only)
 {
     BOOST_CHECK_EQUAL("true", eval("'abcd'.ascii_only?"));
     BOOST_CHECK_EQUAL("false", eval("'abcd£'.ascii_only?"));
 }
+BOOST_AUTO_TEST_CASE(bytes)
+{
+    BOOST_CHECK_EQUAL("[]", eval("''.bytes"));
+    BOOST_CHECK_EQUAL("[97]", eval("'a'.bytes"));
+    BOOST_CHECK_EQUAL("[194, 163]", eval("'\xC2\xA3'.bytes")); //GBP £ U+00A3
+}
+BOOST_AUTO_TEST_CASE(byteslice)
+{
+    BOOST_CHECK_EQUAL("\"s\"", eval("'test'.byteslice 2"));
+    BOOST_CHECK_EQUAL("\"st\"", eval("'test'.byteslice 2, 2"));
+    BOOST_CHECK_EQUAL("nil", eval("'test'.byteslice -5"));
+    BOOST_CHECK_EQUAL("nil", eval("'test'.byteslice 5"));
+    BOOST_CHECK_EQUAL("\"t\"", eval("'test'.byteslice 3, 2"));
+    BOOST_CHECK_EQUAL("nil", eval("'test'.byteslice 5, 2"));
+    BOOST_CHECK_EQUAL("\"\xC2\"", eval("'\xC2\xA3'.byteslice 0")); //GBP £ U+00A3
+}
+BOOST_AUTO_TEST_CASE(chars)
+{
+    BOOST_CHECK_EQUAL("[]", eval("''.chars"));
+    BOOST_CHECK_EQUAL("[\"a\"]", eval("'a'.chars"));
+    BOOST_CHECK_EQUAL("[\"\xC2\xA3\"]", eval("'\xC2\xA3'.chars"));
+    BOOST_CHECK_EQUAL("[\"\xC2\xA3\", \"a\"]", eval("'\xC2\xA3""a'.chars"));
+}
+BOOST_AUTO_TEST_CASE(chop)
+{
+    BOOST_CHECK_EQUAL("\"\"", eval("''.chop"));
+    BOOST_CHECK_EQUAL("\"\"", eval("'a'.chop"));
+    BOOST_CHECK_EQUAL("\"tes\"", eval("'test'.chop"));
+    BOOST_CHECK_EQUAL("\"test\"", eval("'test\xC2\xA3'.chop"));
+}
+BOOST_AUTO_TEST_CASE(chr)
+{
+    BOOST_CHECK_EQUAL("\"\"", eval("''.chr"));
+    BOOST_CHECK_EQUAL("\"a\"", eval("'a'.chr"));
+    BOOST_CHECK_EQUAL("\"t\"", eval("'test'.chr"));
+    BOOST_CHECK_EQUAL("\"\xC2\xA3\"", eval("'\xC2\xA3test'.chr"));
+}
+BOOST_AUTO_TEST_CASE(codepoints)
+{
+    BOOST_CHECK_EQUAL("[]", eval("''.codepoints"));
+    BOOST_CHECK_EQUAL("[97]", eval("'a'.codepoints"));
+    BOOST_CHECK_EQUAL("[163]", eval("'\xC2\xA3'.codepoints"));
+    BOOST_CHECK_EQUAL("[163, 97]", eval("'\xC2\xA3""a'.codepoints"));
+}
+BOOST_AUTO_TEST_CASE(getbyte)
+{
+    BOOST_CHECK_EQUAL("nil", eval("''.getbyte 0"));
+    BOOST_CHECK_EQUAL("97", eval("'a'.getbyte 0"));
+    BOOST_CHECK_EQUAL("97", eval("'a'.getbyte -1"));
+    BOOST_CHECK_EQUAL("nil", eval("'a'.getbyte 1"));
+    BOOST_CHECK_EQUAL("nil", eval("'a'.getbyte -2"));
+
+    BOOST_CHECK_EQUAL("194", eval("'\xC2\xA3'.getbyte 0"));
+    BOOST_CHECK_EQUAL("163", eval("'\xC2\xA3'.getbyte 1"));
+    BOOST_CHECK_EQUAL("97", eval("'\xC2\xA3""a'.getbyte 2"));
+}
+BOOST_AUTO_TEST_CASE(scrub)
+{
+    BOOST_CHECK_EQUAL("\"\"", eval("''.scrub"));
+    BOOST_CHECK_EQUAL("\"a\"", eval("'a'.scrub"));
+    BOOST_CHECK_EQUAL("\"a\xEF\xBF\xBD\"", eval("'a\xC2'.scrub"));
+    BOOST_CHECK_EQUAL("\"a\xEF\xBF\xBD\xEF\xBF\xBD\"", eval("'a\xC2\xC2'.scrub"));
+    BOOST_CHECK_EQUAL("\"a??\"", eval("'a\xC2\xC2'.scrub '?'"));
+}
+
+
 
 BOOST_AUTO_TEST_CASE(inspect_escape)
 {
@@ -99,9 +166,15 @@ BOOST_AUTO_TEST_CASE(size)
 {
     BOOST_CHECK_EQUAL("0", eval("''.size"));
     BOOST_CHECK_EQUAL("0", eval("''.length"));
+    BOOST_CHECK_EQUAL("0", eval("''.bytesize"));
 
     BOOST_CHECK_EQUAL("4", eval("'test'.size"));
     BOOST_CHECK_EQUAL("4", eval("'test'.length"));
+    BOOST_CHECK_EQUAL("4", eval("'test'.bytesize"));
+
+    BOOST_CHECK_EQUAL("2", eval("'\xC2\xA3'.size"));
+    BOOST_CHECK_EQUAL("2", eval("'\xC2\xA3'.length"));
+    BOOST_CHECK_EQUAL("2", eval("'\xC2\xA3'.bytesize")); //GBP £ U+00A3
 
     BOOST_CHECK_EQUAL("true", eval("''.empty?"));
     BOOST_CHECK_EQUAL("false", eval("'test'.empty?"));

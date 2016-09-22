@@ -9,6 +9,7 @@ namespace slim
         if ((el & 0xC0) != 0x80) throw std::runtime_error("Invalid UTF-8 trailing element.");
         return el & 0x3F;
     }
+
     void utf8_decode(const char *_str, uint32_t *out, unsigned *elements)
     {
         auto str = (const unsigned char*)_str;
@@ -42,9 +43,38 @@ namespace slim
                 | (utf8_trailing(str[2]) << 6)
                 | utf8_trailing(str[3]);
         }
-        else // 1111 1xxx (invalid
+        else // 1111 1xxx (invalid)
         {
             throw std::runtime_error("Invalid UTF-8 leading element");
         }
+    }
+
+    bool try_utf8_decode(const char *str, uint32_t *out, unsigned *elements)
+    {
+        try
+        {
+            utf8_decode(str, out, elements);
+            return true;
+        }
+        catch (const std::exception &)
+        {
+            return false;
+        }
+    }
+
+    bool utf8_is_leading(char c)
+    {
+        auto uc = (unsigned char)c;
+        return uc < 0x80 || uc >= 0xC0;
+    }
+
+    unsigned short utf8_next_len(char c)
+    {
+        auto uc = (unsigned char)c;
+        if (uc < 0xC0) return 1;
+        else if (uc < 0xE0) return 2;
+        else if (uc < 0xF0) return 3;
+        else if (uc < 0xF8) return 4;
+        else return 1;
     }
 }

@@ -2,6 +2,8 @@
 
 The `String` class represents UTF-8 strings and is used for String literals. Most of the functionality is similar to Ruby strings, but other encodings and mutator methods are not implemented.
 
+Methods regarding indicies or lengths always work with UTF-8 elements, not "characters" or codepoints, unlike Ruby.
+
 Most methods are the same as the Ruby methods.
 
    * `to_f`, `to_d`: As a number converted using `std::stod`.
@@ -9,16 +11,23 @@ Most methods are the same as the Ruby methods.
    * `to_sym`: Returns a `Symbol` with the same value.
    * `[index]`, `[match_str]`, `[start, length]`: Regex and range is not supported.
    * `ascii_only?`: True if all UTF-8 elements are in the range 0 to 127.
+   * `bytes`
+   * `byteslice`
    * `capitalize`
    * `casecmp string`
    * `center width, pad_str=" "`
    * `ljust width, pad_str=" "`
    * `rjust width, pad_str=" "`
+   * `chars`
+   * `chop`
    * `chomp`, `chomp separator`: Acts as if `$/` is the default
+   * `chr`
+   * `codepoints`
    * `downcase`
    * `each_line |line|`, `each_line sep |line|`. The default separator is always `\n`.
    * `empty?`
    * `end_with? ([suffixes+])`
+   * `getbyte index`
    * `hex`
    * `include? string`
    * `index substring, offset=0`: Regex is not supported.
@@ -30,6 +39,7 @@ Most methods are the same as the Ruby methods.
    * `reverse`
    * `rpartition string`
    * `rindex substring`, `rindex substring, offset`: Regex is not supported.
+   * `scrub replacement=U+FFFD`
    * `size`, `length`
    * `split pattern=" ", limit=0`: Regex is not supported. The default pattern is always " ".
    * `start_with? ([prefixes+])`

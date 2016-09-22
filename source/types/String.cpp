@@ -7,9 +7,10 @@
 #include "Function.hpp"
 #include "FunctionHelpers.hpp"
 #include "Operators.hpp"
+#include "Unicode.hpp"
 #include <algorithm>
 #include <sstream>
-#include <set>
+#include <unordered_set>
 
 namespace slim
 {
@@ -102,10 +103,98 @@ namespace slim
         return make_value(v.substr((size_t)start, (size_t)length));
     }
 
+    //Encoding/unicode
     std::shared_ptr<Boolean> String::ascii_only_q()
     {
         for (auto c : v) if (c < 0 || c >= 128) return FALSE_VALUE;
         return TRUE_VALUE;
+    }
+    Ptr<Array> String::bytes()
+    {
+        std::vector<ObjectPtr> vec;
+        vec.reserve(v.size());
+        for (auto &c : v)
+            vec.emplace_back(make_value((unsigned char)c));
+        return make_value(std::move(vec));
+    }
+    Ptr<Object> String::byteslice(const FunctionArgs &args)
+    {
+        int offset, len = 1;
+        unpack<1>(args, &offset, &len);
+        if (offset < 0) offset = (int)v.size() + offset;
+        if (offset < 0 || offset >= (int)v.size() || len < 0) return NIL_VALUE;
+        return make_value(v.substr((size_t)offset, (size_t)len));
+    }
+    Ptr<Array> String::chars()
+    {
+        std::vector<ObjectPtr> vec;
+        vec.reserve(v.size());
+        uint32_t cp;
+        unsigned cp_len;
+        for (size_t p = 0; p < v.size(); p += cp_len)
+        {
+            utf8_decode(v.c_str() + p, &cp, &cp_len);
+            vec.push_back(make_value(v.substr(p, cp_len)));
+        }
+        return make_value(std::move(vec));
+    }
+    Ptr<String> String::chop()
+    {
+        for (int p = (int)v.size() - 1; p > 0; --p)
+        {
+            if (utf8_is_leading(v[p]))
+            {
+                return make_value(v.substr(0, (size_t)p));
+            }
+        }
+        return make_value(std::string());
+    }
+    Ptr<String> String::chr()
+    {
+        if (v.empty()) return make_value(std::string());
+        else return make_value(v.substr(0, utf8_next_len(v[0])));
+    }
+    Ptr<Array> String::codepoints()
+    {
+        std::vector<ObjectPtr> vec;
+        vec.reserve(v.size());
+        uint32_t cp;
+        unsigned cp_len;
+        for (size_t p = 0; p < v.size(); p += cp_len)
+        {
+            utf8_decode(v.c_str() + p, &cp, &cp_len);
+            vec.push_back(make_value(cp));
+        }
+        return make_value(std::move(vec));
+    }
+    Ptr<Object> String::getbyte(Number *index)
+    {
+        auto n = (int)index->get_value();
+        if (n < 0) n = (int)v.size() + n;
+        if (n < 0 || n >= (int)v.size()) return NIL_VALUE;
+        else return make_value((unsigned char)v[n]);
+    }
+    Ptr<String> String::scrub(const FunctionArgs &args)
+    {
+        std::string replacement = "\xEF\xBF\xBD"; //REPLACEMENT CHARACTER
+        unpack<0>(args, &replacement);
+        std::string out;
+        for (size_t i = 0; i < v.size();)
+        {
+            uint32_t cp;
+            unsigned len;
+            if (try_utf8_decode(v.c_str() + i, &cp, &len))
+            {
+                out.append(v.c_str() + i, len);
+                i += len;
+            }
+            else
+            {
+                out += replacement;
+                ++i;
+            }
+        }
+        return make_value(out);
     }
 
     std::shared_ptr<String> String::capitalize()
@@ -438,7 +527,17 @@ namespace slim
             { &String::to_f, "to_d" },
             { &String::to_i, "to_i" },
             { &String::html_safe, "html_safe" },
+
             { &String::ascii_only_q, "ascii_only?" },
+            { &String::bytes, "bytes" },
+            { &String::byteslice, "byteslice" },
+            { &String::chars, "chars" },
+            { &String::chop, "chop" },
+            { &String::chr, "chr" },
+            { &String::codepoints, "codepoints" },
+            { &String::getbyte, "getbyte" },
+            { &String::scrub, "scrub" },
+
             { &String::capitalize, "capitalize" },
             { &String::casecmp, "casecmp" },
             { &String::center, "center" },
@@ -460,8 +559,7 @@ namespace slim
             { &String::rpartition, "rpartition" },
             { &String::rstrip, "rstrip" },
             { &String::rindex, "rindex" },
-            { &String::size, "size" },
-            { &String::size, "length" },
+            { &String::size, "size" },{ &String::size, "length" },{ &String::size, "bytesize" },
             { &String::el_ref, "slice" },
             { &String::split, "split" },
             { &String::start_with_q, "start_with?" },

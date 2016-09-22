@@ -25,6 +25,8 @@ namespace slim
     class Object;
     class String;
 
+    template<class T> using Ptr = std::shared_ptr<T>;
+
     /**Base abstract object for the expression script interpreter.*/
     class Object : public std::enable_shared_from_this<Object>
     {
