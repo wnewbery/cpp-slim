@@ -24,6 +24,9 @@ Most methods are the same as the Ruby methods.
    * `chr`
    * `codepoints`
    * `downcase`
+   * `each_byte {|int| block} → str`, `each_byte → Enumerator`
+   * `each_char {|int| block} → str`, `each_byte → Enumerator`
+   * `each_codepoint {|int| block} → str`, `each_byte → Enumerator`
    * `each_line |line|`, `each_line sep |line|`. The default separator is always `\n`.
    * `empty?`
    * `end_with? ([suffixes+])`

@@ -303,6 +303,52 @@ namespace slim
         return make_value(ret);
     }
 
+    Ptr<Object> String::each_byte(const FunctionArgs &args)
+    {
+        Proc *proc = nullptr;
+        unpack<0>(args, &proc);
+        if (proc)
+        {
+            for (auto &i : v)
+                proc->call({ make_value((unsigned char)i) });
+            return shared_from_this();
+        }
+        else return make_enumerator(this, { &String::each_byte, "each_byte" });
+    }
+    Ptr<Object> String::each_char(const FunctionArgs &args)
+    {
+        Proc *proc = nullptr;
+        unpack<0>(args, &proc);
+        if (proc)
+        {
+            uint32_t cp;
+            unsigned cp_len;
+            for (size_t p = 0; p < v.size(); p += cp_len)
+            {
+                utf8_decode(v.c_str() + p, &cp, &cp_len);
+                proc->call({ make_value(v.substr(p, cp_len)) });
+            }
+            return shared_from_this();
+        }
+        else return make_enumerator(this, { &String::each_char, "each_char" });
+    }
+    Ptr<Object> String::each_codepoint(const FunctionArgs &args)
+    {
+        Proc *proc = nullptr;
+        unpack<0>(args, &proc);
+        if (proc)
+        {
+            uint32_t cp;
+            unsigned cp_len;
+            for (size_t p = 0; p < v.size(); p += cp_len)
+            {
+                utf8_decode(v.c_str() + p, &cp, &cp_len);
+                proc->call({ make_value(cp) });
+            }
+            return shared_from_this();
+        }
+        else return make_enumerator(this, { &String::each_codepoint, "each_codepoint" });
+    }
     ObjectPtr String::each_line(const FunctionArgs & args)
     {
         Proc *proc;
@@ -543,6 +589,9 @@ namespace slim
             { &String::center, "center" },
             { &String::chomp, "chomp" },
             { &String::downcase, "downcase" },
+            { &String::each_byte, "each_byte" },
+            { &String::each_char, "each_char" },
+            { &String::each_codepoint, "each_codepoint" },
             { &String::each_line, "each_line" },
             { &String::empty_q, "empty?" },
             { &String::end_with_q, "end_with?" },

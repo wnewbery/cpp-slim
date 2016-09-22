@@ -5,15 +5,19 @@
 #include "expression/Scope.hpp"
 #include "types/Array.hpp"
 #include "types/Number.hpp"
+#include "types/Proc.hpp"
 #include "types/String.hpp"
 #include "Error.hpp"
+
+#include "../TestAccumulator.hpp"
 
 using namespace slim;
 using namespace slim::expr;
 BOOST_AUTO_TEST_SUITE(TestString)
 
-std::string eval(Scope &scope, const std::string &str)
+std::string eval(Ptr<ViewModel> model , const std::string &str)
 {
+    Scope scope(model);
     Lexer lexer(str);
     expr::LocalVarNames vars;
     Parser parser(vars, lexer);
@@ -23,8 +27,7 @@ std::string eval(Scope &scope, const std::string &str)
 }
 std::string eval(const std::string &str)
 {
-    Scope scope(create_view_model());
-    return eval(scope, str);
+    return eval(create_view_model(), str);
 }
 
 //Encoding/unicode
@@ -38,6 +41,19 @@ BOOST_AUTO_TEST_CASE(bytes)
     BOOST_CHECK_EQUAL("[]", eval("''.bytes"));
     BOOST_CHECK_EQUAL("[97]", eval("'a'.bytes"));
     BOOST_CHECK_EQUAL("[194, 163]", eval("'\xC2\xA3'.bytes")); //GBP £ U+00A3
+
+    auto model = create_view_model();
+    auto data = create_object<TestAccumulator>();
+    model->set_attr("data", data);
+
+    eval(model, "''.each_byte{|x| @data.store x}");
+    BOOST_CHECK_EQUAL("[]", data->check());
+
+    eval(model, "'\xC2\xA3'.each_byte{|x| @data.store x}");
+    BOOST_CHECK_EQUAL("[194, 163]", data->check());
+
+    eval(model, "'\xC2\xA3'.each_byte.each{|x| @data.store x}");
+    BOOST_CHECK_EQUAL("[194, 163]", data->check());
 }
 BOOST_AUTO_TEST_CASE(byteslice)
 {
@@ -55,6 +71,19 @@ BOOST_AUTO_TEST_CASE(chars)
     BOOST_CHECK_EQUAL("[\"a\"]", eval("'a'.chars"));
     BOOST_CHECK_EQUAL("[\"\xC2\xA3\"]", eval("'\xC2\xA3'.chars"));
     BOOST_CHECK_EQUAL("[\"\xC2\xA3\", \"a\"]", eval("'\xC2\xA3""a'.chars"));
+
+    auto model = create_view_model();
+    auto data = create_object<TestAccumulator>();
+    model->set_attr("data", data);
+
+    eval(model, "''.each_char{|x| @data.store x}");
+    BOOST_CHECK_EQUAL("[]", data->check());
+
+    eval(model, "'\xC2\xA3'.each_char{|x| @data.store x}");
+    BOOST_CHECK_EQUAL("[\"\xC2\xA3\"]", data->check());
+
+    eval(model, "'\xC2\xA3'.each_char.each{|x| @data.store x}");
+    BOOST_CHECK_EQUAL("[\"\xC2\xA3\"]", data->check());
 }
 BOOST_AUTO_TEST_CASE(chop)
 {
@@ -76,6 +105,19 @@ BOOST_AUTO_TEST_CASE(codepoints)
     BOOST_CHECK_EQUAL("[97]", eval("'a'.codepoints"));
     BOOST_CHECK_EQUAL("[163]", eval("'\xC2\xA3'.codepoints"));
     BOOST_CHECK_EQUAL("[163, 97]", eval("'\xC2\xA3""a'.codepoints"));
+
+    auto model = create_view_model();
+    auto data = create_object<TestAccumulator>();
+    model->set_attr("data", data);
+
+    eval(model, "''.each_codepoint{|x| @data.store x}");
+    BOOST_CHECK_EQUAL("[]", data->check());
+
+    eval(model, "'\xC2\xA3'.each_codepoint{|x| @data.store x}");
+    BOOST_CHECK_EQUAL("[163]", data->check());
+
+    eval(model, "'\xC2\xA3'.each_codepoint.each{|x| @data.store x}");
+    BOOST_CHECK_EQUAL("[163]", data->check());
 }
 BOOST_AUTO_TEST_CASE(getbyte)
 {
@@ -362,40 +404,38 @@ BOOST_AUTO_TEST_CASE(each_line)
     };
     auto test = create_object<Test>();
 
-    Scope scope(test);
-
-    BOOST_CHECK_EQUAL("\"test\"", eval(scope, "'test'.each_line{|x| test x}"));
+    BOOST_CHECK_EQUAL("\"test\"", eval(test, "'test'.each_line{|x| test x}"));
     BOOST_REQUIRE_EQUAL(1, test->lines.size());
     BOOST_CHECK_EQUAL("test", test->lines[0]);
     test->lines.clear();
 
-    BOOST_CHECK_EQUAL("\"test\\nline\"", eval(scope, "'test\\nline'.each_line{|x| test x}"));
+    BOOST_CHECK_EQUAL("\"test\\nline\"", eval(test, "'test\\nline'.each_line{|x| test x}"));
     BOOST_REQUIRE_EQUAL(2, test->lines.size());
     BOOST_CHECK_EQUAL("test\n", test->lines[0]);
     BOOST_CHECK_EQUAL("line", test->lines[1]);
     test->lines.clear();
 
 
-    BOOST_CHECK_EQUAL("\"test\\nline\"", eval(scope, "'test\\nline'.each_line ',' {|x| test x}"));
+    BOOST_CHECK_EQUAL("\"test\\nline\"", eval(test, "'test\\nline'.each_line ',' {|x| test x}"));
     BOOST_REQUIRE_EQUAL(1, test->lines.size());
     BOOST_CHECK_EQUAL("test\nline", test->lines[0]);
     test->lines.clear();
 
 
-    BOOST_CHECK_EQUAL("\"test\\nline\"", eval(scope, "'test\\nline'.each_line '' {|x| test x}"));
+    BOOST_CHECK_EQUAL("\"test\\nline\"", eval(test, "'test\\nline'.each_line '' {|x| test x}"));
     BOOST_REQUIRE_EQUAL(1, test->lines.size());
     BOOST_CHECK_EQUAL("test\nline", test->lines[0]);
     test->lines.clear();
 
 
-    BOOST_CHECK_EQUAL("\"test\\n\\n\\nline\"", eval(scope, "'test\\n\\n\\nline'.each_line '' {|x| test x}"));
+    BOOST_CHECK_EQUAL("\"test\\n\\n\\nline\"", eval(test, "'test\\n\\n\\nline'.each_line '' {|x| test x}"));
     BOOST_REQUIRE_EQUAL(2, test->lines.size());
     BOOST_CHECK_EQUAL("test\n\n\n", test->lines[0]);
     BOOST_CHECK_EQUAL("line", test->lines[1]);
     test->lines.clear();
 
 
-    BOOST_CHECK_EQUAL("\"test,line\"", eval(scope, "'test,line'.each_line ',' {|x| test x}"));
+    BOOST_CHECK_EQUAL("\"test,line\"", eval(test, "'test,line'.each_line ',' {|x| test x}"));
     BOOST_REQUIRE_EQUAL(2, test->lines.size());
     BOOST_CHECK_EQUAL("test,", test->lines[0]);
     BOOST_CHECK_EQUAL("line", test->lines[1]);

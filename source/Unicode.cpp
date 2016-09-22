@@ -21,7 +21,7 @@ namespace slim
         }
         else if (c0 < 0xC0) //10xx  xxxx (invalid)
         {
-            throw std::runtime_error("Invalid UTF-8 leading element");
+            throw std::runtime_error("Unexpected UTF-8 trailing element");
         }
         else if (c0 < 0xE0) // 110x xxxx
         {

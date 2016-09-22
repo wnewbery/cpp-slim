@@ -80,6 +80,9 @@ namespace slim
         std::shared_ptr<String> downcase();
         //downcase!
         //dump
+        Ptr<Object> each_byte(const FunctionArgs &args);
+        Ptr<Object> each_char(const FunctionArgs &args);
+        Ptr<Object> each_codepoint(const FunctionArgs &args);
         ObjectPtr each_line(const FunctionArgs &args);
         std::shared_ptr<Boolean> empty_q();
         //encode, encode!
