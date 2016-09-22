@@ -39,6 +39,11 @@ namespace slim
 
         const std::vector<ObjectPtr>& get_value()const { return arr; }
 
+        void push_back(ObjectPtr obj)
+        {
+            arr.push_back(obj);
+        }
+
         //[]=. <<
         //any?
         std::shared_ptr<Object> assoc(const Object *a);

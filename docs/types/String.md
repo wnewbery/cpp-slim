@@ -25,9 +25,11 @@ Most methods are the same as the Ruby methods.
    * `codepoints`
    * `downcase`
    * `each_byte {|int| block} → str`, `each_byte → Enumerator`
-   * `each_char {|int| block} → str`, `each_byte → Enumerator`
-   * `each_codepoint {|int| block} → str`, `each_byte → Enumerator`
-   * `each_line |line|`, `each_line sep |line|`. The default separator is always `\n`.
+   * `each_char {|str| block} → str`, `each_char → Enumerator`
+   * `each_codepoint {|int| block} → str`, `each_codepoint → Enumerator`
+   * `each_line {|line| block} → str`, `each_line sep {|line| block} → str`,
+     `each_line → Enumerator`, `each_line sep → Enumerator`.
+     The default separator is always `\n`.
    * `empty?`
    * `end_with? ([suffixes+])`
    * `getbyte index`

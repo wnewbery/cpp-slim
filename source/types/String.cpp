@@ -351,24 +351,27 @@ namespace slim
     }
     ObjectPtr String::each_line(const FunctionArgs & args)
     {
-        Proc *proc;
-        std::vector<std::string> lines;
-        if (args.size() == 1)
-        {
-            proc = coerce<Proc>(args[0].get());
-            lines = split_lines("\n");
-        }
-        else if (args.size() == 2)
-        {
-            std::string sep;
-            unpack(args, &sep, &proc);
-            lines = split_lines(sep);
-        }
-        else throw ArgumentError(this, "each_line");
+        Proc *proc = nullptr;
+        std::string sep = "\n";
 
-        for (auto &i : lines) proc->call({ make_value(i) });
+        if (args.size() == 2) unpack(args, &sep, &proc);
+        else if (args.size() == 1)
+        {
+            proc = dynamic_cast<Proc*>(args[0].get());
+            if (!proc) sep = coerce<String>(args[0])->get_value();
+        }
+        else if (args.size() > 0) throw ArgumentCountError(args.size(), 0, 2);
 
-        return shared_from_this();
+        if (proc)
+        {
+            auto lines = split_lines(sep);
+            for (auto &i : lines) proc->call({ make_value(i) });
+            return shared_from_this();
+        }
+        else
+        {
+            return make_enumerator(this, { &String::each_line, "each_line" }, args);
+        }
     }
 
     std::shared_ptr<Boolean> String::empty_q()

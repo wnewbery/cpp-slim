@@ -8,8 +8,8 @@ namespace slim
     class Enumerator : public Object
     {
     public:
-        Enumerator(ObjectPtr forward_self, Method forward)
-            : forward_self(forward_self), forward(forward)
+        Enumerator(ObjectPtr forward_self, Method forward, const FunctionArgs &args={})
+            : forward_self(forward_self), forward(forward), args(args)
         {}
 
         static const std::string &name()
@@ -25,14 +25,15 @@ namespace slim
     private:
         ObjectPtr forward_self;
         Method forward;
+        FunctionArgs args;
     };
 
-    inline std::shared_ptr<Enumerator> make_enumerator(Object *forward_self, Method forward)
+    inline std::shared_ptr<Enumerator> make_enumerator(Object *forward_self, Method forward, const FunctionArgs &args = {})
     {
-        return std::make_shared<Enumerator>(forward_self->shared_from_this(), forward);
+        return std::make_shared<Enumerator>(forward_self->shared_from_this(), forward, args);
     }
-    inline std::shared_ptr<Enumerator> make_enumerator(ObjectPtr forward_self, Method forward)
+    inline std::shared_ptr<Enumerator> make_enumerator(ObjectPtr forward_self, Method forward, const FunctionArgs &args = {})
     {
-        return std::make_shared<Enumerator>(forward_self->shared_from_this(), forward);
+        return std::make_shared<Enumerator>(forward_self->shared_from_this(), forward, args);
     }
 }

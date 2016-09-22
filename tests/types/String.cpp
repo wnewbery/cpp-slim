@@ -384,62 +384,40 @@ BOOST_AUTO_TEST_CASE(lines)
 
 BOOST_AUTO_TEST_CASE(each_line)
 {
-    class Test : public ViewModel
-    {
-    public:
-        std::string name = "Test";
-        std::vector<std::string> lines;
 
-        virtual const std::string& type_name()const override { return name; }
-        virtual const MethodTable &method_table()const override
-        {
-            static const MethodTable table(Object::method_table(),
-            { { &Test::test, "test" } });
-            return table;
-        }
-        void test(String *line)
-        {
-            lines.push_back(line->get_value());
-        }
-    };
-    auto test = create_object<Test>();
+    auto model = create_view_model();
+    auto data = create_object<TestAccumulator>();
+    model->set_attr("data", data);
 
-    BOOST_CHECK_EQUAL("\"test\"", eval(test, "'test'.each_line{|x| test x}"));
-    BOOST_REQUIRE_EQUAL(1, test->lines.size());
-    BOOST_CHECK_EQUAL("test", test->lines[0]);
-    test->lines.clear();
+    eval(model, "'test'.each_line{|x| @data.store x}");
+    BOOST_CHECK_EQUAL("[\"test\"]", data->check());
 
-    BOOST_CHECK_EQUAL("\"test\\nline\"", eval(test, "'test\\nline'.each_line{|x| test x}"));
-    BOOST_REQUIRE_EQUAL(2, test->lines.size());
-    BOOST_CHECK_EQUAL("test\n", test->lines[0]);
-    BOOST_CHECK_EQUAL("line", test->lines[1]);
-    test->lines.clear();
+    eval(model, "'test\\nline'.each_line{|x| @data.store x}");
+    BOOST_CHECK_EQUAL("[\"test\\n\", \"line\"]", data->check());
 
+    eval(model, "'test\\nline'.each_line ',' {|x| @data.store x}");
+    BOOST_CHECK_EQUAL("[\"test\\nline\"]", data->check());
 
-    BOOST_CHECK_EQUAL("\"test\\nline\"", eval(test, "'test\\nline'.each_line ',' {|x| test x}"));
-    BOOST_REQUIRE_EQUAL(1, test->lines.size());
-    BOOST_CHECK_EQUAL("test\nline", test->lines[0]);
-    test->lines.clear();
+    eval(model, "'test\\nline'.each_line '' {|x| @data.store x}");
+    BOOST_CHECK_EQUAL("[\"test\\nline\"]", data->check());
 
+    eval(model, "'test\\n\\n\\nline'.each_line '' {|x| @data.store x}");
+    BOOST_CHECK_EQUAL("[\"test\\n\\n\\n\", \"line\"]", data->check());
 
-    BOOST_CHECK_EQUAL("\"test\\nline\"", eval(test, "'test\\nline'.each_line '' {|x| test x}"));
-    BOOST_REQUIRE_EQUAL(1, test->lines.size());
-    BOOST_CHECK_EQUAL("test\nline", test->lines[0]);
-    test->lines.clear();
+    eval(model, "'test,line'.each_line ',' {|x| @data.store x}");
+    BOOST_CHECK_EQUAL("[\"test,\", \"line\"]", data->check());
 
+    //enumerator test
+    eval(model, "'test'.each_line.each{|x| @data.store x}");
+    BOOST_CHECK_EQUAL("[\"test\"]", data->check());
 
-    BOOST_CHECK_EQUAL("\"test\\n\\n\\nline\"", eval(test, "'test\\n\\n\\nline'.each_line '' {|x| test x}"));
-    BOOST_REQUIRE_EQUAL(2, test->lines.size());
-    BOOST_CHECK_EQUAL("test\n\n\n", test->lines[0]);
-    BOOST_CHECK_EQUAL("line", test->lines[1]);
-    test->lines.clear();
+    eval(model, "'test,csv'.each_line(',').each{|x| @data.store x}");
+    BOOST_CHECK_EQUAL("[\"test,\", \"csv\"]", data->check());
 
+    eval(model, "'test,csv'.each_line.each ',' {|x| @data.store x}");
+    BOOST_CHECK_EQUAL("[\"test,\", \"csv\"]", data->check());
 
-    BOOST_CHECK_EQUAL("\"test,line\"", eval(test, "'test,line'.each_line ',' {|x| test x}"));
-    BOOST_REQUIRE_EQUAL(2, test->lines.size());
-    BOOST_CHECK_EQUAL("test,", test->lines[0]);
-    BOOST_CHECK_EQUAL("line", test->lines[1]);
-    test->lines.clear();
+    BOOST_CHECK_THROW(eval(model, "'test,csv'.each_line('\\n').each ',' {|x| @data.store x}"), ArgumentCountError);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
