@@ -77,6 +77,38 @@ namespace slim
         return ret;
     }
 
+    Ptr<Number> Enumerable::count(const FunctionArgs &args)
+    {
+        unsigned count = 0;
+        if (args.empty())
+        {
+            each2({}, [&count](const FunctionArgs &args) {
+                return ++count, NIL_VALUE;
+            });
+        }
+        else if (args.size() == 1)
+        {
+            auto proc = dynamic_cast<Proc*>(args[0].get());
+            if (proc)
+            {
+                each2({}, [proc, &count](const FunctionArgs &args) {
+                    if (proc->call(args)->is_true()) ++count;
+                    return NIL_VALUE;
+                });
+            }
+            else
+            {
+                auto itm = args[0].get();
+                each2({}, [itm, &count](const FunctionArgs &args) {
+                    if (itm->eq(args[0].get())) ++count;
+                    return NIL_VALUE;
+                });
+            }
+        }
+        else throw ArgumentCountError(args.size(), 0, 1);
+        return make_value(count);
+    }
+
     ObjectPtr Enumerable::map(const FunctionArgs &args)
     {
         Proc *proc = nullptr;

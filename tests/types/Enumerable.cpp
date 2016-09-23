@@ -52,6 +52,19 @@ BOOST_AUTO_TEST_CASE(any)
     BOOST_CHECK_EQUAL("false", eval("[5, 5].any? {|x| x != 5}"));
 }
 
+BOOST_AUTO_TEST_CASE(count)
+{
+    BOOST_CHECK_EQUAL("0", eval("[].count"));
+    BOOST_CHECK_EQUAL("4", eval("[1,2,3,5].count"));
+    BOOST_CHECK_EQUAL("4", eval("[1,2,3,5].each.count"));
+
+    BOOST_CHECK_EQUAL("1", eval("[1,2,3,5].count 5"));
+    BOOST_CHECK_EQUAL("2", eval("[1,5,3,5].count 5"));
+
+    BOOST_CHECK_EQUAL("2", eval("[1,2,3,5].count {|x| x > 2}"));
+
+    BOOST_CHECK_THROW(eval("[].count 1, 2"), ArgumentCountError);
+}
 
 BOOST_AUTO_TEST_CASE(map)
 {

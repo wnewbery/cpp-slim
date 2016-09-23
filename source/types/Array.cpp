@@ -95,15 +95,7 @@ namespace slim
     std::shared_ptr<Number> Array::count(const FunctionArgs & args)
     {
         if (args.empty()) return size();
-        else if (args.size() > 1) throw ArgumentError(this, "count");
-        //TODO: if block
-        
-        int c = 0;
-        for (auto &i : arr)
-        {
-            if (slim::eq(args[0].get(), i.get())) ++c;
-        }
-        return make_value((double)c);
+        else return Enumerable::count(args);
     }
     ObjectPtr Array::each(const FunctionArgs &args)
     {

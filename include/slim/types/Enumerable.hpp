@@ -22,8 +22,8 @@ namespace slim
         Ptr<Boolean> all_q(const FunctionArgs &args);
         Ptr<Boolean> any_q(const FunctionArgs &args);
         //chunk
-        //collect_concat
-        //count
+        //collect_concat (flat_map)
+        Ptr<Number> count(const FunctionArgs &args);
         //cycle
         //detect
         //drop
@@ -77,6 +77,7 @@ namespace slim
             {
                 { method<Implementor>(&Enumerable::all_q), "all?" },
                 { method<Implementor>(&Enumerable::any_q), "any?" },
+                { method<Implementor>(&Enumerable::count), "count" },
                 { method<Implementor>(&Enumerable::each), "each" },
                 { method<Implementor>(&Enumerable::map), "collect" },
                 { method<Implementor>(&Enumerable::map), "map" },
