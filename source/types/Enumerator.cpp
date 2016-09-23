@@ -23,61 +23,10 @@ namespace slim
             return make_enumerator(this, { &Enumerator::each, "each" }, args2);
         }
     }
-    ObjectPtr Enumerator::each2(
-        const FunctionArgs &args,
-        std::function<ObjectPtr(const FunctionArgs &args)> func)
-    {
-        auto args2 = args;
-        args2.push_back(create_object<FunctionProc>(func));
-        return each(args2);
-    }
-
-    Ptr<Array> Enumerator::to_a(const FunctionArgs &args)
-    {
-        auto ret = create_object<Array>();
-        each2(args, [ret](const FunctionArgs &args)
-        {
-            if (args.size() == 1) ret->push_back(args[0]);
-            else ret->push_back(make_value(args));
-            return NIL_VALUE;
-        });
-        return ret;
-    }
-
-    Ptr<Hash> Enumerator::to_h(const FunctionArgs &args)
-    {
-        auto ret = create_object<Hash>();
-        each2(args, [ret](const FunctionArgs &args)
-        {
-            if (args.size() == 2) ret->set(args[0], args[1]);
-            else if (args.size() == 1)
-            {
-                auto arr = coerce<Array>(args[0]);
-                if (arr->get_value().size() == 2)
-                {
-                    ret->set(arr->get_value()[0], arr->get_value()[1]);
-                }
-                else
-                {
-                    std::stringstream ss;
-                    ss << "wrong array length. expected 2, was " << arr->get_value().size();
-                    throw ArgumentError(ss.str());
-                }
-            }
-            else throw ArgumentCountError(args.size(), 2, 2);
-            return NIL_VALUE;
-        });
-        return ret;
-    }
-
     const MethodTable & Enumerator::method_table() const
     {
-        static const MethodTable table(Object::method_table(),
-        {
-            { &Enumerator::each, "each" },
-            { &Enumerator::to_a, "to_a" },
-            { &Enumerator::to_h, "to_h" }
-        });
+        static const MethodTable table = MethodTable(Object::method_table())
+            .add_all(Enumerable::get_methods<Enumerator>());
         return table;
     }
 }

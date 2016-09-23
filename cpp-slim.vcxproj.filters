@@ -150,6 +150,9 @@
     <ClInclude Include="source\Unicode.hpp">
       <Filter>source</Filter>
     </ClInclude>
+    <ClInclude Include="include\slim\types\Enumerable.hpp">
+      <Filter>include\types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\types\Object.cpp">
@@ -229,6 +232,9 @@
     </ClCompile>
     <ClCompile Include="source\Unicode.cpp">
       <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\types\Enumerable.cpp">
+      <Filter>source\types</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

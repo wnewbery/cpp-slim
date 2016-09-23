@@ -1,4 +1,5 @@
 #pragma once
+#include "Enumerable.hpp"
 #include "Object.hpp"
 #include "Function.hpp"
 #include <functional>
@@ -7,7 +8,7 @@ namespace slim
     class Array;
     class Hash;
     /**Script Enumerator type.*/
-    class Enumerator : public Object
+    class Enumerator : public Enumerable, public Object
     {
     public:
         Enumerator(ObjectPtr forward_self, Method forward, const FunctionArgs &args={})
@@ -22,15 +23,9 @@ namespace slim
         virtual const std::string& type_name()const override { return name(); }
 
 
-        ObjectPtr each(const FunctionArgs &args);
-        ObjectPtr each2(
-            const FunctionArgs &args,
-            std::function<ObjectPtr(const FunctionArgs &args)> func);
-
-        Ptr<Array> to_a(const FunctionArgs &args);
-        Ptr<Hash> to_h(const FunctionArgs &args);
+        virtual ObjectPtr each(const FunctionArgs &args)override;
     protected:
-        virtual const MethodTable &method_table()const;
+        const MethodTable &method_table()const override;
     private:
         ObjectPtr forward_self;
         Method forward;

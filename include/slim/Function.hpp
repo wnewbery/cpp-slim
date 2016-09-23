@@ -275,9 +275,17 @@ namespace slim
         }
 
         /**Adds a method to the table. Overrwrites any existing method with that name.*/
-        void add(const Method &func)
+        MethodTable& add(const Method &func)
         {
             map[func.name()] = func;
+            return *this;
+        }
+        /**Adds a list of methods using add.*/
+        template<class T>
+        MethodTable& add_all(const T &container)
+        {
+            for (const Method &method : container) add(method);
+            return *this;
         }
         /**Find a method. Returns nullptr if the method is not found.*/
         const Method *find(SymPtr name)const

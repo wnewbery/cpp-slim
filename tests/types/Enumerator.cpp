@@ -40,14 +40,11 @@ BOOST_AUTO_TEST_CASE(each)
     BOOST_CHECK_EQUAL("[5, 6, 9]", data->check());
 }
 
-BOOST_AUTO_TEST_CASE(to_a)
+BOOST_AUTO_TEST_CASE(enumerable)
 {
     BOOST_CHECK_EQUAL("[1, 2, 3]", eval("[1, 2, 3].each.to_a"));
     BOOST_CHECK_EQUAL("[[1, 6], 2, [3]]", eval("[[1, 6], 2, [3]].each.to_a"));
-}
 
-BOOST_AUTO_TEST_CASE(to_h)
-{
     BOOST_CHECK_EQUAL("{1 => 6, 2 => 7, 3 => 8}", eval("[[1, 6], [2, 7], [3, 8]].each.to_h"));
     BOOST_CHECK_THROW(eval("[1].each.to_h"), TypeError);
     BOOST_CHECK_THROW(eval("[[]].each.to_h"), ArgumentError);

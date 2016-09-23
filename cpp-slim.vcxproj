@@ -44,6 +44,7 @@
     <ClInclude Include="include\slim\template\Token.hpp" />
     <ClInclude Include="include\slim\types\Array.hpp" />
     <ClInclude Include="include\slim\types\Boolean.hpp" />
+    <ClInclude Include="include\slim\types\Enumerable.hpp" />
     <ClInclude Include="include\slim\types\Enumerator.hpp" />
     <ClInclude Include="include\slim\types\Hash.hpp" />
     <ClInclude Include="include\slim\types\HtmlSafeString.hpp" />
@@ -77,6 +78,7 @@
     <ClCompile Include="source\template\TemplateBlock.cpp" />
     <ClCompile Include="source\template\TemplateParts.cpp" />
     <ClCompile Include="source\types\Array.cpp" />
+    <ClCompile Include="source\types\Enumerable.cpp" />
     <ClCompile Include="source\types\Math.cpp" />
     <ClCompile Include="source\types\String.cpp" />
     <ClCompile Include="source\types\Symbol.cpp" />
