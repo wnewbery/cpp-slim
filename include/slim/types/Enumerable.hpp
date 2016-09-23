@@ -22,7 +22,6 @@ namespace slim
         Ptr<Boolean> all_q(const FunctionArgs &args);
         Ptr<Boolean> any_q(const FunctionArgs &args);
         //chunk
-        //collect
         //collect_concat
         //count
         //cycle
@@ -44,7 +43,7 @@ namespace slim
         //include?
         //inject
         //lazy
-        //map
+        ObjectPtr map(const FunctionArgs &args);
         //max
         //max_by
         //member?
@@ -79,6 +78,7 @@ namespace slim
                 { method<Implementor>(&Enumerable::all_q), "all?" },
                 { method<Implementor>(&Enumerable::any_q), "any?" },
                 { method<Implementor>(&Enumerable::each), "each" },
+                { method<Implementor>(&Enumerable::map), "map" },
                 { method<Implementor>(&Enumerable::to_a), "to_a" },
                 { method<Implementor>(&Enumerable::to_h), "to_h" }
             };

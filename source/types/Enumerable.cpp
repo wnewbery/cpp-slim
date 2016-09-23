@@ -77,6 +77,26 @@ namespace slim
         return ret;
     }
 
+    ObjectPtr Enumerable::map(const FunctionArgs &args)
+    {
+        Proc *proc = nullptr;
+        unpack<0>(args, &proc);
+        if (proc)
+        {
+            try
+            {
+                auto ret = create_object<Array>();
+                each2({}, [ret, proc](const FunctionArgs &args) {
+                    ret->push_back(proc->call(args));
+                    return NIL_VALUE;
+                });
+                return ret;
+            }
+            catch (const BreakException &e) { return e.value; }
+        }
+        else return make_enumerator(this, &Enumerable::map, "map");
+    }
+
     Ptr<Array> Enumerable::to_a(const FunctionArgs &args)
     {
         auto ret = create_object<Array>();

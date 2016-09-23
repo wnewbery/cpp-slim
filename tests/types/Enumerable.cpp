@@ -53,6 +53,11 @@ BOOST_AUTO_TEST_CASE(any)
 }
 
 
+BOOST_AUTO_TEST_CASE(map)
+{
+    BOOST_CHECK_EQUAL("[2, 4, 8, 10]", eval("[1,2,4,5].map{|x| x*2}"));
+}
+
 BOOST_AUTO_TEST_CASE(to_a)
 {
     BOOST_CHECK_EQUAL("[1, 2, 3]", eval("[1, 2, 3].to_a"));
