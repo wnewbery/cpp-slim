@@ -166,6 +166,7 @@
     <ClCompile Include="tests\template\Template.cpp" />
     <ClCompile Include="tests\types\Array.cpp" />
     <ClCompile Include="tests\types\BasicTypes.cpp" />
+    <ClCompile Include="tests\types\Enumerable.cpp" />
     <ClCompile Include="tests\types\Enumerator.cpp" />
     <ClCompile Include="tests\types\Hash.cpp" />
     <ClCompile Include="tests\types\HtmlSafeString.cpp" />

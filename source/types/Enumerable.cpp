@@ -17,6 +17,66 @@ namespace slim
         return each(args2);
     }
 
+    Ptr<Boolean> Enumerable::all_q(const FunctionArgs &args)
+    {
+        Proc *proc = nullptr;
+        try_unpack<0>(args, &proc);
+        Ptr<Boolean> ret = TRUE_VALUE;
+        if (proc)
+        {
+            each2({}, [&ret, proc](const FunctionArgs &args) {
+                if(!proc->call(args)->is_true())
+                {
+                    ret = FALSE_VALUE;
+                    throw BreakException();
+                }
+                else return NIL_VALUE;
+            });
+        }
+        else
+        {
+            each2({}, [&ret](const FunctionArgs &args) {
+                if (args.size() == 1 && !args[0]->is_true())
+                {
+                    ret = FALSE_VALUE;
+                    throw BreakException();
+                }
+                else return NIL_VALUE;
+            });
+        }
+        return ret;
+    }
+
+    Ptr<Boolean> Enumerable::any_q(const FunctionArgs &args)
+    {
+        Proc *proc = nullptr;
+        try_unpack<0>(args, &proc);
+        Ptr<Boolean> ret = FALSE_VALUE;
+        if (proc)
+        {
+            each2({}, [&ret, proc](const FunctionArgs &args) {
+                if (proc->call(args)->is_true())
+                {
+                    ret = TRUE_VALUE;
+                    throw BreakException();
+                }
+                else return NIL_VALUE;
+            });
+        }
+        else
+        {
+            each2({}, [&ret](const FunctionArgs &args) {
+                if ((args.size() > 1 || args[0]->is_true()))
+                {
+                    ret = TRUE_VALUE;
+                    throw BreakException();
+                }
+                else return NIL_VALUE;
+            });
+        }
+        return ret;
+    }
+
     Ptr<Array> Enumerable::to_a(const FunctionArgs &args)
     {
         auto ret = create_object<Array>();

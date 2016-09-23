@@ -84,6 +84,9 @@
     <ClCompile Include="tests\types\Enumerator.cpp">
       <Filter>tests\types</Filter>
     </ClCompile>
+    <ClCompile Include="tests\types\Enumerable.cpp">
+      <Filter>tests\types</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tests\TestAccumulator.hpp">

@@ -1,10 +1,14 @@
 #include "Error.hpp"
+#include "types/Nil.hpp"
 #include "types/Object.hpp"
 #include "types/Symbol.hpp"
 #include <sstream>
 #include <cassert>
 namespace slim
 {
+    BreakException::BreakException() : value(NIL_VALUE) {}
+    BreakException::BreakException(ObjectPtr value) : value(value) {}
+
     std::string syntax_error_str(const std::string &file_name, int line, int offset, const std::string &message)
     {
         std::stringstream ss;

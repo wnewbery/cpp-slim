@@ -14,9 +14,16 @@ namespace slim
 
         if (proc)
         {
-            FunctionArgs all_args = args;
-            all_args.insert(all_args.end(), args2.begin(), args2.end());
-            return forward(forward_self.get(), all_args);
+            try
+            {
+                FunctionArgs all_args = args;
+                all_args.insert(all_args.end(), args2.begin(), args2.end());
+                return forward(forward_self.get(), all_args);
+            }
+            catch (const BreakException &e)
+            {
+                return e.value;
+            }
         }
         else
         {

@@ -9,6 +9,21 @@ namespace slim
     typedef std::shared_ptr<Object> ObjectPtr;
     typedef std::shared_ptr<Symbol> SymPtr;
 
+    class ControlFlowException : public std::exception
+    {
+    };
+    /**Used to implement the Ruby "break" statement without passing a context param
+     * through every AST node.
+     */
+    class BreakException : public ControlFlowException
+    {
+    public:
+        ObjectPtr value;
+
+        BreakException();
+        BreakException(ObjectPtr value);
+    };
+
     /**Base type for all exceptions.*/
     class Error : public std::runtime_error
     {

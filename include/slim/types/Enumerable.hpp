@@ -5,7 +5,9 @@
 namespace slim
 {
     class Array;
+    class Boolean;
     class Hash;
+    class Proc;
 
     /**Enumerable mixin module.*/
     class Enumerable
@@ -17,8 +19,8 @@ namespace slim
             const FunctionArgs &args,
             std::function<ObjectPtr(const FunctionArgs &args)> func);
 
-        //all?
-        //any?
+        Ptr<Boolean> all_q(const FunctionArgs &args);
+        Ptr<Boolean> any_q(const FunctionArgs &args);
         //chunk
         //collect
         //collect_concat
@@ -74,6 +76,8 @@ namespace slim
         {
             return
             {
+                { method<Implementor>(&Enumerable::all_q), "all?" },
+                { method<Implementor>(&Enumerable::any_q), "any?" },
                 { method<Implementor>(&Enumerable::each), "each" },
                 { method<Implementor>(&Enumerable::to_a), "to_a" },
                 { method<Implementor>(&Enumerable::to_h), "to_h" }

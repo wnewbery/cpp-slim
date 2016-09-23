@@ -309,9 +309,16 @@ namespace slim
         unpack<0>(args, &proc);
         if (proc)
         {
-            for (auto &i : v)
-                proc->call({ make_value((unsigned char)i) });
-            return shared_from_this();
+            try
+            {
+                for (auto &i : v)
+                    proc->call({ make_value((unsigned char)i) });
+                return shared_from_this();
+            }
+            catch (const BreakException &e)
+            {
+                return e.value;
+            }
         }
         else return make_enumerator(this, { &String::each_byte, "each_byte" });
     }
@@ -321,14 +328,21 @@ namespace slim
         unpack<0>(args, &proc);
         if (proc)
         {
-            uint32_t cp;
-            unsigned cp_len;
-            for (size_t p = 0; p < v.size(); p += cp_len)
+            try
             {
-                utf8_decode(v.c_str() + p, &cp, &cp_len);
-                proc->call({ make_value(v.substr(p, cp_len)) });
+                uint32_t cp;
+                unsigned cp_len;
+                for (size_t p = 0; p < v.size(); p += cp_len)
+                {
+                    utf8_decode(v.c_str() + p, &cp, &cp_len);
+                    proc->call({ make_value(v.substr(p, cp_len)) });
+                }
+                return shared_from_this();
             }
-            return shared_from_this();
+            catch (const BreakException &e)
+            {
+                return e.value;
+            }
         }
         else return make_enumerator(this, { &String::each_char, "each_char" });
     }
@@ -338,14 +352,21 @@ namespace slim
         unpack<0>(args, &proc);
         if (proc)
         {
-            uint32_t cp;
-            unsigned cp_len;
-            for (size_t p = 0; p < v.size(); p += cp_len)
+            try
             {
-                utf8_decode(v.c_str() + p, &cp, &cp_len);
-                proc->call({ make_value(cp) });
+                uint32_t cp;
+                unsigned cp_len;
+                for (size_t p = 0; p < v.size(); p += cp_len)
+                {
+                    utf8_decode(v.c_str() + p, &cp, &cp_len);
+                    proc->call({ make_value(cp) });
+                }
+                return shared_from_this();
             }
-            return shared_from_this();
+            catch (const BreakException &e)
+            {
+                return e.value;
+            }
         }
         else return make_enumerator(this, { &String::each_codepoint, "each_codepoint" });
     }
@@ -365,8 +386,15 @@ namespace slim
         if (proc)
         {
             auto lines = split_lines(sep);
-            for (auto &i : lines) proc->call({ make_value(i) });
-            return shared_from_this();
+            try
+            {
+                for (auto &i : lines) proc->call({ make_value(i) });
+                return shared_from_this();
+            }
+            catch(const BreakException &e)
+            {
+                return e.value;
+            }
         }
         else
         {
