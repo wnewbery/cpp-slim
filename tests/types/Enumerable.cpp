@@ -32,40 +32,40 @@ std::string eval(const std::string &str)
 
 BOOST_AUTO_TEST_CASE(all)
 {
-    BOOST_CHECK_EQUAL("true", eval("[].each.all?"));
-    BOOST_CHECK_EQUAL("true", eval("[1, 2, 3].each.all?"));
-    BOOST_CHECK_EQUAL("false", eval("[1, 2, nil, 3].each.all?"));
+    BOOST_CHECK_EQUAL("true", eval("[].all?"));
+    BOOST_CHECK_EQUAL("true", eval("[1, 2, 3].all?"));
+    BOOST_CHECK_EQUAL("false", eval("[1, 2, nil, 3].all?"));
 
-    BOOST_CHECK_EQUAL("true", eval("[1, 2, nil, 3].each.all? {|x| x != 5}"));
-    BOOST_CHECK_EQUAL("false", eval("[5, 2, nil, 3].each.all? {|x| x != 5}"));
+    BOOST_CHECK_EQUAL("true", eval("[1, 2, nil, 3].all? {|x| x != 5}"));
+    BOOST_CHECK_EQUAL("false", eval("[5, 2, nil, 3].all? {|x| x != 5}"));
 }
 
 BOOST_AUTO_TEST_CASE(any)
 {
-    BOOST_CHECK_EQUAL("false", eval("[].each.any?"));
-    BOOST_CHECK_EQUAL("false", eval("[nil, false, nil].each.any?"));
-    BOOST_CHECK_EQUAL("true", eval("[1, 2, 3].each.any?"));
-    BOOST_CHECK_EQUAL("true", eval("[1, 2, nil, 3].each.any?"));
+    BOOST_CHECK_EQUAL("false", eval("[].any?"));
+    BOOST_CHECK_EQUAL("false", eval("[nil, false, nil].any?"));
+    BOOST_CHECK_EQUAL("true", eval("[1, 2, 3].any?"));
+    BOOST_CHECK_EQUAL("true", eval("[1, 2, nil, 3].any?"));
 
-    BOOST_CHECK_EQUAL("true", eval("[1, 2, nil, 3].each.any? {|x| x != 5}"));
-    BOOST_CHECK_EQUAL("true", eval("[5, 2, nil, 3].each.any? {|x| x != 5}"));
-    BOOST_CHECK_EQUAL("false", eval("[5, 5].each.any? {|x| x != 5}"));
+    BOOST_CHECK_EQUAL("true", eval("[1, 2, nil, 3].any? {|x| x != 5}"));
+    BOOST_CHECK_EQUAL("true", eval("[5, 2, nil, 3].any? {|x| x != 5}"));
+    BOOST_CHECK_EQUAL("false", eval("[5, 5].any? {|x| x != 5}"));
 }
 
 
 BOOST_AUTO_TEST_CASE(to_a)
 {
-    BOOST_CHECK_EQUAL("[1, 2, 3]", eval("[1, 2, 3].each.to_a"));
-    BOOST_CHECK_EQUAL("[[1, 6], 2, [3]]", eval("[[1, 6], 2, [3]].each.to_a"));
+    BOOST_CHECK_EQUAL("[1, 2, 3]", eval("[1, 2, 3].to_a"));
+    BOOST_CHECK_EQUAL("[[1, 6], 2, [3]]", eval("[[1, 6], 2, [3]].to_a"));
 }
 
 BOOST_AUTO_TEST_CASE(to_h)
 {
-    BOOST_CHECK_EQUAL("{1 => 6, 2 => 7, 3 => 8}", eval("[[1, 6], [2, 7], [3, 8]].each.to_h"));
-    BOOST_CHECK_THROW(eval("[1].each.to_h"), TypeError);
-    BOOST_CHECK_THROW(eval("[[]].each.to_h"), ArgumentError);
-    BOOST_CHECK_THROW(eval("[[1]].each.to_h"), ArgumentError);
-    BOOST_CHECK_THROW(eval("[[1, 2, 3]].each.to_h"), ArgumentError);
+    BOOST_CHECK_EQUAL("{1 => 6, 2 => 7, 3 => 8}", eval("[[1, 6], [2, 7], [3, 8]].to_h"));
+    BOOST_CHECK_THROW(eval("[1].to_h"), TypeError);
+    BOOST_CHECK_THROW(eval("[[]].to_h"), ArgumentError);
+    BOOST_CHECK_THROW(eval("[[1]].to_h"), ArgumentError);
+    BOOST_CHECK_THROW(eval("[[1, 2, 3]].to_h"), ArgumentError);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -105,16 +105,23 @@ namespace slim
         }
         return make_value((double)c);
     }
-    std::shared_ptr<Object> Array::each(const FunctionArgs &args)
+    ObjectPtr Array::each(const FunctionArgs &args)
     {
         if (args.size() == 1)
         {
-            auto proc = coerce<Proc>(args[0]);
-            for (auto &i : arr)
+            try
             {
-                proc->call({i});
+                auto proc = coerce<Proc>(args[0]);
+                for (auto &i : arr)
+                {
+                    proc->call({i});
+                }
+                return shared_from_this();
             }
-            return shared_from_this();
+            catch (const BreakException &e)
+            {
+                return e.value;
+            }
         }
         else if(args.size() == 0)
         {
@@ -337,8 +344,9 @@ namespace slim
     }
     const MethodTable & Array::method_table() const
     {
-        static const MethodTable table(Object::method_table(),
-        {
+        static const MethodTable table = MethodTable(Object::method_table())
+            .add_all(Enumerable::get_methods<Array>())
+            .add_all({
             { &Array::assoc, "assoc" },
             { &Array::at, "at" },
             { &Array::compact, "compact" },

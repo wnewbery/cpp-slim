@@ -1,5 +1,6 @@
 #pragma once
 #include "Object.hpp"
+#include "Enumerable.hpp"
 #include <vector>
 namespace slim
 {
@@ -7,7 +8,7 @@ namespace slim
     class Number;
     class String;
     /**Script array type.*/
-    class Array : public Object
+    class Array : public Object, public Enumerable
     {
     public:
         typedef std::vector<ObjectPtr> List;
@@ -56,7 +57,7 @@ namespace slim
         std::shared_ptr<Number> count(const FunctionArgs &args);
         //cycle
         //delete, delete_at, delete_if, drop, drop_while
-        std::shared_ptr<Object> each(const FunctionArgs &args);
+        virtual ObjectPtr each(const FunctionArgs &args)override;
         //each_index
         std::shared_ptr<Boolean> empty_q();
         std::shared_ptr<Object> fetch(const FunctionArgs &args);
@@ -103,7 +104,7 @@ namespace slim
         //sort_by
         std::shared_ptr<Array> take(const Number *n);
         //take_while
-        //to_a, to_ary, to_h
+        //to_ary
         //transpose
         std::shared_ptr<Array> uniq();
         //unshift

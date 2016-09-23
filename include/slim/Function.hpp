@@ -287,6 +287,11 @@ namespace slim
             for (const Method &method : container) add(method);
             return *this;
         }
+        MethodTable& add_all(std::initializer_list<Method> methods)
+        {
+            for (auto &f : methods) add(f);
+            return *this;
+        }
         /**Find a method. Returns nullptr if the method is not found.*/
         const Method *find(SymPtr name)const
         {
