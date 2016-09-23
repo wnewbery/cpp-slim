@@ -4,6 +4,8 @@
 #include <functional>
 namespace slim
 {
+    class Array;
+    class Hash;
     /**Script Enumerator type.*/
     class Enumerator : public Object
     {
@@ -19,7 +21,14 @@ namespace slim
         }
         virtual const std::string& type_name()const override { return name(); }
 
-        std::shared_ptr<Object> each(const FunctionArgs &args);
+
+        ObjectPtr each(const FunctionArgs &args);
+        ObjectPtr each2(
+            const FunctionArgs &args,
+            std::function<ObjectPtr(const FunctionArgs &args)> func);
+
+        Ptr<Array> to_a(const FunctionArgs &args);
+        Ptr<Hash> to_h(const FunctionArgs &args);
     protected:
         virtual const MethodTable &method_table()const;
     private:

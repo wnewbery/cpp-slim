@@ -6,18 +6,24 @@
 
 namespace slim
 {
-    Proc::Proc(
+    const MethodTable &Proc::method_table()const
+    {
+        static const MethodTable table(Object::method_table(),
+        {
+            { &Proc::call, "call" }
+        });
+        return table;
+    }
+
+    BlockProc::BlockProc(
         const expr::ExpressionNode &code,
         const std::vector<SymPtr> &param_names,
         expr::Scope &scope)
         : code(code), param_names(param_names), scope(scope)
     {
     }
-    Proc::~Proc()
-    {
-    }
 
-    ObjectPtr Proc::call(const FunctionArgs & args)
+    ObjectPtr BlockProc::call(const FunctionArgs & args)
     {
         if (args.size() != param_names.size())
         {
@@ -32,14 +38,5 @@ namespace slim
         auto result = code.eval(new_scope);
 
         return result;
-    }
-
-    const MethodTable &Proc::method_table()const
-    {
-        static const MethodTable table(Object::method_table(),
-        {
-            { &Proc::call, "call" }
-        });
-        return table;
     }
 }

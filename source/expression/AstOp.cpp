@@ -151,7 +151,7 @@ namespace slim
         }
         ObjectPtr Block::eval(Scope & scope) const
         {
-            return std::make_shared<Proc>(*code, param_names, scope);
+            return std::make_shared<BlockProc>(*code, param_names, scope);
         }
 
         std::string Conditional::to_string() const

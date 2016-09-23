@@ -384,7 +384,6 @@ BOOST_AUTO_TEST_CASE(lines)
 
 BOOST_AUTO_TEST_CASE(each_line)
 {
-
     auto model = create_view_model();
     auto data = create_object<TestAccumulator>();
     model->set_attr("data", data);

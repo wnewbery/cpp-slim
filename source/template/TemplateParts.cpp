@@ -113,7 +113,7 @@ namespace slim
             CallNode call(body.get(), buffer);
             auto result = expr->eval(scope);
             auto enumerator = coerce<Enumerator>(result);
-            auto proc = std::make_shared<Proc>(call, param_names, scope);
+            auto proc = std::make_shared<BlockProc>(call, param_names, scope);
             enumerator->each({ proc });
         }
 

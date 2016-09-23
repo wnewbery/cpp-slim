@@ -6,6 +6,7 @@
 #include "types/Array.hpp"
 #include "types/Number.hpp"
 #include "types/String.hpp"
+#include "../TestAccumulator.hpp"
 #include "Error.hpp"
 
 using namespace slim;
@@ -29,6 +30,11 @@ std::string eval(const std::string &str, Scope &scope)
 std::string eval(const std::string &str)
 {
     Scope scope(create_view_model());
+    return eval(str, scope);
+}
+std::string eval(Ptr<ViewModel> model, const std::string &str)
+{
+    Scope scope(model);
     return eval(str, scope);
 }
 
@@ -285,40 +291,20 @@ BOOST_AUTO_TEST_CASE(uniq)
 
 BOOST_AUTO_TEST_CASE(enumerate)
 {
+    auto model = create_view_model();
+    auto data = create_object<TestAccumulator>();
+    model->set_attr("data", data);
 
-    class Test : public ViewModel
-    {
-    public:
-        double sum = 0;
-        std::string name = "Test";
+    eval(model, "[].each{|x| @data.store x}");
+    BOOST_CHECK_EQUAL("[]", data->check());
 
-        virtual const std::string& type_name()const override { return name; }
-        virtual const MethodTable &method_table()const override
-        {
-            static const MethodTable table(Object::method_table(),
-            { { &Test::test, "test" } });
-            return table;
-        }
-        void test(Number *n)
-        {
-            sum += n->get_value();
-        }
-    };
-    auto test = create_object<Test>();
-    Scope scope(test);
+    eval(model, "[1, 2, 3].each{|x| @data.store x}");
+    BOOST_CHECK_EQUAL("[1, 2, 3]", data->check());
 
-    BOOST_CHECK_EQUAL("[]", eval("[].each{|x| test x}", scope));
-    BOOST_CHECK_EQUAL(0, test->sum);
-    BOOST_CHECK_EQUAL("[1, 2, 3]", eval("[1, 2, 3].each{|x| test x}", scope));
-    BOOST_CHECK_EQUAL(6, test->sum);
     BOOST_CHECK_THROW(eval("[].each 1, 1"), ArgumentError);
 
-    auto enumerator = eval_obj("[5, 6, 9].each", scope);
-    scope.set("e", enumerator);
-    BOOST_CHECK_EQUAL("[5, 6, 9]", eval("e.each{|x| test x}", scope));
-    BOOST_CHECK_EQUAL(26, test->sum);
-
-}
+    eval(model, "[5, 6, 9].each.each{|x| @data.store x}");
+    BOOST_CHECK_EQUAL("[5, 6, 9]", data->check());}
 
 BOOST_AUTO_TEST_SUITE_END()
 
