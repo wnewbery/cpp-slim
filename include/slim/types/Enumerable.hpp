@@ -78,6 +78,7 @@ namespace slim
                 { method<Implementor>(&Enumerable::all_q), "all?" },
                 { method<Implementor>(&Enumerable::any_q), "any?" },
                 { method<Implementor>(&Enumerable::each), "each" },
+                { method<Implementor>(&Enumerable::map), "collect" },
                 { method<Implementor>(&Enumerable::map), "map" },
                 { method<Implementor>(&Enumerable::to_a), "to_a" },
                 { method<Implementor>(&Enumerable::to_h), "to_h" }

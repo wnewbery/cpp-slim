@@ -50,7 +50,6 @@ namespace slim
         std::shared_ptr<Object> assoc(const Object *a);
         std::shared_ptr<Object> at(const Number *n);
         //bsearch
-        //collect
         //combination
         std::shared_ptr<Array> compact();
         //concat
@@ -79,7 +78,6 @@ namespace slim
         std::shared_ptr<Object> last(const FunctionArgs &args);
         /**Also length */
         std::shared_ptr<Number> size();
-        //map
         //pack
         //permutation
         //pop
