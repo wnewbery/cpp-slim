@@ -47,7 +47,9 @@ namespace slim
         {
             try
             {
-                return func(args2);
+                FunctionArgs all_args = args;
+                all_args.insert(all_args.end(), args2.begin(), args2.end());
+                return func(all_args);
             }
             catch (const BreakException &e)
             {

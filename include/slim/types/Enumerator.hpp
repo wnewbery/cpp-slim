@@ -44,10 +44,12 @@ namespace slim
     {
     public:
         typedef std::function<ObjectPtr(const FunctionArgs &args)> Func;
-        FunctionEnumerator(Func func) : func(func) {}
+        FunctionEnumerator(Func func, const FunctionArgs &args = {})
+            : func(func), args(args) {}
         virtual ObjectPtr each(const FunctionArgs &args)override;
     private:
         Func func;
+        FunctionArgs args;
     };
 
     inline Ptr<Enumerator> make_enumerator(Object *forward_self, Method forward, const FunctionArgs &args = {})

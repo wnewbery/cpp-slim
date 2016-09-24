@@ -42,7 +42,7 @@ namespace slim
         ObjectPtr drop_while(const FunctionArgs &args);
         //each_cons
         //each_entry
-        //each_with_index
+        ObjectPtr each_with_index(const FunctionArgs &args);
         //each_with_object
         //entries
         //find
@@ -94,6 +94,7 @@ namespace slim
                 { method<Implementor>(&Enumerable::map), "collect" },
                 { method<Implementor>(&Enumerable::drop), "drop" },
                 { method<Implementor>(&Enumerable::drop_while), "drop_while" },
+                { method<Implementor>(&Enumerable::each_with_index), "each_with_index" },
                 { method<Implementor>(&Enumerable::map), "map" },
                 { method<Implementor>(&Enumerable::to_a), "to_a" },
                 { method<Implementor>(&Enumerable::to_h), "to_h" }

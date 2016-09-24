@@ -11,10 +11,16 @@ namespace slim
     //Need to make an object that keeps "this" alive, but also can call a function not derived from Object
 
     template<class T>
-    Ptr<Enumerator> make_enumerator(ObjectPtr save_self, T *forward_self, ObjectPtr(T::*func)(const FunctionArgs &args), const char *name)
+    Ptr<Enumerator> make_enumerator(
+        ObjectPtr save_self,
+        T *forward_self,
+        ObjectPtr(T::*func)(const FunctionArgs &args),
+        const char *name,
+        const FunctionArgs &args = {})
     {
         return create_object<FunctionEnumerator>(
-            [save_self, forward_self, func](const FunctionArgs &args) { return (forward_self->*func)(args); });
+            [save_self, forward_self, func](const FunctionArgs &args) { return (forward_self->*func)(args); },
+            args);
     }
 
     ObjectPtr Enumerable::each2(
@@ -160,6 +166,35 @@ namespace slim
             return ret;
         }
         else throw ArgumentCountError(args.size(), 0, 1);
+    }
+
+
+    ObjectPtr Enumerable::each_with_index(const FunctionArgs &args)
+    {
+        Proc *proc = nullptr;
+        if (!args.empty()) proc = dynamic_cast<Proc*>(args.back().get());
+
+        if (proc)
+        {
+            try
+            {
+                auto args2 = args;
+                args2.pop_back();
+                unsigned i = 0;
+                return each_single(args2, [&i, proc](Object *arg) {
+                    proc->call({ arg->shared_from_this(), make_value(i++) });
+                    return NIL_VALUE;
+                });
+            }
+            catch (const BreakException &e)
+            {
+                return e.value;
+            }
+        }
+        else
+        {
+            return make_enumerator(this_obj(), this, &Enumerable::each_with_index, "each_with_index", args);
+        }
     }
 
     ObjectPtr Enumerable::map(const FunctionArgs &args)

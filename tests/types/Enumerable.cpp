@@ -84,6 +84,17 @@ BOOST_AUTO_TEST_CASE(drop_while)
     BOOST_CHECK_EQUAL("[5, 3, 2]", eval("[1,2,3,5,3,2].each.drop_while {|x| x < 5}"));
 }
 
+BOOST_AUTO_TEST_CASE(each_with_index)
+{
+    BOOST_CHECK_EQUAL("[]", eval("[].each_with_index.to_a"));
+    BOOST_CHECK_EQUAL("[[5, 0], [6, 1], [7, 2]]", eval("[5,6,7].each_with_index.to_a"));
+    BOOST_CHECK_EQUAL("{5 => 0, 6 => 1, 7 => 2}", eval("[5,6,7].each_with_index.to_h"));
+
+    BOOST_CHECK_EQUAL("[[\"te,\", 0], [\"st\", 1]]", eval("'te,st'.each_line.each_with_index(',').to_a"));
+    BOOST_CHECK_EQUAL("[[\"te,\", 0], [\"st\", 1]]", eval("'te,st'.each_line.each_with_index.to_a(',')"));
+    BOOST_CHECK_EQUAL("{\"te,\" => 0, \"st\" => 1}", eval("'te,st'.each_line.each_with_index.to_h(',')"));
+}
+
 BOOST_AUTO_TEST_CASE(map)
 {
     BOOST_CHECK_EQUAL("[2, 4, 8, 10]", eval("[1,2,4,5].map{|x| x*2}"));
@@ -98,6 +109,8 @@ BOOST_AUTO_TEST_CASE(to_a)
 {
     BOOST_CHECK_EQUAL("[1, 2, 3]", eval("[1, 2, 3].to_a"));
     BOOST_CHECK_EQUAL("[[1, 6], 2, [3]]", eval("[[1, 6], 2, [3]].to_a"));
+
+    BOOST_CHECK_EQUAL("[\"te,\", \"st\"]", eval("'te,st'.each_line.to_a(',')"));
 }
 
 BOOST_AUTO_TEST_CASE(to_h)
