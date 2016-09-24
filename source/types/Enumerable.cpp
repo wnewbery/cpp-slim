@@ -46,60 +46,54 @@ namespace slim
     {
         Proc *proc = nullptr;
         try_unpack<0>(args, &proc);
-        Ptr<Boolean> ret = TRUE_VALUE;
-        if (proc)
+        try
         {
-            each2({}, [&ret, proc](const FunctionArgs &args) {
-                if(!proc->call(args)->is_true())
-                {
-                    ret = FALSE_VALUE;
-                    throw BreakException();
-                }
-                else return NIL_VALUE;
-            });
+            if (proc)
+            {
+                each2({}, [proc](const FunctionArgs &args) {
+                    if(!proc->call(args)->is_true())
+                        throw SpecialFlowException();
+                    else return NIL_VALUE;
+                });
+            }
+            else
+            {
+                each2({}, [](const FunctionArgs &args) {
+                    if (args.size() == 1 && !args[0]->is_true())
+                        throw SpecialFlowException();
+                    else return NIL_VALUE;
+                });
+            }
+            return TRUE_VALUE;
         }
-        else
-        {
-            each2({}, [&ret](const FunctionArgs &args) {
-                if (args.size() == 1 && !args[0]->is_true())
-                {
-                    ret = FALSE_VALUE;
-                    throw BreakException();
-                }
-                else return NIL_VALUE;
-            });
-        }
-        return ret;
+        catch (const SpecialFlowException &) { return FALSE_VALUE; }
     }
 
     Ptr<Boolean> Enumerable::any_q(const FunctionArgs &args)
     {
         Proc *proc = nullptr;
         try_unpack<0>(args, &proc);
-        Ptr<Boolean> ret = FALSE_VALUE;
-        if (proc)
+        try
         {
-            each2({}, [&ret, proc](const FunctionArgs &args) {
-                if (proc->call(args)->is_true())
-                {
-                    ret = TRUE_VALUE;
-                    throw BreakException();
-                }
-                else return NIL_VALUE;
-            });
+            if (proc)
+            {
+                each2({}, [proc](const FunctionArgs &args) {
+                    if (proc->call(args)->is_true())
+                        throw SpecialFlowException();
+                    else return NIL_VALUE;
+                });
+            }
+            else
+            {
+                each2({}, [](const FunctionArgs &args) {
+                    if ((args.size() > 1 || args[0]->is_true()))
+                        throw SpecialFlowException();
+                    else return NIL_VALUE;
+                });
+            }
+            return FALSE_VALUE;
         }
-        else
-        {
-            each2({}, [&ret](const FunctionArgs &args) {
-                if ((args.size() > 1 || args[0]->is_true()))
-                {
-                    ret = TRUE_VALUE;
-                    throw BreakException();
-                }
-                else return NIL_VALUE;
-            });
-        }
-        return ret;
+        catch (const SpecialFlowException &) { return TRUE_VALUE; }
     }
 
     Ptr<Number> Enumerable::count(const FunctionArgs &args)
@@ -125,7 +119,7 @@ namespace slim
             {
                 auto itm = args[0].get();
                 each2({}, [itm, &count](const FunctionArgs &args) {
-                    if (itm->eq(args[0].get())) ++count;
+                    if (eq(itm, args[0].get())) ++count;
                     return NIL_VALUE;
                 });
             }
@@ -176,25 +170,73 @@ namespace slim
 
         if (proc)
         {
-            try
-            {
-                auto args2 = args;
-                args2.pop_back();
-                unsigned i = 0;
-                return each_single(args2, [&i, proc](Object *arg) {
-                    proc->call({ arg->shared_from_this(), make_value(i++) });
-                    return NIL_VALUE;
-                });
-            }
-            catch (const BreakException &e)
-            {
-                return e.value;
-            }
+            auto args2 = args;
+            args2.pop_back();
+            unsigned i = 0;
+            return each_single(args2, [&i, proc](Object *arg) {
+                return proc->call({ arg->shared_from_this(), make_value(i++) });
+            });
         }
         else
         {
             return make_enumerator(this_obj(), this, &Enumerable::each_with_index, "each_with_index", args);
         }
+    }
+
+    ObjectPtr Enumerable::find(const FunctionArgs &args)
+    {
+        if (args.size() > 2) throw ArgumentCountError(args.size(), 0, 2);
+        auto proc = args.empty() ? nullptr : dynamic_cast<Proc*>(args.back().get());
+        if (proc)
+        {
+            try
+            {
+                each2({}, [proc](const FunctionArgs &args) {
+                    if (proc->call(args)->is_true())
+                        throw SpecialFlowException(args.size() == 1 ? args[0] : make_value(args));
+                    return NIL_VALUE;
+                });
+                return args.size() == 2 ? args.front() : NIL_VALUE;
+            }
+            catch (const SpecialFlowException &e) { return e.value; }
+        }
+        else
+        {
+            if (args.size() > 1) throw TypeError(args.back().get(), Proc::name());
+            return make_enumerator(this_obj(), this, &Enumerable::find, "find", args);
+        }
+    }
+
+    ObjectPtr Enumerable::find_index(const FunctionArgs &args)
+    {
+        if (args.empty()) return make_enumerator(this_obj(), this, &Enumerable::find_index, "find_index", args);
+        if (args.size() > 1) throw ArgumentCountError(args.size(), 0, 1);
+        
+        try
+        {
+            unsigned i = 0;
+            if (auto proc = dynamic_cast<Proc*>(args[0].get()))
+            {
+                each2({}, [&i, proc](const FunctionArgs &args) {
+                    if (proc->call(args)->is_true())
+                        throw SpecialFlowException(make_value(i));
+                    ++i;
+                    return NIL_VALUE;
+                });
+            }
+            else //find value
+            {
+                auto value = args[0].get();
+                each2({}, [&i, value](const FunctionArgs &args) {
+                    if (eq(value, args.size() == 1 ? args[0].get() : make_value(args).get()))
+                        throw SpecialFlowException(make_value(i));
+                    ++i;
+                    return NIL_VALUE;
+                });
+            }
+            return NIL_VALUE;
+        }
+        catch (const SpecialFlowException &e) { return e.value; }
     }
 
     ObjectPtr Enumerable::map(const FunctionArgs &args)
@@ -203,18 +245,48 @@ namespace slim
         unpack<0>(args, &proc);
         if (proc)
         {
-            try
-            {
-                auto ret = create_object<Array>();
-                each2({}, [ret, proc](const FunctionArgs &args) {
-                    ret->push_back(proc->call(args));
-                    return NIL_VALUE;
-                });
-                return ret;
-            }
-            catch (const BreakException &e) { return e.value; }
+            auto ret = create_object<Array>();
+            each2({}, [ret, proc](const FunctionArgs &args) {
+                ret->push_back(proc->call(args));
+                return NIL_VALUE;
+            });
+            return ret;
         }
         else return make_enumerator(this_obj(), this, &Enumerable::map, "map");
+    }
+
+    ObjectPtr Enumerable::reject(const FunctionArgs &args)
+    {
+        Proc *proc = nullptr;
+        unpack<0>(args, &proc);
+        if (proc)
+        {
+            auto ret = create_object<Array>();
+            each2({}, [ret, proc](const FunctionArgs &args) {
+                if (!proc->call(args)->is_true())
+                    ret->push_back(args.size() == 1 ? args[0] : make_value(args));
+                return NIL_VALUE;
+            });
+            return ret;
+        }
+        else return make_enumerator(this_obj(), this, &Enumerable::reject, "reject", args);
+    }
+
+    ObjectPtr Enumerable::select(const FunctionArgs &args)
+    {
+        Proc *proc = nullptr;
+        unpack<0>(args, &proc);
+        if (proc)
+        {
+            auto ret = create_object<Array>();
+            each2({}, [ret, proc](const FunctionArgs &args) {
+                if (proc->call(args)->is_true())
+                    ret->push_back(args.size() == 1 ? args[0] : make_value(args));
+                return NIL_VALUE;
+            });
+            return ret;
+        }
+        else return make_enumerator(this_obj(), this, &Enumerable::select, "select", args);
     }
 
     Ptr<Array> Enumerable::to_a(const FunctionArgs &args)

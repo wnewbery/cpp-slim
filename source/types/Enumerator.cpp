@@ -21,16 +21,9 @@ namespace slim
 
         if (proc)
         {
-            try
-            {
-                FunctionArgs all_args = args;
-                all_args.insert(all_args.end(), args2.begin(), args2.end());
-                return forward(forward_self.get(), all_args);
-            }
-            catch (const BreakException &e)
-            {
-                return e.value;
-            }
+            FunctionArgs all_args = args;
+            all_args.insert(all_args.end(), args2.begin(), args2.end());
+            return forward(forward_self.get(), all_args);
         }
         else
         {
@@ -45,16 +38,9 @@ namespace slim
 
         if (proc)
         {
-            try
-            {
-                FunctionArgs all_args = args;
-                all_args.insert(all_args.end(), args2.begin(), args2.end());
-                return func(all_args);
-            }
-            catch (const BreakException &e)
-            {
-                return e.value;
-            }
+            FunctionArgs all_args = args;
+            all_args.insert(all_args.end(), args2.begin(), args2.end());
+            return func(all_args);
         }
         else
         {

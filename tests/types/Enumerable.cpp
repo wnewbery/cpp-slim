@@ -95,6 +95,52 @@ BOOST_AUTO_TEST_CASE(each_with_index)
     BOOST_CHECK_EQUAL("{\"te,\" => 0, \"st\" => 1}", eval("'te,st'.each_line.each_with_index.to_h(',')"));
 }
 
+BOOST_AUTO_TEST_CASE(find)
+{
+    BOOST_CHECK_EQUAL("nil", eval("[].find{|x| x > 5}"));
+    BOOST_CHECK_EQUAL("0", eval("[].find(0){|x| x > 5}"));
+
+    BOOST_CHECK_EQUAL("5", eval("[1, 3, 5, 2].find{|x| x >= 5}"));
+    BOOST_CHECK_EQUAL("5", eval("[1, 3, 5, 2].find(0){|x| x >= 5}"));
+    BOOST_CHECK_EQUAL("0", eval("[1, 3, 5, 2].find(0){|x| x >= 6}"));
+
+    BOOST_CHECK_EQUAL("5", eval("[1, 3, 5, 2].find.each{|x| x >= 5}"));
+    BOOST_CHECK_EQUAL("nil", eval("[1, 3, 5, 2].find.each{|x| x >= 6}"));
+    BOOST_CHECK_EQUAL("5", eval("[1, 3, 5, 2].find(0).each{|x| x >= 5}"));
+    BOOST_CHECK_EQUAL("0", eval("[1, 3, 5, 2].find(0).each{|x| x >= 6}"));
+
+    BOOST_CHECK_EQUAL("2", eval("[1, 3, 5, 2].find.each_with_index{|x, i| i == 3}"));
+    BOOST_CHECK_EQUAL("nil", eval("[1, 3, 5, 2].find.each_with_index{|x, i| i == 4}"));
+    BOOST_CHECK_EQUAL("2", eval("[1, 3, 5, 2].find(0).each_with_index{|x, i| i == 3}"));
+    BOOST_CHECK_EQUAL("0", eval("[1, 3, 5, 2].find(0).each_with_index{|x, i| i == 4}"));
+
+    BOOST_CHECK_EQUAL("[2, 3]", eval("[1, 3, 5, 2].each_with_index.find{|x, i| i == 3}"));
+    BOOST_CHECK_EQUAL("nil", eval("[1, 3, 5, 2].each_with_index.find{|x, i| i == 4}"));
+    BOOST_CHECK_EQUAL("[2, 3]", eval("[1, 3, 5, 2].each_with_index.find(0){|x, i| i == 3}"));
+    BOOST_CHECK_EQUAL("0", eval("[1, 3, 5, 2].each_with_index.find(0){|x, i| i == 4}"));
+}
+
+BOOST_AUTO_TEST_CASE(find_index)
+{
+    BOOST_CHECK_EQUAL("nil", eval("[].find_index{|x| x > 5}"));
+    //with proc
+    BOOST_CHECK_EQUAL("2", eval("[1, 3, 5, 2].find_index{|x| x >= 5}"));
+
+    BOOST_CHECK_EQUAL("2", eval("[1, 3, 5, 2].find_index.each{|x| x >= 5}"));
+    BOOST_CHECK_EQUAL("nil", eval("[1, 3, 5, 2].find_index.each{|x| x >= 6}"));
+
+    BOOST_CHECK_EQUAL("3", eval("[1, 3, 5, 2].find_index.each_with_index{|x, i| i == 3}"));
+    BOOST_CHECK_EQUAL("nil", eval("[1, 3, 5, 2].find_index.each_with_index{|x, i| i == 4}"));
+
+    BOOST_CHECK_EQUAL("3", eval("[1, 3, 5, 2].each_with_index.find_index{|x, i| i == 3}"));
+    BOOST_CHECK_EQUAL("nil", eval("[1, 3, 5, 2].each_with_index.find_index{|x, i| i == 4}"));
+    //with value
+    BOOST_CHECK_EQUAL("2", eval("[1, 3, 5, 2].find_index 5"));
+    BOOST_CHECK_EQUAL("2", eval("[1, 5, 5, 2].each_with_index.find_index([5, 2])"));
+
+    BOOST_CHECK_THROW(eval("[].find_index 1, 2"), ArgumentCountError);
+}
+
 BOOST_AUTO_TEST_CASE(map)
 {
     BOOST_CHECK_EQUAL("[2, 4, 8, 10]", eval("[1,2,4,5].map{|x| x*2}"));
@@ -103,6 +149,27 @@ BOOST_AUTO_TEST_CASE(map)
     BOOST_CHECK_EQUAL("[2, 4, 8, 10]", eval("[1,2,4,5].each.map{|x| x*2}"));
     BOOST_CHECK_EQUAL("[2, 4, 8, 10]", eval("[1,2,4,5].map.each{|x| x*2}"));
     BOOST_CHECK_EQUAL("[2, 4, 8, 10]", eval("[1,2,4,5].map.map{|x| x*2}"));
+}
+
+BOOST_AUTO_TEST_CASE(reject)
+{
+    BOOST_CHECK_EQUAL("[]", eval("[1, 5, 3, 7].reject{|x| true}"));
+    BOOST_CHECK_EQUAL("[1, 5, 3, 7]", eval("[1, 5, 3, 7].reject{|x| x > 9}"));
+    BOOST_CHECK_EQUAL("[1, 3]", eval("[1, 5, 3, 7].reject{|x| x > 4}"));
+    BOOST_CHECK_EQUAL("[1, 3]", eval("[1, 5, 3, 7].reject.each{|x| x > 4}"));
+
+    BOOST_CHECK_EQUAL("[1, 5]", eval("[1, 5, 3, 7].reject.each_with_index{|x, i| i > 1}"));
+    BOOST_CHECK_EQUAL("[[1, 0], [5, 1]]", eval("[1, 5, 3, 7].each_with_index.reject{|x, i| i > 1}"));
+}
+
+BOOST_AUTO_TEST_CASE(select)
+{
+    BOOST_CHECK_EQUAL("[]", eval("[1, 5, 3, 7].select{|x| x > 9}"));
+    BOOST_CHECK_EQUAL("[5, 7]", eval("[1, 5, 3, 7].select{|x| x > 4}"));
+    BOOST_CHECK_EQUAL("[5, 7]", eval("[1, 5, 3, 7].select.each{|x| x > 4}"));
+
+    BOOST_CHECK_EQUAL("[3, 7]", eval("[1, 5, 3, 7].select.each_with_index{|x, i| i > 1}"));
+    BOOST_CHECK_EQUAL("[[3, 2], [7, 3]]", eval("[1, 5, 3, 7].each_with_index.select{|x, i| i > 1}"));
 }
 
 BOOST_AUTO_TEST_CASE(to_a)

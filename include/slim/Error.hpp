@@ -9,9 +9,17 @@ namespace slim
     typedef std::shared_ptr<Object> ObjectPtr;
     typedef std::shared_ptr<Symbol> SymPtr;
 
+    /**These need to return "through" other C++ functions and is not a control flow C++ has
+     * directly (or C, MRI appears to use thread locals and longjmp for these features).
+     *
+     * The other option would be along the lines of passing a context to every method, and then
+     * checking it after every return to see if things like "break" or "return" were invoked by
+     * a block within it.
+     */
     class ControlFlowException : public std::exception
     {
     };
+    //TODO: "break" script keyword is not fully implemented yet
     /**Used to implement the Ruby "break" statement without passing a context param
      * through every AST node.
      */
@@ -22,6 +30,19 @@ namespace slim
 
         BreakException();
         BreakException(ObjectPtr value);
+    };
+    /**Used for "break" and "return" like constructs within pure C++ enumeration code.
+     * Such as in Enumerable.
+     * This is useful because such C++ methods dont set up the same context as blocks do
+     * in regards to what "break" and "return" will exit.
+     */
+    class SpecialFlowException : public ControlFlowException
+    {
+    public:
+        ObjectPtr value;
+
+        SpecialFlowException();
+        SpecialFlowException(ObjectPtr value);
     };
 
     /**Base type for all exceptions.*/

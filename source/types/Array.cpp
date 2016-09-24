@@ -186,14 +186,6 @@ namespace slim
     {
         return make_value(include_q_imp(obj));
     }
-    std::shared_ptr<Object> Array::index(const Object *obj)
-    {
-        for (size_t i = 0; i < arr.size(); ++i)
-        {
-            if (slim::eq(obj, arr[i].get())) return make_value((double)i);
-        }
-        return NIL_VALUE;
-    }
     std::shared_ptr<String> Array::join(const String * o_sep)
     {
         auto sep = o_sep->get_value();
@@ -334,6 +326,7 @@ namespace slim
         }
         return make_value(std::move(out));
     }
+
     const MethodTable & Array::method_table() const
     {
         static const MethodTable table = MethodTable(Object::method_table())
@@ -350,8 +343,7 @@ namespace slim
             { &Array::flatten, "flatten" },
             { &Array::frozen_q, "frozen?" },
             { &Array::include_q, "include?" },
-            { &Array::index, "index" },
-            { &Array::index, "find_index" },
+            { Enumerable::method<Array>(&Array::find_index), "index" },
             { &Array::join, "join" },
             { &Array::last, "last" },
             { &Array::size, "size" },

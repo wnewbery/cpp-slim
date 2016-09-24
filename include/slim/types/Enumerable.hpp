@@ -45,9 +45,9 @@ namespace slim
         ObjectPtr each_with_index(const FunctionArgs &args);
         //each_with_object
         //entries
-        //find
-        //find_all
-        //find_index
+        ObjectPtr find(const FunctionArgs &args);
+        //find_all = select
+        ObjectPtr find_index(const FunctionArgs &args);
         //first
         //flat_map
         //grep
@@ -67,9 +67,9 @@ namespace slim
         //one?
         //partition
         //reduce
-        //reject
         //reverse_each
-        //select
+        ObjectPtr reject(const FunctionArgs &args);
+        ObjectPtr select(const FunctionArgs &args);
         //slice_after
         //slice_before
         //slice_when
@@ -95,7 +95,12 @@ namespace slim
                 { method<Implementor>(&Enumerable::drop), "drop" },
                 { method<Implementor>(&Enumerable::drop_while), "drop_while" },
                 { method<Implementor>(&Enumerable::each_with_index), "each_with_index" },
+                { method<Implementor>(&Enumerable::find), "find" },
+                { method<Implementor>(&Enumerable::find_index), "find_index" },
                 { method<Implementor>(&Enumerable::map), "map" },
+                { method<Implementor>(&Enumerable::reject), "reject" },
+                { method<Implementor>(&Enumerable::select), "find_all" },
+                { method<Implementor>(&Enumerable::select), "select" },
                 { method<Implementor>(&Enumerable::to_a), "to_a" },
                 { method<Implementor>(&Enumerable::to_h), "to_h" }
             };

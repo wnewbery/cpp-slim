@@ -9,6 +9,9 @@ namespace slim
     BreakException::BreakException() : value(NIL_VALUE) {}
     BreakException::BreakException(ObjectPtr value) : value(value) {}
 
+    SpecialFlowException::SpecialFlowException() : value(NIL_VALUE) {}
+    SpecialFlowException::SpecialFlowException(ObjectPtr value) : value(value) {}
+
     std::string syntax_error_str(const std::string &file_name, int line, int offset, const std::string &message)
     {
         std::stringstream ss;
