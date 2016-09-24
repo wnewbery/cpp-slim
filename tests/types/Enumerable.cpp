@@ -66,10 +66,32 @@ BOOST_AUTO_TEST_CASE(count)
     BOOST_CHECK_THROW(eval("[].count 1, 2"), ArgumentCountError);
 }
 
+BOOST_AUTO_TEST_CASE(drop)
+{
+    BOOST_CHECK_EQUAL("[]", eval("[].drop 1"));
+    BOOST_CHECK_EQUAL("[2, 3, 5]", eval("[1,2,3,5].drop 1"));
+    BOOST_CHECK_EQUAL("[5]", eval("[1,2,3,5].drop 3"));
+    BOOST_CHECK_EQUAL("[]", eval("[1].drop 3"));
+}
+
+BOOST_AUTO_TEST_CASE(drop_while)
+{
+    BOOST_CHECK_EQUAL("[]", eval("[].drop_while {|x| x < 5}"));
+    BOOST_CHECK_EQUAL("[5]", eval("[1,2,3,5].drop_while {|x| x < 5}"));
+    BOOST_CHECK_EQUAL("[5, 3, 2]", eval("[1,2,3,5,3,2].drop_while {|x| x < 5}"));
+
+    BOOST_CHECK_EQUAL("[5, 3, 2]", eval("[1,2,3,5,3,2].drop_while.each {|x| x < 5}"));
+    BOOST_CHECK_EQUAL("[5, 3, 2]", eval("[1,2,3,5,3,2].each.drop_while {|x| x < 5}"));
+}
+
 BOOST_AUTO_TEST_CASE(map)
 {
     BOOST_CHECK_EQUAL("[2, 4, 8, 10]", eval("[1,2,4,5].map{|x| x*2}"));
     BOOST_CHECK_EQUAL("[2, 4, 8, 10]", eval("[1,2,4,5].collect{|x| x*2}"));
+
+    BOOST_CHECK_EQUAL("[2, 4, 8, 10]", eval("[1,2,4,5].each.map{|x| x*2}"));
+    BOOST_CHECK_EQUAL("[2, 4, 8, 10]", eval("[1,2,4,5].map.each{|x| x*2}"));
+    BOOST_CHECK_EQUAL("[2, 4, 8, 10]", eval("[1,2,4,5].map.map{|x| x*2}"));
 }
 
 BOOST_AUTO_TEST_CASE(to_a)

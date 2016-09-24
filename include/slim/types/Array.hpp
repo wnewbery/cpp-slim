@@ -25,6 +25,8 @@ namespace slim
         }
         virtual const std::string& type_name()const override { return name(); }
 
+        virtual ObjectPtr this_obj()override { return shared_from_this(); }
+
         virtual std::string to_string()const override { return inspect(); }
         virtual std::string inspect()const override;
         virtual bool eq(const Object *rhs)const override { return cmp(rhs) == 0; }
@@ -43,6 +45,10 @@ namespace slim
         void push_back(ObjectPtr obj)
         {
             arr.push_back(obj);
+        }
+        void push_back(Object *obj)
+        {
+            arr.push_back(obj->shared_from_this());
         }
 
         //[]=. <<

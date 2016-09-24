@@ -18,6 +18,8 @@ namespace slim
         }
         virtual const std::string& type_name()const override { return name(); }
 
+        virtual ObjectPtr this_obj()override { return shared_from_this(); }
+
         virtual ObjectPtr each(const FunctionArgs &args)=0;
     protected:
         const MethodTable &method_table()const override;
@@ -59,11 +61,5 @@ namespace slim
     inline Ptr<Enumerator> make_enumerator(FunctionEnumerator::Func f)
     {
         return create_object<FunctionEnumerator>(f);
-    }
-    template<class T>
-    Ptr<Enumerator> make_enumerator(T *forward_self, ObjectPtr(T::*func)(const FunctionArgs &args), const char *name)
-    {
-        return create_object<FunctionEnumerator>(
-            [forward_self, func](const FunctionArgs &args) { return (forward_self->*func)(args); });
     }
 }

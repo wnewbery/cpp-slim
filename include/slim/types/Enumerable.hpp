@@ -14,10 +14,22 @@ namespace slim
     {
     public:
         virtual ObjectPtr each(const FunctionArgs &args) = 0;
+        virtual ObjectPtr this_obj() = 0;
 
         ObjectPtr each2(
             const FunctionArgs &args,
             std::function<ObjectPtr(const FunctionArgs &args)> func);
+
+        /**Each element as a single element. Multiple values, e.g. from Hash or each_with_index
+         * will be wrapped in an array.
+         */
+        ObjectPtr each_single(
+            const FunctionArgs &args,
+            std::function<ObjectPtr(Object *arg)> func);
+        ObjectPtr each_single(std::function<ObjectPtr(Object *arg)> func)
+        {
+            return each_single({}, func);
+        }
 
         Ptr<Boolean> all_q(const FunctionArgs &args);
         Ptr<Boolean> any_q(const FunctionArgs &args);
@@ -25,9 +37,9 @@ namespace slim
         //collect_concat (flat_map)
         Ptr<Number> count(const FunctionArgs &args);
         //cycle
-        //detect
-        //drop
-        //drop_while
+        //detect (find)
+        Ptr<Array> drop(Number *n);
+        ObjectPtr drop_while(const FunctionArgs &args);
         //each_cons
         //each_entry
         //each_with_index
@@ -80,6 +92,8 @@ namespace slim
                 { method<Implementor>(&Enumerable::count), "count" },
                 { method<Implementor>(&Enumerable::each), "each" },
                 { method<Implementor>(&Enumerable::map), "collect" },
+                { method<Implementor>(&Enumerable::drop), "drop" },
+                { method<Implementor>(&Enumerable::drop_while), "drop_while" },
                 { method<Implementor>(&Enumerable::map), "map" },
                 { method<Implementor>(&Enumerable::to_a), "to_a" },
                 { method<Implementor>(&Enumerable::to_h), "to_h" }

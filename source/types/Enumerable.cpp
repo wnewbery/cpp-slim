@@ -8,6 +8,15 @@
 
 namespace slim
 {
+    //Need to make an object that keeps "this" alive, but also can call a function not derived from Object
+
+    template<class T>
+    Ptr<Enumerator> make_enumerator(ObjectPtr save_self, T *forward_self, ObjectPtr(T::*func)(const FunctionArgs &args), const char *name)
+    {
+        return create_object<FunctionEnumerator>(
+            [save_self, forward_self, func](const FunctionArgs &args) { return (forward_self->*func)(args); });
+    }
+
     ObjectPtr Enumerable::each2(
         const FunctionArgs &args,
         std::function<ObjectPtr(const FunctionArgs &args)> func)
@@ -15,6 +24,16 @@ namespace slim
         auto args2 = args;
         args2.push_back(create_object<FunctionProc>(func));
         return each(args2);
+    }
+
+    ObjectPtr Enumerable::each_single(
+        const FunctionArgs &args,
+        std::function<ObjectPtr(Object *arg)> func)
+    {
+        return each2(args, [func](const FunctionArgs &args) {
+            auto v = args.size() == 1 ? args[0] : make_value(args);
+            return func(v.get());
+        });
     }
 
     Ptr<Boolean> Enumerable::all_q(const FunctionArgs &args)
@@ -109,6 +128,40 @@ namespace slim
         return make_value(count);
     }
 
+    Ptr<Array> Enumerable::drop(Number *n)
+    {
+        auto ret = create_object<Array>();
+        unsigned i = 0;
+        each_single([&ret, &i, n](Object *arg) {
+            if (++i > n->get_value())
+                ret->push_back(arg);
+            return NIL_VALUE;
+        });
+        return ret;
+    }
+
+    ObjectPtr Enumerable::drop_while(const FunctionArgs &args)
+    {
+        if (args.empty()) return make_enumerator(this_obj(), this, &Enumerable::drop_while, "drop_while");
+        else if (args.size() == 1)
+        {
+            auto ret = create_object<Array>();
+            bool start = false;
+            auto proc = coerce<Proc>(args[0].get());
+            each2({}, [proc, &ret, &start](const FunctionArgs &args) {
+                start = start || !proc->call(args)->is_true();
+                if (start)
+                {
+                    if (args.size() == 1) ret->push_back(args[0]);
+                    else ret->push_back(make_value(args));
+                }
+                return NIL_VALUE;
+            });
+            return ret;
+        }
+        else throw ArgumentCountError(args.size(), 0, 1);
+    }
+
     ObjectPtr Enumerable::map(const FunctionArgs &args)
     {
         Proc *proc = nullptr;
@@ -126,7 +179,7 @@ namespace slim
             }
             catch (const BreakException &e) { return e.value; }
         }
-        else return make_enumerator(this, &Enumerable::map, "map");
+        else return make_enumerator(this_obj(), this, &Enumerable::map, "map");
     }
 
     Ptr<Array> Enumerable::to_a(const FunctionArgs &args)
