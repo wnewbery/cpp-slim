@@ -246,6 +246,7 @@ BOOST_AUTO_TEST_CASE(to_a)
 {
     BOOST_CHECK_EQUAL("[1, 2, 3]", eval("[1, 2, 3].to_a"));
     BOOST_CHECK_EQUAL("[[1, 6], 2, [3]]", eval("[[1, 6], 2, [3]].to_a"));
+    BOOST_CHECK_EQUAL("[[1, 6], 2, [3]]", eval("[[1, 6], 2, [3]].entries"));
 
     BOOST_CHECK_EQUAL("[\"te,\", \"st\"]", eval("'te,st'.each_line.to_a(',')"));
 }

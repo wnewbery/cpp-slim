@@ -44,7 +44,6 @@ namespace slim
         //each_entry
         ObjectPtr each_with_index(const FunctionArgs &args);
         //each_with_object
-        //entries
         ObjectPtr find(const FunctionArgs &args);
         //find_all = select
         ObjectPtr find_index(const FunctionArgs &args);
@@ -63,8 +62,6 @@ namespace slim
         ObjectPtr minmax(const FunctionArgs &args);
         ObjectPtr minmax_by(const FunctionArgs &args);
         //member?
-        //none?
-        //one?
         //partition
         //reduce
         //reverse_each
@@ -108,6 +105,7 @@ namespace slim
                 { method<Implementor>(&Enumerable::select), "find_all" },
                 { method<Implementor>(&Enumerable::select), "select" },
                 { method<Implementor>(&Enumerable::to_a), "to_a" },
+                { method<Implementor>(&Enumerable::to_a), "entries" },
                 { method<Implementor>(&Enumerable::to_h), "to_h" }
             };
         }
