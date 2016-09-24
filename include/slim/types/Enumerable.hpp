@@ -56,13 +56,13 @@ namespace slim
         //inject
         //lazy
         ObjectPtr map(const FunctionArgs &args);
-        //max
-        //max_by
+        ObjectPtr max(const FunctionArgs &args);
+        ObjectPtr max_by(const FunctionArgs &args);
+        ObjectPtr min(const FunctionArgs &args);
+        ObjectPtr min_by(const FunctionArgs &args);
+        ObjectPtr minmax(const FunctionArgs &args);
+        ObjectPtr minmax_by(const FunctionArgs &args);
         //member?
-        //min
-        //min_by
-        //minmax
-        //minmax_by
         //none?
         //one?
         //partition
@@ -98,6 +98,12 @@ namespace slim
                 { method<Implementor>(&Enumerable::find), "find" },
                 { method<Implementor>(&Enumerable::find_index), "find_index" },
                 { method<Implementor>(&Enumerable::map), "map" },
+                { method<Implementor>(&Enumerable::max), "max" },
+                { method<Implementor>(&Enumerable::max_by), "max_by" },
+                { method<Implementor>(&Enumerable::min), "min" },
+                { method<Implementor>(&Enumerable::min_by), "min_by" },
+                { method<Implementor>(&Enumerable::minmax), "minmax" },
+                { method<Implementor>(&Enumerable::minmax_by), "minmax_by" },
                 { method<Implementor>(&Enumerable::reject), "reject" },
                 { method<Implementor>(&Enumerable::select), "find_all" },
                 { method<Implementor>(&Enumerable::select), "select" },

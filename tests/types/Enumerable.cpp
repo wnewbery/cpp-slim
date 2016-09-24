@@ -151,6 +151,76 @@ BOOST_AUTO_TEST_CASE(map)
     BOOST_CHECK_EQUAL("[2, 4, 8, 10]", eval("[1,2,4,5].map.map{|x| x*2}"));
 }
 
+BOOST_AUTO_TEST_CASE(max)
+{
+    BOOST_CHECK_EQUAL("nil", eval("[].max"));
+    BOOST_CHECK_EQUAL("5", eval("[1,5,3,5].max"));
+
+    BOOST_CHECK_EQUAL("[]", eval("[].max 0"));
+    BOOST_CHECK_EQUAL("[]", eval("[].max 2"));
+    BOOST_CHECK_EQUAL("[5, 5]", eval("[1,5,3,5].max 2"));
+    BOOST_CHECK_EQUAL("[5, 3]", eval("[1,5,3].max 2"));
+    BOOST_CHECK_EQUAL("[5, 3]", eval("[5,3].max 3"));
+
+
+    BOOST_CHECK_EQUAL("nil", eval("[].max {|a, b| a.abs <=> b.abs}"));
+    BOOST_CHECK_EQUAL("-5", eval("[4, -5].max {|a, b| a.abs <=> b.abs}"));
+    BOOST_CHECK_EQUAL("[6, -5]", eval("[4, -5, 6, 3].max 2 {|a, b| a.abs <=> b.abs}"));
+}
+
+BOOST_AUTO_TEST_CASE(max_by)
+{
+    BOOST_CHECK_EQUAL("nil", eval("[].max_by{|x| x.abs}"));
+    BOOST_CHECK_EQUAL("-6", eval("[1,5,-6,5].max_by{|x| x.abs}"));
+    BOOST_CHECK_EQUAL("-6", eval("[1,5,-6,5].max_by.each{|x| x.abs}"));
+
+    BOOST_CHECK_EQUAL("[-6, 5]", eval("[1,5,-6,5].max_by 2{|x| x.abs}"));
+}
+
+BOOST_AUTO_TEST_CASE(min_by)
+{
+    BOOST_CHECK_EQUAL("nil", eval("[].min_by{|x| x.abs}"));
+    BOOST_CHECK_EQUAL("-1", eval("[-1,1,-6,5].min_by{|x| x.abs}"));
+    BOOST_CHECK_EQUAL("1", eval("[1,5,-6,5].min_by.each{|x| x.abs}"));
+
+    BOOST_CHECK_EQUAL("[1, 5]", eval("[1,5,-6,5].min_by 2{|x| x.abs}"));
+}
+
+BOOST_AUTO_TEST_CASE(minmax)
+{
+    BOOST_CHECK_EQUAL("[nil, nil]", eval("[].minmax"));
+    BOOST_CHECK_EQUAL("[1, 1]", eval("[1].minmax"));
+    BOOST_CHECK_EQUAL("[0, 6]", eval("[1, 6, 2, 0, 4].minmax"));
+
+    BOOST_CHECK_EQUAL("[0, -6]", eval("[1, -6, 2, 0, 4].minmax{|a, b| a.abs <=> b.abs}"));
+}
+
+BOOST_AUTO_TEST_CASE(minmax_by)
+{
+    BOOST_CHECK_EQUAL("[nil, nil]", eval("[].minmax_by{|x| x.abs}"));
+    BOOST_CHECK_EQUAL("[1, 1]", eval("[1].minmax_by{|x| x.abs}"));
+    BOOST_CHECK_EQUAL("[0, -6]", eval("[1, -6, -2, 0, 4].minmax_by{|x| x.abs}"));
+
+    BOOST_CHECK_EQUAL("[0, -6]", eval("[1, -6, -2, 0, 4].minmax_by.each{|x| x.abs}"));
+}
+
+BOOST_AUTO_TEST_CASE(min)
+{
+    BOOST_CHECK_EQUAL("nil", eval("[].min"));
+    BOOST_CHECK_EQUAL("1", eval("[1,5,3,5].min"));
+
+    BOOST_CHECK_EQUAL("[]", eval("[].min 0"));
+    BOOST_CHECK_EQUAL("[]", eval("[].min 2"));
+    BOOST_CHECK_EQUAL("[1, 1]", eval("[1,5,3,1].min 2"));
+    BOOST_CHECK_EQUAL("[1, 3]", eval("[1,5,3].min 2"));
+    BOOST_CHECK_EQUAL("[3, 5]", eval("[5,3].min 3"));
+
+
+    BOOST_CHECK_EQUAL("nil", eval("[].min {|a, b| a.abs <=> b.abs}"));
+    BOOST_CHECK_EQUAL("4", eval("[4, -5].min {|a, b| a.abs <=> b.abs}"));
+    BOOST_CHECK_EQUAL("[3, -4]", eval("[-4, -5, 6, 3].min 2 {|a, b| a.abs <=> b.abs}"));
+}
+
 BOOST_AUTO_TEST_CASE(reject)
 {
     BOOST_CHECK_EQUAL("[]", eval("[1, 5, 3, 7].reject{|x| true}"));

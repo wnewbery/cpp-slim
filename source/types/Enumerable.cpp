@@ -5,6 +5,8 @@
 #include "types/Proc.hpp"
 #include "Function.hpp"
 #include <sstream>
+#include <algorithm>
+#include <deque>
 
 namespace slim
 {
@@ -253,6 +255,169 @@ namespace slim
             return ret;
         }
         else return make_enumerator(this_obj(), this, &Enumerable::map, "map");
+    }
+
+    namespace
+    {
+        void minmax_args(const FunctionArgs &args, Proc **proc, int *n)
+        {
+            if (args.size() == 0)
+            {
+                *proc = nullptr;
+                *n = 1;
+            }
+            else if (args.size() == 1)
+            {
+                *proc = dynamic_cast<Proc*>(args[0].get());
+                if (*proc) *n = 1;
+                else *n = (int)coerce<Number>(args[0])->get_value();
+            }
+            else if (args.size() == 2)
+            {
+                *n = (int)coerce<Number>(args[0])->get_value();
+                *proc = coerce<Proc>(args[1]).get();
+            }
+            else throw ArgumentCountError(args.size(), 0, 2);
+        }
+    
+        template<class T> ObjectPtr do_min(Enumerable *self, int n, T cmp)
+        {
+            if (n == 0) return make_array({});
+            else if (n == 1)
+            {
+                ObjectPtr min = nullptr;
+                self->each_single([&min, cmp](Object *nextp) {
+                    auto next = nextp->shared_from_this();
+                    if (!min) min = next;
+                    else if (cmp(next, min)) min = next;
+                    return NIL_VALUE;
+                });
+                return min ? min : NIL_VALUE;
+            }
+            else if (n > 1)
+            {
+                std::deque<ObjectPtr> arr;
+                self->each_single([&arr, cmp, n](Object *nextp) {
+                    auto next = nextp->shared_from_this();
+                    arr.insert(std::upper_bound(arr.begin(), arr.end(), next, cmp), next);
+                    if (arr.size() > (size_t)n) arr.pop_back();
+                    return NIL_VALUE;
+                });
+                return make_array({arr.begin(), arr.end()});
+            }
+            else throw ArgumentError("negative size (" + std::to_string(n) + ")");
+        }
+    }
+    ObjectPtr Enumerable::max(const FunctionArgs &args)
+    {
+        Proc *proc;
+        int n;
+        minmax_args(args, &proc, &n);
+        if (proc)
+        {
+            return do_min(this, n, [proc](ObjectPtr a, ObjectPtr b) {
+                return coerce<Number>(proc->call({ a, b }))->get_value() > 0;
+            });
+        }
+        else
+        {
+            return do_min(this, n, [](ObjectPtr a, ObjectPtr b) {
+                return slim::cmp(a.get(), b.get()) > 0;
+            });
+        }
+    }
+    ObjectPtr Enumerable::max_by(const FunctionArgs &args)
+    {
+        Proc *proc;
+        int n;
+        minmax_args(args, &proc, &n);
+        if (proc)
+        {
+            return do_min(this, n, [proc](ObjectPtr a, ObjectPtr b) {
+                return slim::cmp(proc->call({a}).get(), proc->call({b}).get()) > 0;
+            });
+        }
+        else return make_enumerator(this_obj(), this, &Enumerable::max_by, "max_by", args);
+    }
+    ObjectPtr Enumerable::min(const FunctionArgs &args)
+    {
+        Proc *proc;
+        int n;
+        minmax_args(args, &proc, &n);
+        if (proc)
+        {
+            return do_min(this, n, [proc](ObjectPtr a, ObjectPtr b) {
+                return coerce<Number>(proc->call({ a, b }))->get_value() < 0;
+            });
+        }
+        else
+        {
+            return do_min(this, n, [](ObjectPtr a, ObjectPtr b) {
+                return slim::cmp(a.get(), b.get()) < 0;
+            });
+        }
+    }
+    ObjectPtr Enumerable::min_by(const FunctionArgs &args)
+    {
+        Proc *proc;
+        int n;
+        minmax_args(args, &proc, &n);
+        if (proc)
+        {
+            return do_min(this, n, [proc](ObjectPtr a, ObjectPtr b) {
+                return slim::cmp(proc->call({ a }).get(), proc->call({ b }).get()) < 0;
+            });
+        }
+        else return make_enumerator(this_obj(), this, &Enumerable::min_by, "min_by", args);
+    }
+
+    namespace
+    {
+        template<class T> ObjectPtr do_minmax(Enumerable *self, T cmp)
+        {
+            ObjectPtr min = nullptr, max = nullptr;
+            self->each_single([&min, &max, cmp](Object *nextp) {
+                auto next = nextp->shared_from_this();
+                if (!min) min = max = next;
+                else
+                {
+                    if (cmp(next, min) < 0) min = next;
+                    if (cmp(next, max) > 0) max = next;
+                }
+                return NIL_VALUE;
+            });
+            return make_array({min ? min : NIL_VALUE, max ? max : NIL_VALUE});
+        }
+    }
+    ObjectPtr Enumerable::minmax(const FunctionArgs &args)
+    {
+        Proc *proc = nullptr;
+        unpack<0>(args, &proc);
+        if (proc)
+        {
+            return do_minmax(this, [proc](ObjectPtr a, ObjectPtr b) {
+                return (int)coerce<Number>(proc->call({ a, b }))->get_value();
+            });
+        }
+        else
+        {
+            return do_minmax(this, [](ObjectPtr a, ObjectPtr b) {
+                return slim::cmp(a.get(), b.get());
+            });
+        }
+    }
+
+    ObjectPtr Enumerable::minmax_by(const FunctionArgs &args)
+    {
+        Proc *proc = nullptr;
+        unpack<0>(args, &proc);
+        if (proc)
+        {
+            return do_minmax(this, [proc](ObjectPtr a, ObjectPtr b) {
+                return slim::cmp(proc->call({a}).get(), proc->call({b}).get());
+            });
+        }
+        else return make_enumerator(this_obj(), this, &Enumerable::minmax_by, "minmax_by");
     }
 
     ObjectPtr Enumerable::reject(const FunctionArgs &args)
