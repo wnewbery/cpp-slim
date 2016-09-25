@@ -289,16 +289,44 @@ namespace slim
         }
         else throw ArgumentError(this, "slice");
     }
-    std::shared_ptr<Array> Array::sort()
+    Ptr<Array> Array::sort(const FunctionArgs &args)
     {
-        std::vector<ObjectPtr> out = arr;
-        std::sort(out.begin(), out.end(), ObjLess());
-        return make_value(std::move(out));
+        Proc *proc = nullptr;
+        unpack<0>(args, &proc);
+        if (proc)
+        {
+            std::vector<ObjectPtr> out = arr;
+            std::sort(out.begin(), out.end(), [proc](ObjectPtr a, ObjectPtr b) {
+                return coerce<Number>(proc->call({a, b}))->get_value() < 0;
+            });
+            return make_value(std::move(out));
+        }
+        else
+        {
+            std::vector<ObjectPtr> out = arr;
+            std::sort(out.begin(), out.end(), ObjLess());
+            return make_value(std::move(out));
+        }
+    }
+    ObjectPtr Array::sort_by(const FunctionArgs &args)
+    {
+        Proc *proc = nullptr;
+        unpack<0>(args, &proc);
+        if (proc)
+        {
+            std::vector<ObjectPtr> out = arr;
+            std::sort(out.begin(), out.end(), [proc](ObjectPtr a, ObjectPtr b) {
+                return slim::cmp(proc->call({a}).get(), proc->call({b}).get()) < 0;
+            });
+            return make_value(std::move(out));
+        }
+        else return make_enumerator(this, { &Array::sort_by, "sort_by" });
     }
     std::shared_ptr<Array> Array::take(const Number * n)
     {
         std::vector<ObjectPtr> out;
         auto count = (int)n->get_value();
+        if (count < 0) throw ArgumentError("negative array size");
         for (int i = 0; i < count && i < (int)arr.size(); ++i) out.push_back(arr[i]);
         return make_value(std::move(out));
     }
@@ -355,6 +383,7 @@ namespace slim
             { &Array::rotate, "rotate" },
             { &Array::slice, "slice" },
             { &Array::sort, "sort" },
+            { &Array::sort_by, "sort_by" },
             { &Array::take, "take" },
             { &Array::uniq, "uniq" },
             { &Array::values_at, "values_at" }

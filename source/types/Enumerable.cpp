@@ -551,6 +551,16 @@ namespace slim
         else return make_enumerator(this_obj(), this, &Enumerable::select, "select", args);
     }
 
+    Ptr<Array> Enumerable::sort(const FunctionArgs &args)
+    {
+        return to_a({})->sort(args);
+    }
+
+    ObjectPtr Enumerable::sort_by(const FunctionArgs &args)
+    {
+        return to_a({})->sort_by(args);
+    }
+
     Ptr<Array> Enumerable::take(Number *n_obj)
     {
         int n = (int)n_obj->get_value();

@@ -102,7 +102,8 @@ namespace slim
         //shift
         //shuffle
         std::shared_ptr<Object> slice(const FunctionArgs &args);
-        std::shared_ptr<Array> sort();
+        Ptr<Array> sort(const FunctionArgs &args);
+        ObjectPtr sort_by(const FunctionArgs &args);
         //sort_by
         std::shared_ptr<Array> take(const Number *n);
         //take_while

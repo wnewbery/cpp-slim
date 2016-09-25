@@ -69,8 +69,8 @@ namespace slim
         //slice_after
         //slice_before
         //slice_when
-        //sort
-        //sort_by
+        Ptr<Array> sort(const FunctionArgs &args);
+        ObjectPtr sort_by(const FunctionArgs &args);
         Ptr<Array> take(Number *n);
         ObjectPtr take_while(const FunctionArgs &args);
         Ptr<Array> to_a(const FunctionArgs &args);
@@ -109,6 +109,8 @@ namespace slim
                 { method<Implementor>(&Enumerable::reject), "reject" },
                 { method<Implementor>(&Enumerable::select), "find_all" },
                 { method<Implementor>(&Enumerable::select), "select" },
+                { method<Implementor>(&Enumerable::sort), "sort" },
+                { method<Implementor>(&Enumerable::sort_by), "sort_by" },
                 { method<Implementor>(&Enumerable::take), "take" },
                 { method<Implementor>(&Enumerable::take_while), "take_while" },
                 { method<Implementor>(&Enumerable::to_a), "to_a" },

@@ -304,6 +304,19 @@ BOOST_AUTO_TEST_CASE(take_while)
     BOOST_CHECK_EQUAL("[1, 5]", eval("[1, 5, 2, 1, 4].take_while{|x| x != 2}"));
 }
 
+BOOST_AUTO_TEST_CASE(sort)
+{
+    BOOST_CHECK_EQUAL("[1, 2, 3, 5]", eval("[1,5,3,2].each.sort"));
+    BOOST_CHECK_EQUAL("[-3, -2, 1, 5]", eval("[1,5,-3,-2].each.sort"));
+    BOOST_CHECK_EQUAL("[1, -2, -3, 5]", eval("[1,5,-3,-2].each.sort{|a, b| a.abs <=> b.abs}"));
+}
+
+BOOST_AUTO_TEST_CASE(sort_by)
+{
+    BOOST_CHECK_EQUAL("[1, -2, -3, 5]", eval("[1,5,-3,-2].each.sort_by{|a| a.abs}"));
+    BOOST_CHECK_EQUAL("[1, -2, -3, 5]", eval("[1,5,-3,-2].each.sort_by.each{|a| a.abs}"));
+}
+
 BOOST_AUTO_TEST_CASE(to_a)
 {
     BOOST_CHECK_EQUAL("[1, 2, 3]", eval("[1, 2, 3].to_a"));
