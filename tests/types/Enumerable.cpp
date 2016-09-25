@@ -237,6 +237,13 @@ BOOST_AUTO_TEST_CASE(min)
     BOOST_CHECK_EQUAL("[3, -4]", eval("[-4, -5, 6, 3].min 2 {|a, b| a.abs <=> b.abs}"));
 }
 
+BOOST_AUTO_TEST_CASE(partition)
+{
+    BOOST_CHECK_EQUAL("[[], []]", eval("[].partition{|x| true}"));
+    BOOST_CHECK_EQUAL("[[1, 2, 3], [5, 8, 9]]", eval("[1,5,8,2,3,9].partition{|x| x < 4}"));
+    BOOST_CHECK_EQUAL("[[1, 2, 3], [5, 8, 9]]", eval("[1,5,8,2,3,9].partition.each{|x| x < 4}"));
+}
+
 BOOST_AUTO_TEST_CASE(reduce)
 {
     BOOST_CHECK_EQUAL("nil", eval("[].reduce{|memo, val| memo + val}"));

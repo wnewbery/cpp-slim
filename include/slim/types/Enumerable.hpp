@@ -61,7 +61,7 @@ namespace slim
         ObjectPtr minmax(const FunctionArgs &args);
         ObjectPtr minmax_by(const FunctionArgs &args);
         //member?
-        //partition
+        ObjectPtr partition(const FunctionArgs &args);
         ObjectPtr reduce(const FunctionArgs &args);
         //reverse_each
         ObjectPtr reject(const FunctionArgs &args);
@@ -102,6 +102,7 @@ namespace slim
                 { method<Implementor>(&Enumerable::min_by), "min_by" },
                 { method<Implementor>(&Enumerable::minmax), "minmax" },
                 { method<Implementor>(&Enumerable::minmax_by), "minmax_by" },
+                { method<Implementor>(&Enumerable::partition), "partition" },
                 { method<Implementor>(&Enumerable::reduce), "reduce" },
                 { method<Implementor>(&Enumerable::reduce), "inject" },
                 { method<Implementor>(&Enumerable::reject), "reject" },

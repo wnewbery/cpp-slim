@@ -457,6 +457,24 @@ namespace slim
         else return make_enumerator(this_obj(), this, &Enumerable::minmax_by, "minmax_by");
     }
 
+    ObjectPtr Enumerable::partition(const FunctionArgs &args)
+    {
+        Proc *proc = nullptr;
+        unpack<0>(args, &proc);
+        if (proc)
+        {
+            auto true_arr = create_object<Array>();
+            auto false_arr = create_object<Array>();
+            each2({}, [proc, true_arr, false_arr](const FunctionArgs &args) {
+                (proc->call(args)->is_true() ? true_arr : false_arr)->push_back(
+                    args.size() == 1 ? args[0] : make_array(args));
+                return NIL_VALUE;
+            });
+            return make_array({true_arr, false_arr});
+        }
+        else return make_enumerator(this_obj(), this, &Enumerable::partition, "partition");
+    }
+
     ObjectPtr Enumerable::reduce(const FunctionArgs &args)
     {
         ObjectPtr value = nullptr;
