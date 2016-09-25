@@ -241,6 +241,27 @@ namespace slim
         catch (const SpecialFlowException &e) { return e.value; }
     }
 
+    ObjectPtr Enumerable::first(const FunctionArgs &args)
+    {
+        if (args.empty())
+        {
+            try
+            {
+                each_single([](Object *arg) -> ObjectPtr {
+                    throw SpecialFlowException(arg->shared_from_this());
+                });
+                return NIL_VALUE;
+            }
+            catch (const SpecialFlowException &e) { return e.value; }
+        }
+        else
+        {
+            Number *n;
+            unpack(args, &n);
+            return take(n);
+        }
+    }
+
     ObjectPtr Enumerable::flat_map(const FunctionArgs &args)
     {
         Proc *proc = nullptr;
@@ -528,6 +549,46 @@ namespace slim
             return ret;
         }
         else return make_enumerator(this_obj(), this, &Enumerable::select, "select", args);
+    }
+
+    Ptr<Array> Enumerable::take(Number *n_obj)
+    {
+        int n = (int)n_obj->get_value();
+        if (n < 0) throw ArgumentError("negative array size");
+        auto ret = create_object<Array>();
+        try
+        {
+            each_single([ret, n](Object *arg) -> ObjectPtr {
+                ret->push_back(arg->shared_from_this());
+                if (ret->get_value().size() >= (size_t)n)
+                    throw SpecialFlowException();
+                else return NIL_VALUE;
+            });
+        }
+        catch (const SpecialFlowException &) {}
+        return ret;
+    }
+
+    ObjectPtr Enumerable::take_while(const FunctionArgs &args)
+    {
+        Proc *proc = nullptr;
+        unpack<0>(args, &proc);
+        if (proc)
+        {
+            auto ret = create_object<Array>();
+            try
+            {
+                each2({}, [ret, proc](const FunctionArgs &args) {
+                    if (!proc->call(args)->is_true())
+                        throw SpecialFlowException();
+                    ret->push_back(args.size() == 1 ? args[0] : make_value(args));
+                    return NIL_VALUE;
+                });
+            }
+            catch (const SpecialFlowException &) {}
+            return ret;
+        }
+        else return make_enumerator(this_obj(), this, &Enumerable::take_while, "take_while", args);
     }
 
     Ptr<Array> Enumerable::to_a(const FunctionArgs &args)

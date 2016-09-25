@@ -47,7 +47,7 @@ namespace slim
         ObjectPtr find(const FunctionArgs &args);
         //find_all = select
         ObjectPtr find_index(const FunctionArgs &args);
-        //first
+        ObjectPtr first(const FunctionArgs &args);
         ObjectPtr flat_map(const FunctionArgs &args);
         //grep
         ObjectPtr group_by(const FunctionArgs &args);
@@ -71,8 +71,8 @@ namespace slim
         //slice_when
         //sort
         //sort_by
-        //take
-        //take_while
+        Ptr<Array> take(Number *n);
+        ObjectPtr take_while(const FunctionArgs &args);
         Ptr<Array> to_a(const FunctionArgs &args);
         Ptr<Hash> to_h(const FunctionArgs &args);
         //zip
@@ -93,6 +93,7 @@ namespace slim
                 { method<Implementor>(&Enumerable::each_with_index), "each_with_index" },
                 { method<Implementor>(&Enumerable::find), "find" },
                 { method<Implementor>(&Enumerable::find_index), "find_index" },
+                { method<Implementor>(&Enumerable::first), "first" },
                 { method<Implementor>(&Enumerable::flat_map), "flat_map" },
                 { method<Implementor>(&Enumerable::group_by), "group_by" },
                 { method<Implementor>(&Enumerable::map), "map" },
@@ -108,6 +109,8 @@ namespace slim
                 { method<Implementor>(&Enumerable::reject), "reject" },
                 { method<Implementor>(&Enumerable::select), "find_all" },
                 { method<Implementor>(&Enumerable::select), "select" },
+                { method<Implementor>(&Enumerable::take), "take" },
+                { method<Implementor>(&Enumerable::take_while), "take_while" },
                 { method<Implementor>(&Enumerable::to_a), "to_a" },
                 { method<Implementor>(&Enumerable::to_a), "entries" },
                 { method<Implementor>(&Enumerable::to_h), "to_h" }

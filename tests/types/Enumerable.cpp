@@ -141,6 +141,18 @@ BOOST_AUTO_TEST_CASE(find_index)
     BOOST_CHECK_THROW(eval("[].find_index 1, 2"), ArgumentCountError);
 }
 
+BOOST_AUTO_TEST_CASE(first)
+{
+    BOOST_CHECK_EQUAL("nil", eval("[].first"));
+    BOOST_CHECK_EQUAL("[]", eval("[].first 0"));
+    BOOST_CHECK_EQUAL("[]", eval("[].first 5"));
+    BOOST_CHECK_EQUAL("1", eval("[1, 4, 6].first"));
+    BOOST_CHECK_EQUAL("[1]", eval("[1, 4, 6].first 1"));
+    BOOST_CHECK_EQUAL("[1, 4, 6]", eval("[1, 4, 6].first 4"));
+    BOOST_CHECK_THROW(eval("[].first -2"), ArgumentError);
+    BOOST_CHECK_THROW(eval("[].first false"), TypeError);
+}
+
 BOOST_AUTO_TEST_CASE(flat_map)
 {
     BOOST_CHECK_EQUAL("[]", eval("[].flat_map{|x| x*2}"));
@@ -272,6 +284,24 @@ BOOST_AUTO_TEST_CASE(select)
 
     BOOST_CHECK_EQUAL("[3, 7]", eval("[1, 5, 3, 7].select.each_with_index{|x, i| i > 1}"));
     BOOST_CHECK_EQUAL("[[3, 2], [7, 3]]", eval("[1, 5, 3, 7].each_with_index.select{|x, i| i > 1}"));
+}
+
+BOOST_AUTO_TEST_CASE(take)
+{
+    //NOTE: Array overrides Enumerable::take implementation
+    BOOST_CHECK_EQUAL("[]", eval("[].each.take 0"));
+    BOOST_CHECK_EQUAL("[]", eval("[].each.take 5"));
+    BOOST_CHECK_EQUAL("[1]", eval("[1, 4, 6].each.take 1"));
+    BOOST_CHECK_EQUAL("[1, 4, 6]", eval("[1, 4, 6].each.take 4"));
+    BOOST_CHECK_THROW(eval("[].each.take -2"), ArgumentError);
+}
+
+BOOST_AUTO_TEST_CASE(take_while)
+{
+    BOOST_CHECK_EQUAL("[]", eval("[].take_while{|x| true}"));
+    BOOST_CHECK_EQUAL("[1, 5, 2, 1, 4]", eval("[1, 5, 2, 1, 4].take_while{|x| true}"));
+    BOOST_CHECK_EQUAL("[]", eval("[1, 5, 2, 1, 4].take_while{|x| x != 1}"));
+    BOOST_CHECK_EQUAL("[1, 5]", eval("[1, 5, 2, 1, 4].take_while{|x| x != 2}"));
 }
 
 BOOST_AUTO_TEST_CASE(to_a)
