@@ -241,6 +241,43 @@ namespace slim
         catch (const SpecialFlowException &e) { return e.value; }
     }
 
+    ObjectPtr Enumerable::flat_map(const FunctionArgs &args)
+    {
+        Proc *proc = nullptr;
+        unpack<0>(args, &proc);
+        if (proc)
+        {
+            auto arr = create_object<Array>();
+            each2({}, [&arr, proc](const FunctionArgs &args) {
+                auto value = proc->call(args);
+                if (auto value_arr = dynamic_cast<Array*>(value.get()))
+                    for (auto &i : *value_arr) arr->push_back(i);
+                else arr->push_back(value);
+                return NIL_VALUE;
+            });
+            return arr;
+        }
+        else return make_enumerator(this_obj(), this, &Enumerable::flat_map, "flat_map");
+    }
+
+    ObjectPtr Enumerable::group_by(const FunctionArgs &args)
+    {
+        Proc *proc = nullptr;
+        unpack<0>(args, &proc);
+        if (proc)
+        {
+            auto hash = create_object<Hash>();
+            each2({}, [&hash, proc](const FunctionArgs &args) {
+                auto key = proc->call(args);
+                auto arr = coerce<Array>(hash->get_or_create<Array>(key));
+                arr->push_back(args.size() == 1 ? args[0] : make_value(args));
+                return NIL_VALUE;
+            });
+            return hash;
+        }
+        else return make_enumerator(this_obj(), this, &Enumerable::group_by, "group_by");
+    }
+
     ObjectPtr Enumerable::map(const FunctionArgs &args)
     {
         Proc *proc = nullptr;
@@ -418,6 +455,27 @@ namespace slim
             });
         }
         else return make_enumerator(this_obj(), this, &Enumerable::minmax_by, "minmax_by");
+    }
+
+    ObjectPtr Enumerable::reduce(const FunctionArgs &args)
+    {
+        ObjectPtr value = nullptr;
+        Proc *proc;
+        if (args.size() == 1) proc = coerce<Proc>(args[0].get());
+        else if (args.size() == 2)
+        {
+            value = args[0];
+            proc = coerce<Proc>(args[1].get());
+        }
+        else throw ArgumentCountError(args.size(), 1, 2);
+
+        each_single({}, [&value, proc](Object *el) {
+            if (value) value = proc->call({value, el ->shared_from_this()});
+            else value = el->shared_from_this();
+            return NIL_VALUE;
+        });
+
+        return value ? value : NIL_VALUE;
     }
 
     ObjectPtr Enumerable::reject(const FunctionArgs &args)

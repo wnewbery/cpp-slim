@@ -212,6 +212,7 @@ namespace slim
         }
         else throw ArgumentError(this, "last");
     }
+
     std::shared_ptr<Number> Array::size()
     {
         return make_value((double)arr.size());

@@ -74,6 +74,7 @@ namespace slim
         //hash
         bool include_q_imp(const Object *obj);
         std::shared_ptr<Boolean> include_q(const Object *obj);
+        //std::shared_ptr<Object> index(const FunctionArgs &args);
         //initialize_copy
         //insert
         std::shared_ptr<String> join(const String *sep);

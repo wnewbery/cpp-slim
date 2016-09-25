@@ -141,6 +141,22 @@ BOOST_AUTO_TEST_CASE(find_index)
     BOOST_CHECK_THROW(eval("[].find_index 1, 2"), ArgumentCountError);
 }
 
+BOOST_AUTO_TEST_CASE(flat_map)
+{
+    BOOST_CHECK_EQUAL("[]", eval("[].flat_map{|x| x*2}"));
+    BOOST_CHECK_EQUAL("[2, 10, 4]", eval("[1, 5, 2].flat_map{|x| x*2}"));
+    BOOST_CHECK_EQUAL("[1, 1, 5, 5, 2, 2]", eval("[1, 5, 2].flat_map{|x| [x,x]}"));
+    BOOST_CHECK_EQUAL("[1, 1, 5, 5, 2, 2]", eval("[1, 5, 2].flat_map.each{|x| [x,x]}"));
+}
+
+BOOST_AUTO_TEST_CASE(group_by)
+{
+    BOOST_CHECK_EQUAL("{}", eval("[].group_by{|x| (x / 5).to_i}"));
+    BOOST_CHECK_EQUAL("{0 => [1, 3], 2 => [11], 1 => [7]}", eval("[1, 11, 3, 7].group_by{|x| (x / 5).to_i}"));
+    BOOST_CHECK_EQUAL("{0 => [1, 3], 2 => [11], 1 => [7]}", eval("[1, 11, 3, 7].group_by.each{|x| (x / 5).to_i}"));
+    BOOST_CHECK_EQUAL("{0 => [1, 3], 1 => [11, 7]}", eval("[1, 11, 3, 7].group_by.each_with_index{|x,i| i % 2}"));
+}
+
 BOOST_AUTO_TEST_CASE(map)
 {
     BOOST_CHECK_EQUAL("[2, 4, 8, 10]", eval("[1,2,4,5].map{|x| x*2}"));
@@ -219,6 +235,15 @@ BOOST_AUTO_TEST_CASE(min)
     BOOST_CHECK_EQUAL("nil", eval("[].min {|a, b| a.abs <=> b.abs}"));
     BOOST_CHECK_EQUAL("4", eval("[4, -5].min {|a, b| a.abs <=> b.abs}"));
     BOOST_CHECK_EQUAL("[3, -4]", eval("[-4, -5, 6, 3].min 2 {|a, b| a.abs <=> b.abs}"));
+}
+
+BOOST_AUTO_TEST_CASE(reduce)
+{
+    BOOST_CHECK_EQUAL("nil", eval("[].reduce{|memo, val| memo + val}"));
+    BOOST_CHECK_EQUAL("2", eval("[].reduce 2 {|memo, val| memo + val}"));
+    BOOST_CHECK_EQUAL("5", eval("[5].reduce{|memo, val| memo + val}"));
+    BOOST_CHECK_EQUAL("7", eval("[5].reduce 2 {|memo, val| memo + val}"));
+    BOOST_CHECK_EQUAL("6", eval("[1, 2, 3].reduce{|memo, val| memo + val}"));
 }
 
 BOOST_AUTO_TEST_CASE(reject)

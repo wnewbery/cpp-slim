@@ -38,6 +38,22 @@ namespace slim
         const_iterator end() { return list.end(); }
 
         void set(ObjectPtr key, ObjectPtr val);
+        /**Gets a value by key if it exists, else creates a new blank one with
+         * create_object.
+         * Functions in a similar manner to std::map::operator[].
+         */
+        template<class T>
+        ObjectPtr get_or_create(ObjectPtr key)
+        {
+            auto x = map.emplace(key, list.size());
+            if (x.second)
+            {
+                auto created = create_object<T>();
+                list.emplace_back(key, created);
+                return created;
+            }
+            else return list[x.first->second].second;
+        }
 
         //TODO: Needs some more thought (e.g. string vs symbol keys)
         /**C++ convinence function for "self.fetch(key, default).to_s" expression.*/

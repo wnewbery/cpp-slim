@@ -48,11 +48,10 @@ namespace slim
         //find_all = select
         ObjectPtr find_index(const FunctionArgs &args);
         //first
-        //flat_map
+        ObjectPtr flat_map(const FunctionArgs &args);
         //grep
-        //group_by
+        ObjectPtr group_by(const FunctionArgs &args);
         //include?
-        //inject
         //lazy
         ObjectPtr map(const FunctionArgs &args);
         ObjectPtr max(const FunctionArgs &args);
@@ -63,7 +62,7 @@ namespace slim
         ObjectPtr minmax_by(const FunctionArgs &args);
         //member?
         //partition
-        //reduce
+        ObjectPtr reduce(const FunctionArgs &args);
         //reverse_each
         ObjectPtr reject(const FunctionArgs &args);
         ObjectPtr select(const FunctionArgs &args);
@@ -94,6 +93,8 @@ namespace slim
                 { method<Implementor>(&Enumerable::each_with_index), "each_with_index" },
                 { method<Implementor>(&Enumerable::find), "find" },
                 { method<Implementor>(&Enumerable::find_index), "find_index" },
+                { method<Implementor>(&Enumerable::flat_map), "flat_map" },
+                { method<Implementor>(&Enumerable::group_by), "group_by" },
                 { method<Implementor>(&Enumerable::map), "map" },
                 { method<Implementor>(&Enumerable::max), "max" },
                 { method<Implementor>(&Enumerable::max_by), "max_by" },
@@ -101,6 +102,8 @@ namespace slim
                 { method<Implementor>(&Enumerable::min_by), "min_by" },
                 { method<Implementor>(&Enumerable::minmax), "minmax" },
                 { method<Implementor>(&Enumerable::minmax_by), "minmax_by" },
+                { method<Implementor>(&Enumerable::reduce), "reduce" },
+                { method<Implementor>(&Enumerable::reduce), "inject" },
                 { method<Implementor>(&Enumerable::reject), "reject" },
                 { method<Implementor>(&Enumerable::select), "find_all" },
                 { method<Implementor>(&Enumerable::select), "select" },
