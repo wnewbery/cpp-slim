@@ -301,10 +301,20 @@ BOOST_AUTO_TEST_CASE(enumerate)
     eval(model, "[1, 2, 3].each{|x| @data.store x}");
     BOOST_CHECK_EQUAL("[1, 2, 3]", data->check());
 
-    BOOST_CHECK_THROW(eval("[].each 1, 1"), ArgumentError);
+    BOOST_CHECK_THROW(eval("[].each 1, 1"), ArgumentCountError);
 
     eval(model, "[5, 6, 9].each.each{|x| @data.store x}");
-    BOOST_CHECK_EQUAL("[5, 6, 9]", data->check());}
+    BOOST_CHECK_EQUAL("[5, 6, 9]", data->check());
+
+
+
+    eval(model, "[].reverse_each{|x| @data.store x}");
+    BOOST_CHECK_EQUAL("[]", data->check());
+
+    eval(model, "[1, 2, 3].reverse_each{|x| @data.store x}");
+    BOOST_CHECK_EQUAL("[3, 2, 1]", data->check());
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()
 

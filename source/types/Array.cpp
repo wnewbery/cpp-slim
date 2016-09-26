@@ -99,27 +99,17 @@ namespace slim
     }
     ObjectPtr Array::each(const FunctionArgs &args)
     {
-        if (args.size() == 1)
+        Proc*proc = nullptr;
+        unpack<0>(args, &proc);
+        if (proc)
         {
-            try
+            for (auto &i : arr)
             {
-                auto proc = coerce<Proc>(args[0]);
-                for (auto &i : arr)
-                {
-                    proc->call({i});
-                }
-                return shared_from_this();
+                proc->call({i});
             }
-            catch (const BreakException &e)
-            {
-                return e.value;
-            }
+            return shared_from_this();
         }
-        else if(args.size() == 0)
-        {
-            return make_enumerator(this, { &Array::each, "each" });
-        }
-        else throw ArgumentError(this, "each");
+        else return make_enumerator(this, { &Array::each, "each" });
     }
     std::shared_ptr<Boolean> Array::empty_q()
     {
@@ -261,6 +251,20 @@ namespace slim
         }
         return make_value(std::move(out));
     }
+    ObjectPtr Array::reverse_each(const FunctionArgs &args)
+    {
+        Proc*proc = nullptr;
+        unpack<0>(args, &proc);
+        if (proc)
+        {
+            for (auto it = arr.rbegin(); it != arr.rend(); ++it)
+            {
+                proc->call({ *it });
+            }
+            return shared_from_this();
+        }
+        else return make_enumerator(this, { &Array::reverse_each, "reverse_each" });
+    }
     std::shared_ptr<Object> Array::slice(const FunctionArgs & args)
     {
         if (args.size() == 1)
@@ -381,6 +385,7 @@ namespace slim
             { &Array::reverse, "reverse" },
             { &Array::rindex, "rindex" },
             { &Array::rotate, "rotate" },
+            { &Array::reverse_each, "reverse_each" },
             { &Array::slice, "slice" },
             { &Array::sort, "sort" },
             { &Array::sort_by, "sort_by" },

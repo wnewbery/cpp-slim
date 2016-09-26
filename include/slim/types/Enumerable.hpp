@@ -65,8 +65,8 @@ namespace slim
         ObjectPtr minmax_by(const FunctionArgs &args);
         ObjectPtr partition(const FunctionArgs &args);
         ObjectPtr reduce(const FunctionArgs &args);
-        //reverse_each
         ObjectPtr reject(const FunctionArgs &args);
+        ObjectPtr reverse_each(const FunctionArgs &args);
         ObjectPtr select(const FunctionArgs &args);
         //slice_after
         //slice_before
@@ -111,6 +111,7 @@ namespace slim
                 { method<Implementor>(&Enumerable::reduce), "reduce" },
                 { method<Implementor>(&Enumerable::reduce), "inject" },
                 { method<Implementor>(&Enumerable::reject), "reject" },
+                { method<Implementor>(&Enumerable::reverse_each), "reverse_each" },
                 { method<Implementor>(&Enumerable::select), "find_all" },
                 { method<Implementor>(&Enumerable::select), "select" },
                 { method<Implementor>(&Enumerable::sort), "sort" },

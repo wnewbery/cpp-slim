@@ -284,6 +284,17 @@ BOOST_AUTO_TEST_CASE(reject)
     BOOST_CHECK_EQUAL("[[1, 0], [5, 1]]", eval("[1, 5, 3, 7].each_with_index.reject{|x, i| i > 1}"));
 }
 
+BOOST_AUTO_TEST_CASE(reverse_each)
+{
+    //Note, Array#reverse_each is overriden, so using Enumerator#reserve_each
+    BOOST_CHECK_EQUAL("[]", eval("[].each.reverse_each.to_a"));
+    BOOST_CHECK_EQUAL("[3, 2, 1]", eval("[1, 2, 3].each.reverse_each.to_a"));
+    BOOST_CHECK_EQUAL("[2, 2, 1]", eval("[1, 2, 3, 2].select.reverse_each.select{|x| x < 3}.to_a"));
+    BOOST_CHECK_EQUAL("[3, 2, 1]", eval("[1, 2, 3].each.reverse_each.to_a"));
+
+    BOOST_CHECK_EQUAL("[\"st\", \"te,\"]", eval("'te,st'.each_line.reverse_each(',').to_a"));
+}
+
 BOOST_AUTO_TEST_CASE(select)
 {
     BOOST_CHECK_EQUAL("[]", eval("[1, 5, 3, 7].select{|x| x > 9}"));

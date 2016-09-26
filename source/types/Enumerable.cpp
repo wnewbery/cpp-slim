@@ -309,7 +309,7 @@ namespace slim
             });
             return FALSE_VALUE;
         }
-        catch (const SpecialFlowException &e) { return TRUE_VALUE; }
+        catch (const SpecialFlowException &) { return TRUE_VALUE; }
     }
 
     ObjectPtr Enumerable::map(const FunctionArgs &args)
@@ -545,6 +545,19 @@ namespace slim
             return ret;
         }
         else return make_enumerator(this_obj(), this, &Enumerable::reject, "reject", args);
+    }
+
+    ObjectPtr Enumerable::reverse_each(const FunctionArgs &args)
+    {
+        Proc *proc = nullptr;
+        if (!args.empty()) proc = dynamic_cast<Proc*>(args.back().get());
+        if (proc)
+        {
+            FunctionArgs args2 = {args.begin(), args.end() - 1};
+            auto arr = to_a(args2);
+            return arr->reverse_each({proc->shared_from_this()});
+        }
+        else return make_enumerator(this_obj(), this, &Enumerable::reverse_each, "reverse_each", args);
     }
 
     ObjectPtr Enumerable::select(const FunctionArgs &args)

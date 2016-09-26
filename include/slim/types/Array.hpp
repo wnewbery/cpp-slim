@@ -93,7 +93,7 @@ namespace slim
         //repeated_permutation
         //replace
         std::shared_ptr<Array> reverse();
-        //reverse_each
+        ObjectPtr reverse_each(const FunctionArgs &args);
         std::shared_ptr<Object> rindex(const Object *obj);
         //std::shared_ptr<Object> rindex(const FunctionArgs &args);
         std::shared_ptr<Array> rotate(const FunctionArgs &args);
