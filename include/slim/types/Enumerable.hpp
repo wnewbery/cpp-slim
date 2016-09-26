@@ -14,8 +14,12 @@ namespace slim
     {
     public:
         virtual ObjectPtr each(const FunctionArgs &args) = 0;
+        /**Get the object instance including Enumerable.
+         * This is mostly used for memory managment.
+         */
         virtual ObjectPtr this_obj() = 0;
 
+        /**Turns the "func" param into a Proc object, adds it to args then calls each.*/
         ObjectPtr each2(
             const FunctionArgs &args,
             std::function<ObjectPtr(const FunctionArgs &args)> func);
@@ -45,13 +49,12 @@ namespace slim
         ObjectPtr each_with_index(const FunctionArgs &args);
         //each_with_object
         ObjectPtr find(const FunctionArgs &args);
-        //find_all = select
         ObjectPtr find_index(const FunctionArgs &args);
         ObjectPtr first(const FunctionArgs &args);
         ObjectPtr flat_map(const FunctionArgs &args);
         //grep
         ObjectPtr group_by(const FunctionArgs &args);
-        //include?
+        Ptr<Boolean> include_q(Object *obj);
         //lazy
         ObjectPtr map(const FunctionArgs &args);
         ObjectPtr max(const FunctionArgs &args);
@@ -60,7 +63,6 @@ namespace slim
         ObjectPtr min_by(const FunctionArgs &args);
         ObjectPtr minmax(const FunctionArgs &args);
         ObjectPtr minmax_by(const FunctionArgs &args);
-        //member?
         ObjectPtr partition(const FunctionArgs &args);
         ObjectPtr reduce(const FunctionArgs &args);
         //reverse_each
@@ -96,6 +98,8 @@ namespace slim
                 { method<Implementor>(&Enumerable::first), "first" },
                 { method<Implementor>(&Enumerable::flat_map), "flat_map" },
                 { method<Implementor>(&Enumerable::group_by), "group_by" },
+                { method<Implementor>(&Enumerable::include_q), "include?" },
+                { method<Implementor>(&Enumerable::include_q), "member?" },
                 { method<Implementor>(&Enumerable::map), "map" },
                 { method<Implementor>(&Enumerable::max), "max" },
                 { method<Implementor>(&Enumerable::max_by), "max_by" },

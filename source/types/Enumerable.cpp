@@ -299,6 +299,19 @@ namespace slim
         else return make_enumerator(this_obj(), this, &Enumerable::group_by, "group_by");
     }
 
+    Ptr<Boolean> Enumerable::include_q(Object *obj)
+    {
+        try
+        {
+            each_single([obj](Object *arg) {
+                if (arg->eq(obj)) throw SpecialFlowException(arg->shared_from_this());
+                return NIL_VALUE;
+            });
+            return FALSE_VALUE;
+        }
+        catch (const SpecialFlowException &e) { return TRUE_VALUE; }
+    }
+
     ObjectPtr Enumerable::map(const FunctionArgs &args)
     {
         Proc *proc = nullptr;

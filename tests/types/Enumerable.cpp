@@ -169,6 +169,14 @@ BOOST_AUTO_TEST_CASE(group_by)
     BOOST_CHECK_EQUAL("{0 => [1, 3], 1 => [11, 7]}", eval("[1, 11, 3, 7].group_by.each_with_index{|x,i| i % 2}"));
 }
 
+BOOST_AUTO_TEST_CASE(include_q)
+{
+    BOOST_CHECK_EQUAL("false", eval("[].include? 5"));
+    BOOST_CHECK_EQUAL("false", eval("[1, -5, 3].include? 5"));
+    BOOST_CHECK_EQUAL("true", eval("[1, -5, 5, 3].include? 5"));
+    BOOST_CHECK_EQUAL("true", eval("[1, -5, 5, 3].member? 5"));
+}
+
 BOOST_AUTO_TEST_CASE(map)
 {
     BOOST_CHECK_EQUAL("[2, 4, 8, 10]", eval("[1,2,4,5].map{|x| x*2}"));
