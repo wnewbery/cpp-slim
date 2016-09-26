@@ -64,8 +64,8 @@ namespace slim
         ObjectPtr min_by(const FunctionArgs &args);
         ObjectPtr minmax(const FunctionArgs &args);
         ObjectPtr minmax_by(const FunctionArgs &args);
-        //none?
-        //one?
+        Ptr<Boolean> none_q(const FunctionArgs &args);
+        Ptr<Boolean> one_q(const FunctionArgs &args);
         ObjectPtr partition(const FunctionArgs &args);
         ObjectPtr reduce(const FunctionArgs &args);
         ObjectPtr reject(const FunctionArgs &args);
@@ -110,6 +110,8 @@ namespace slim
                 { method<Implementor>(&Enumerable::min_by), "min_by" },
                 { method<Implementor>(&Enumerable::minmax), "minmax" },
                 { method<Implementor>(&Enumerable::minmax_by), "minmax_by" },
+                { method<Implementor>(&Enumerable::none_q), "none?" },
+                { method<Implementor>(&Enumerable::one_q), "one?" },
                 { method<Implementor>(&Enumerable::partition), "partition" },
                 { method<Implementor>(&Enumerable::reduce), "reduce" },
                 { method<Implementor>(&Enumerable::reduce), "inject" },

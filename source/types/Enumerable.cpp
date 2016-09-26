@@ -47,7 +47,7 @@ namespace slim
     Ptr<Boolean> Enumerable::all_q(const FunctionArgs &args)
     {
         Proc *proc = nullptr;
-        try_unpack<0>(args, &proc);
+        unpack<0>(args, &proc);
         try
         {
             if (proc)
@@ -74,7 +74,7 @@ namespace slim
     Ptr<Boolean> Enumerable::any_q(const FunctionArgs &args)
     {
         Proc *proc = nullptr;
-        try_unpack<0>(args, &proc);
+        unpack<0>(args, &proc);
         try
         {
             if (proc)
@@ -489,6 +489,45 @@ namespace slim
             });
         }
         else return make_enumerator(this_obj(), this, &Enumerable::minmax_by, "minmax_by");
+    }
+
+    Ptr<Boolean> Enumerable::none_q(const FunctionArgs &args)
+    {
+        return make_value(!any_q(args)->is_true());
+    }
+
+    Ptr<Boolean> Enumerable::one_q(const FunctionArgs &args)
+    {
+        Proc *proc = nullptr;
+        unpack<0>(args, &proc);
+        try
+        {
+            bool found = false;
+            if (proc)
+            {
+                each2({}, [&found, proc](const FunctionArgs &args) {
+                    if (proc->call(args)->is_true())
+                    {
+                        if (found) throw SpecialFlowException();
+                        else found = true;
+                    }
+                    return NIL_VALUE;
+                });
+            }
+            else
+            {
+                each2({}, [&found](const FunctionArgs &args) {
+                    if ((args.size() > 1 || args[0]->is_true()))
+                    {
+                        if (found) throw SpecialFlowException();
+                        else found = true;
+                    }
+                    return NIL_VALUE;
+                });
+            }
+            return make_value(found);
+        }
+        catch (const SpecialFlowException &) { return FALSE_VALUE; }
     }
 
     ObjectPtr Enumerable::partition(const FunctionArgs &args)

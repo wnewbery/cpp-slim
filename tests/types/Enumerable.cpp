@@ -257,6 +257,30 @@ BOOST_AUTO_TEST_CASE(min)
     BOOST_CHECK_EQUAL("[3, -4]", eval("[-4, -5, 6, 3].min 2 {|a, b| a.abs <=> b.abs}"));
 }
 
+BOOST_AUTO_TEST_CASE(none_q)
+{
+    BOOST_CHECK_EQUAL("true", eval("[].none?"));
+    BOOST_CHECK_EQUAL("true", eval("[nil, false].none?"));
+    BOOST_CHECK_EQUAL("false", eval("[1].none?"));
+    BOOST_CHECK_EQUAL("true", eval("[].none?{|x| x >= 5}"));
+    BOOST_CHECK_EQUAL("true", eval("[1, 4].none?{|x| x >= 5}"));
+    BOOST_CHECK_EQUAL("false", eval("[1, 4, 5, 4].none?{|x| x >= 5}"));
+}
+
+BOOST_AUTO_TEST_CASE(one_q)
+{
+    BOOST_CHECK_EQUAL("false", eval("[].one?"));
+    BOOST_CHECK_EQUAL("false", eval("[nil].one?"));
+    BOOST_CHECK_EQUAL("true", eval("[1].one?"));
+    BOOST_CHECK_EQUAL("false", eval("[1, 2].one?"));
+    BOOST_CHECK_EQUAL("true", eval("[1, nil, false].one?"));
+
+    BOOST_CHECK_EQUAL("false", eval("[].one?{|x| x >= 5}"));
+    BOOST_CHECK_EQUAL("false", eval("[1, 4].one?{|x| x >= 5}"));
+    BOOST_CHECK_EQUAL("true", eval("[1, 4, 5, 4].one?{|x|x  >= 5}"));
+    BOOST_CHECK_EQUAL("false", eval("[1, 4, 5, 4, 7].one?{|x| x >= 5}"));
+}
+
 BOOST_AUTO_TEST_CASE(partition)
 {
     BOOST_CHECK_EQUAL("[[], []]", eval("[].partition{|x| true}"));
