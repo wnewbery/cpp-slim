@@ -46,6 +46,7 @@ namespace slim
         ObjectPtr drop_while(const FunctionArgs &args);
         //each_cons
         //each_entry
+        //each_slice
         ObjectPtr each_with_index(const FunctionArgs &args);
         //each_with_object
         ObjectPtr find(const FunctionArgs &args);
@@ -63,6 +64,8 @@ namespace slim
         ObjectPtr min_by(const FunctionArgs &args);
         ObjectPtr minmax(const FunctionArgs &args);
         ObjectPtr minmax_by(const FunctionArgs &args);
+        //none?
+        //one?
         ObjectPtr partition(const FunctionArgs &args);
         ObjectPtr reduce(const FunctionArgs &args);
         ObjectPtr reject(const FunctionArgs &args);

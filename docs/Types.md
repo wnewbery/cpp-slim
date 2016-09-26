@@ -4,6 +4,7 @@ These provide most of the script functionality, and use the same method names an
 
    * [Array](types/Array.md)
    * Boolean
+   * [Enumerable](types/Enumerable.md)
    * Hash
    * HtmlSafeString
    * [Math](types/Math.md)
