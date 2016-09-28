@@ -40,6 +40,27 @@ BOOST_AUTO_TEST_CASE(each)
     BOOST_CHECK_EQUAL("[5, 6, 9]", data->check());
 }
 
+BOOST_AUTO_TEST_CASE(with_index)
+{
+    auto model = create_view_model();
+    auto data = create_object<TestAccumulator>();
+    model->set_attr("data", data);
+
+    BOOST_CHECK_EQUAL("[]", eval("[].each.with_index.to_a"));
+    BOOST_CHECK_EQUAL("[[1, 0], [5, 1], [3, 2]]", eval("[1, 5, 3].each.with_index.to_a"));
+    BOOST_CHECK_EQUAL("[[1, 4], [5, 5], [3, 6]]", eval("[1, 5, 3].each.with_index(4).to_a"));
+
+
+    eval(model, "[5, 6, 9].each.with_index{|x, i| @data.store i}");
+    BOOST_CHECK_EQUAL("[0, 1, 2]", data->check());
+
+    eval(model, "[5, 6, 9].each.with_index(4){|x, i| @data.store i}");
+    BOOST_CHECK_EQUAL("[4, 5, 6]", data->check());
+
+
+    BOOST_CHECK_THROW(eval("[].each.with_index 0, 1, 2"), ArgumentCountError);
+}
+
 BOOST_AUTO_TEST_CASE(enumerable)
 {
     BOOST_CHECK_EQUAL("[1, 2, 3]", eval("[1, 2, 3].each.to_a"));

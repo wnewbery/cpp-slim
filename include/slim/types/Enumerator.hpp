@@ -21,6 +21,7 @@ namespace slim
         virtual ObjectPtr this_obj()override { return shared_from_this(); }
 
         virtual ObjectPtr each(const FunctionArgs &args)=0;
+        ObjectPtr with_index(const FunctionArgs &args);
     protected:
         const MethodTable &method_table()const override;
     };

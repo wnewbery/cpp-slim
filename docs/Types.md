@@ -5,6 +5,7 @@ These provide most of the script functionality, and use the same method names an
    * [Array](types/Array.md)
    * Boolean
    * [Enumerable](types/Enumerable.md)
+   * Enumerator
    * Hash
    * HtmlSafeString
    * [Math](types/Math.md)
@@ -28,6 +29,10 @@ The `Boolean` class has two instances, `true` and `false` and performs a similar
 
 ### `to_s`, `inspect`
 Returns `"true"` or `"false"`.
+
+# Enumerator
+`Enumerator` class. Includes `Enumerable` and provides some of the functionality of the Ruby
+`Enumerator` but notably does not support being used as an iterator (`next`, `peek`, etc.).
 
 #Hash
 The `Hash` object stores an ordered set of key-value pairs. The order is the order in which each unique key was added to the array.
