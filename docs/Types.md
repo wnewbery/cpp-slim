@@ -39,11 +39,14 @@ The `Hash` object stores an ordered set of key-value pairs. The order is the ord
 
 Scripts can create array hash using curly brackets, e.g. `{}` (empty), `{a: 5}`, `{a: 5, 5 => true}`.
 
-Most methods are the same as the Ruby hash methods.
+Includes `Enumerable` and most methods are the same as the Ruby hash methods.
 
    * `==`, `!=`, `<=>`
    * `[key]`
    * `dup`
+   * `each`
+   * `each_key`
+   * `each_value`
    * `empty?`
    * `fetch key`, `fetch key, default`: A block is not supported.
    * `flatten level=0`

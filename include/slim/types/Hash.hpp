@@ -1,5 +1,6 @@
 #pragma once
 #include "Object.hpp"
+#include "Enumerable.hpp"
 #include <vector>
 #include <cassert>
 namespace slim
@@ -9,7 +10,7 @@ namespace slim
     class Number;
     class String;
     /**Script Hash type.*/
-    class Hash : public Object
+    class Hash : public Object, public Enumerable
     {
     public:
         typedef std::vector<std::pair<ObjectPtr, ObjectPtr>> List;
@@ -33,6 +34,8 @@ namespace slim
         virtual bool eq(const Object *rhs)const override;
 
         virtual ObjectPtr el_ref(const FunctionArgs &args)override;
+
+        virtual ObjectPtr this_obj()override { return shared_from_this(); }
 
         const_iterator begin() { return list.begin(); }
         const_iterator end() { return list.end(); }
@@ -68,7 +71,9 @@ namespace slim
         //compare_by_identity, compare_by_identity?
         //default
         //delete, delete_if
-        //each, each_pair, each_key, each_value
+        virtual ObjectPtr each(const FunctionArgs &args)override;
+        ObjectPtr each_key(const FunctionArgs &args);
+        ObjectPtr each_value(const FunctionArgs &args);
         ObjectPtr empty_q();
         //eql?
         ObjectPtr fetch(const FunctionArgs &args);

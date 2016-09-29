@@ -154,5 +154,12 @@ BOOST_AUTO_TEST_CASE(merge)
     BOOST_CHECK_EQUAL("{:a => 5, :b => 15, :c => 20}", eval("{a: 5, b: 10}.merge({c: 20, b: 15})"));
 }
 
+BOOST_AUTO_TEST_CASE(each)
+{
+    BOOST_CHECK_EQUAL("[[5, 7], [3, 2], [1, 7]]", eval("{5 => 7, 3 => 2, 1 => 7}.each.to_a"));
+    BOOST_CHECK_EQUAL("[5, 3, 1]", eval("{5 => 7, 3 => 2, 1 => 7}.each_key.to_a"));
+    BOOST_CHECK_EQUAL("[7, 2, 7]", eval("{5 => 7, 3 => 2, 1 => 7}.each_value.to_a"));
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 

@@ -1,5 +1,7 @@
 #include "types/Hash.hpp"
 #include "types/Array.hpp"
+#include "types/Enumerator.hpp"
+#include "types/Proc.hpp"
 #include "Value.hpp"
 #include "Function.hpp"
 #include "Operators.hpp"
@@ -84,6 +86,49 @@ namespace slim
         auto it = map.find(args[0]);
         if (it != map.end()) return list[it->second].second;
         else return def_value;
+    }
+
+    ObjectPtr Hash::each(const FunctionArgs &args)
+    {
+        Proc*proc = nullptr;
+        unpack<0>(args, &proc);
+        if (proc)
+        {
+            for (auto &i : list)
+            {
+                proc->call({ i.first, i.second });
+            }
+            return shared_from_this();
+        }
+        else return make_enumerator(this,{ &Hash::each, "each" });
+    }
+    ObjectPtr Hash::each_key(const FunctionArgs &args)
+    {
+        Proc*proc = nullptr;
+        unpack<0>(args, &proc);
+        if (proc)
+        {
+            for (auto &i : list)
+            {
+                proc->call({ i.first });
+            }
+            return shared_from_this();
+        }
+        else return make_enumerator(this, { &Hash::each_key, "each_key" });
+    }
+    ObjectPtr Hash::each_value(const FunctionArgs &args)
+    {
+        Proc*proc = nullptr;
+        unpack<0>(args, &proc);
+        if (proc)
+        {
+            for (auto &i : list)
+            {
+                proc->call({ i.second });
+            }
+            return shared_from_this();
+        }
+        else return make_enumerator(this, { &Hash::each_value, "each_value" });
     }
 
     ObjectPtr Hash::empty_q()
@@ -187,9 +232,13 @@ namespace slim
 
     const MethodTable & Hash::method_table() const
     {
-        static const MethodTable table(Object::method_table(),
-        {
+        static const MethodTable table = MethodTable(Object::method_table())
+            .add_all(Enumerable::get_methods<Hash>())
+            .add_all({
             { &Hash::dup, "dup" },
+            { &Hash::each, "each" },
+            { &Hash::each_key, "each_key" },
+            { &Hash::each_value, "each_value" },
             { &Hash::empty_q, "empty?" },
             { &Hash::fetch, "fetch" },
             { &Hash::flatten, "flatten" },
