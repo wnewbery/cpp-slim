@@ -55,6 +55,10 @@ BOOST_AUTO_TEST_CASE(basic_methods)
     BOOST_CHECK_EQUAL(max_s, eval("inf.prev_float", scope));
     BOOST_CHECK_EQUAL("-inf", eval("ninf.prev_float", scope));
     BOOST_CHECK_EQUAL("-inf", eval("min.prev_float", scope));
+
+    BOOST_CHECK_EQUAL("true", eval("0.zero?", scope));
+    BOOST_CHECK_EQUAL("true", eval("-0.zero?", scope));
+    BOOST_CHECK_EQUAL("false", eval("5.zero?", scope));
 }
 
 BOOST_AUTO_TEST_CASE(operators)

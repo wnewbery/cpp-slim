@@ -2,6 +2,7 @@
 #include "Object.hpp"
 namespace slim
 {
+    class Boolean;
     /**Number script type.
      * Currently this is the only numeric type, taking the place of Ruby Numeric class and all its
      * subtypes. The number is stored as a double.
@@ -75,7 +76,7 @@ namespace slim
         //quo
         //rationalize
         //to_r
-        //zero?
+        Ptr<Boolean> zero_q();
     protected:
         virtual const MethodTable &method_table()const;
     private:

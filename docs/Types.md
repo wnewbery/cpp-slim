@@ -110,6 +110,7 @@ Most methods are the same as the Ruby methods.
    * `floor`
    * `next_float`
    * `prev_float`
+   * `zero?`
 
 # Symbol
 The `Symbol` type represents process-wide unique strings, allowing for fast comparison via identity, but somewhat slower creation. The script parser creates instances at compile time to avoid the expense on every execution.

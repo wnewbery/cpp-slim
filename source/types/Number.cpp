@@ -26,6 +26,7 @@ namespace slim
             { &Number::ceil, "ceil" },
             { &Number::floor, "floor" },
             { &Number::round, "round" },
+            { &Number::zero_q, "zero?" },
 
             //alias
             { &Number::to_i, "truncate" },
@@ -143,6 +144,9 @@ namespace slim
         else return make_value(std::round(round_f(v, -ndigits)));
     }
 
-
+    Ptr<Boolean> Number::zero_q()
+    {
+        return make_value(v == 0);
+    }
 }
 
