@@ -51,7 +51,6 @@ namespace slim
 
         std::shared_ptr<Number> to_f();
         std::shared_ptr<Number> to_i();
-        std::shared_ptr<Number> abs();
         std::shared_ptr<Number> next_float();
         std::shared_ptr<Number> prev_float();
 
@@ -59,22 +58,36 @@ namespace slim
         std::shared_ptr<Number> floor();
         std::shared_ptr<Number> round(const FunctionArgs &args);
 
-        //Not provided
-        //arg
+        std::shared_ptr<Number> abs();
+        //Ptr<Number> abs2();
+        //angle, arg
         //coerce
+        //conj, conjugate
         //denominator
-        //numerator
+        //div (integer division)
         //divmod
-        //fdiv
         //eql?
+        //fdiv
         Ptr<Boolean> finite_q();
+        //i
+        //imag, imaginary
         ObjectPtr infinite_q();
-        //hash
+        //integer?
         //modulo
         Ptr<Boolean> nan_q();
+        //nonzero?
+        //numerator
+        //phase
+        //polar
         //phase
         //quo
         //rationalize
+        //real
+        //real?
+        //rect ,rectangular
+        //remainder
+        //step
+        //to_c
         //to_r
         Ptr<Boolean> zero_q();
     protected:
