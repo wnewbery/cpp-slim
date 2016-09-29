@@ -18,7 +18,7 @@ std::string eval(const std::string &str, Scope &scope)
     Parser parser(vars, lexer);
     auto expr = parser.full_expression();
     auto result = expr->eval(scope);
-    return result->to_string();
+    return result->inspect();
 }
 std::string eval(const std::string &str)
 {
@@ -55,6 +55,21 @@ BOOST_AUTO_TEST_CASE(basic_methods)
     BOOST_CHECK_EQUAL(max_s, eval("inf.prev_float", scope));
     BOOST_CHECK_EQUAL("-inf", eval("ninf.prev_float", scope));
     BOOST_CHECK_EQUAL("-inf", eval("min.prev_float", scope));
+
+    BOOST_CHECK_EQUAL("true", eval("0.finite?"));
+    BOOST_CHECK_EQUAL("true", eval("5.5.finite?"));
+    BOOST_CHECK_EQUAL("false", eval("(0.0/0.0).finite?"));
+    BOOST_CHECK_EQUAL("false", eval("(1.0/0.0).finite?"));
+
+    BOOST_CHECK_EQUAL("nil", eval("0.infinite?"));
+    BOOST_CHECK_EQUAL("nil", eval("(0.0/0.0).infinite?"));
+    BOOST_CHECK_EQUAL("1", eval("(1.0/0.0).infinite?"));
+    BOOST_CHECK_EQUAL("-1", eval("(-1.0/0.0).infinite?"));
+
+    BOOST_CHECK_EQUAL("false", eval("1.nan?"));
+    BOOST_CHECK_EQUAL("true", eval("(0.0/0.0).nan?"));
+    BOOST_CHECK_EQUAL("false", eval("(1.0/0.0).nan?"));
+    BOOST_CHECK_EQUAL("false", eval("(-1.0/0.0).nan?"));
 
     BOOST_CHECK_EQUAL("true", eval("0.zero?", scope));
     BOOST_CHECK_EQUAL("true", eval("-0.zero?", scope));

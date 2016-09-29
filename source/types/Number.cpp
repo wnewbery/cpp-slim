@@ -25,7 +25,10 @@ namespace slim
             { &Number::prev_float, "prev_float" },
             { &Number::ceil, "ceil" },
             { &Number::floor, "floor" },
+            { &Number::finite_q, "finite?" },
+            { &Number::infinite_q, "infinite?" },
             { &Number::round, "round" },
+            { &Number::nan_q, "nan?" },
             { &Number::zero_q, "zero?" },
 
             //alias
@@ -142,6 +145,23 @@ namespace slim
         if (ndigits == 0) return make_value(std::round(v));
         else if (ndigits > 0) return make_value(round_f(v, ndigits));
         else return make_value(std::round(round_f(v, -ndigits)));
+    }
+
+    Ptr<Boolean> Number::finite_q()
+    {
+        return make_value(std::isfinite(v));
+    }
+    ObjectPtr Number::infinite_q()
+    {
+        if (std::isinf(v))
+        {
+            return make_value(v < 0 ? -1 : 1);
+        }
+        else return NIL_VALUE;
+    }
+    Ptr<Boolean> Number::nan_q()
+    {
+        return make_value(std::isnan(v));
     }
 
     Ptr<Boolean> Number::zero_q()

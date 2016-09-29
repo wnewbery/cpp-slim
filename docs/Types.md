@@ -107,7 +107,10 @@ Most methods are the same as the Ruby methods.
    * `number << number`, `number >> number`, `number & number`, `number | number`, `number ^ number`, `~number`: Bit operators which cast both numbers to `int`.
    * `abs`
    * `ceil`
+   * `finite?`
    * `floor`
+   * `infinite?`
+   * `nan?`
    * `next_float`
    * `prev_float`
    * `zero?`

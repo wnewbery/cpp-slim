@@ -67,11 +67,11 @@ namespace slim
         //divmod
         //fdiv
         //eql?
-        //finite?
-        //infinite?
+        Ptr<Boolean> finite_q();
+        ObjectPtr infinite_q();
         //hash
         //modulo
-        //nan?
+        Ptr<Boolean> nan_q();
         //phase
         //quo
         //rationalize
