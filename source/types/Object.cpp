@@ -31,6 +31,10 @@ namespace slim
     {
         return detail::hash(this);
     }
+    Ptr<Number> Object::hash_obj()
+    {
+        return make_value(hash());
+    }
     int Object::cmp(const Object *rhs)const
     {
         throw UnorderableTypeError(this, "cmp", rhs);
@@ -121,8 +125,9 @@ namespace slim
     {
         static const MethodTable table =
         {
-            { &Object::to_string_obj, "to_s" },
-            { &Object::inspect_obj, "inspect" }
+            { &Object::hash_obj, "hash" },
+            { &Object::inspect_obj, "inspect" },
+            { &Object::to_string_obj, "to_s" }
         };
         return table;
     }

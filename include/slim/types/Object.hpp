@@ -23,6 +23,7 @@ namespace slim
     SymPtr symbol(const std::string &str);
 
     class Object;
+    class Number;
     class String;
 
     template<class T> using Ptr = std::shared_ptr<T>;
@@ -70,6 +71,8 @@ namespace slim
         virtual bool eq(const Object *rhs)const;
         /**Computes a hash value to optimise equality checks.*/
         virtual size_t hash()const;
+        /**hash() as a script object.*/
+        Ptr<Number> hash_obj();
         /**Compare with another object of the same type.
          * Default throws UnorderableTypeError.
          */

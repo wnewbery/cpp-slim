@@ -78,6 +78,9 @@ Returns the value of the C++ `Object::to_string` virtual method. The default imp
 ### `inspect`
 Returns the value of the C++ `Object::inspect` virtual method. The default implementation returns the type name and heap memory address as a string.
 
+### `hash`
+Returns the default value of the C++ `Object::hash` virtual method. The default implementation returns a hash based on the objects memory address.
+
 ### `==`, `!=`
 Implemented by `Object::eq`. The default implementation compares object identity.
 
