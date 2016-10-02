@@ -123,9 +123,9 @@ namespace slim
         }
         /**Call a static/global varargs function.*/
         template<class RetType>
-        ObjectPtr call(Object*, RetType(*func)(const FunctionArgs &args), const FunctionArgs &args)
+        ObjectPtr call_static(Object*, RetType(*func)(const FunctionArgs &args), const FunctionArgs &args)
         {
-            return do_call(func, args);
+            return do_static_call(func, args);
         }
         /**Call a static/global typed args function.*/
         template<class RetType, class... Args>

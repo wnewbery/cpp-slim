@@ -153,6 +153,9 @@
     <ClInclude Include="include\slim\types\Enumerable.hpp">
       <Filter>include\types</Filter>
     </ClInclude>
+    <ClInclude Include="include\slim\types\Regexp.hpp">
+      <Filter>include\types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\types\Object.cpp">
@@ -234,6 +237,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="source\types\Enumerable.cpp">
+      <Filter>source\types</Filter>
+    </ClCompile>
+    <ClCompile Include="source\types\Regexp.cpp">
       <Filter>source\types</Filter>
     </ClCompile>
   </ItemGroup>

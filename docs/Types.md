@@ -8,10 +8,12 @@ These provide most of the script functionality, and use the same method names an
    * Enumerator
    * Hash
    * HtmlSafeString
+   * MatchData
    * [Math](types/Math.md)
    * Nil
    * Number
    * Object
+   * Regexp
    * [String](types/String.md)
    * Symbol
    * [ViewModel](types/ViewModel.md)
@@ -63,6 +65,25 @@ Includes `Enumerable` and most methods are the same as the Ruby hash methods.
 
 # HtmlSafeString
 `HtmlSafeString` is a sub type of `String` that is not escaped when being added to the template output.
+
+# MatchData
+Match data for a `Regexp#match` result.
+
+   * `==`
+   * `[i]`, `[start, length]`: No named capature or range support.
+   * `begin`
+   * `captures`
+   * `end`
+   * `length`
+   * `offset`
+   * `post_match`
+   * `pre_match`
+   * `regexp`
+   * `size`
+   * `string`
+   * `to_a`
+   * `to_s`
+   * `values_at`
 
 # Object
 The Object class is the base class for all script types. It is mostly of interest for creating new types (see API docs for C++ methods), but also includes some basic script methods.
@@ -117,6 +138,27 @@ Most methods are the same as the Ruby methods.
    * `next_float`
    * `prev_float`
    * `zero?`
+
+#Regexp
+Regular expression object using `std::regex` with `std::regex::ECMAScript`.
+As a result the syntax and capabilities differ from the Ruby Regexp object.
+Some details are available at http://www.regular-expressions.info/stdregex.html .
+
+Notable limitations are no support for a multiline flag, and no named captures.
+
+There is also currently no `$~` or related global variables.
+
+   * `::compile`
+   * `::escape`
+   * `::new`
+   * `::quote`
+   * `::IGNORECASE`
+   * `==`
+   * `casefold?`
+   * `match`
+   * `options`
+   * `source`
+   * `to_s`
 
 # Symbol
 The `Symbol` type represents process-wide unique strings, allowing for fast comparison via identity, but somewhat slower creation. The script parser creates instances at compile time to avoid the expense on every execution.
