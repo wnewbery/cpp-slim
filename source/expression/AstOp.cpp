@@ -4,8 +4,9 @@
 #include "types/Array.hpp"
 #include "types/Hash.hpp"
 #include "types/HtmlSafeString.hpp"
-#include "types/String.hpp"
 #include "types/Proc.hpp"
+#include "types/Regexp.hpp"
+#include "types/String.hpp"
 #include "template/Template.hpp"
 #include <sstream>
 namespace slim
@@ -190,6 +191,20 @@ namespace slim
                 else buf += node.literal_text;
             }
             return make_value(std::move(buf));
+        }
+
+        std::string InterpolatedRegex::to_string()const
+        {
+            auto src_str = src->to_string();
+            //replace quotes
+            src_str.front() = '/';
+            src_str.back() = '/';
+            return src_str;
+        }
+        ObjectPtr InterpolatedRegex::eval(Scope &scope)const
+        {
+            auto str = src->eval(scope);
+            return create_object<Regexp>(coerce<String>(str)->get_value(), opts);
         }
 }
 }

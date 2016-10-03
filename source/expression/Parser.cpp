@@ -12,6 +12,7 @@
 #include "types/Boolean.hpp"
 #include "types/Nil.hpp"
 #include "types/Number.hpp"
+#include "types/Regexp.hpp"
 #include "types/String.hpp"
 #include "types/Symbol.hpp"
 
@@ -100,6 +101,7 @@ namespace slim
             switch (current_token.type)
             {
             case Token::STRING_DELIM: return interp_string();
+            case Token::DIV: return regex_literal();
             case Token::NUMBER: return lit(make_value(parse_num()));
             case Token::SYMBOL:
                 if (current_token.str == "true") return lit(TRUE_VALUE);
@@ -147,13 +149,15 @@ namespace slim
             }
         }
 
-        ExpressionNodePtr Parser::interp_string()
+        struct Parser::BaseInterpString
         {
-            assert(current_token.type == Token::STRING_DELIM);
             InterpolatedString::Nodes parts;
             bool interp = false;
-            char delim = current_token.str[0];
+        };
 
+        Parser::BaseInterpString Parser::base_interp_string(char delim)
+        {
+            BaseInterpString out;
             do
             {
                 current_token = lexer.next_str_interp(delim);
@@ -161,34 +165,55 @@ namespace slim
                 {
                 case Token::STRING_DELIM: break;
                 case Token::STRING_TEXT:
-                    parts.emplace_back(current_token.str);
+                    out.parts.emplace_back(current_token.str);
                     break;
                 case Token::STRING_INTERP_START:
                 {
-                    interp = true;
+                    out.interp = true;
                     next();
                     auto expr = expression();
                     if (current_token.type != Token::R_CURLY_BRACKET) error("Expected '}'");
-                    parts.emplace_back(std::move(expr));
+                    out.parts.emplace_back(std::move(expr));
                     break;
                 }
                 default: error("Unexpected token in interpolated string");
                 }
-            }
-            while (current_token.type != Token::STRING_DELIM);
+            } while (current_token.type != Token::STRING_DELIM);
             next();
+            return out;
+        }
 
-            if (parts.empty()) return slim::make_unique<Literal>(make_value(""));
+        ExpressionNodePtr Parser::interp_string()
+        {
+            assert(current_token.type == Token::STRING_DELIM);
+            char delim = current_token.str[0];
+            auto interp = base_interp_string(delim);
 
-            if (!interp)
+            if (interp.parts.empty()) return slim::make_unique<Literal>(make_value(""));
+
+            if (!interp.interp)
             {
                 //single string text
-                assert(parts.size() <= 1);
-                assert(!parts[0].expr);
-                return slim::make_unique<Literal>(make_value(parts[0].literal_text));
+                assert(interp.parts.size() <= 1);
+                assert(!interp.parts[0].expr);
+                return slim::make_unique<Literal>(make_value(interp.parts[0].literal_text));
             }
-
-            return slim::make_unique<InterpolatedString>(std::move(parts));
+            else return slim::make_unique<InterpolatedString>(std::move(interp.parts));
+        }
+        ExpressionNodePtr Parser::regex_literal()
+        {
+            assert(current_token.type == Token::DIV);
+            auto interp = base_interp_string('/');
+            if (interp.interp)
+            {
+                auto src_expr = slim::make_unique<InterpolatedString>(std::move(interp.parts));
+                return slim::make_unique<InterpolatedRegex>(std::move(src_expr), 0);
+            }
+            else
+            {
+                std::string str = interp.parts.empty() ? "" : interp.parts[0].literal_text;
+                return slim::make_unique<Literal>(create_object<Regexp>(str, 0));
+            }
         }
 
         ExpressionNodePtr Parser::array_literal()

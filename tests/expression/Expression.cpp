@@ -33,6 +33,7 @@ BOOST_AUTO_TEST_CASE(literals)
     BOOST_CHECK_EQUAL("false", eval("false"));
     BOOST_CHECK_EQUAL("nil", eval("nil"));
     BOOST_CHECK_EQUAL("\"Hello World\"", eval("'Hello World'"));
+    BOOST_CHECK_EQUAL("/regex/", eval("/regex/"));
     BOOST_CHECK_EQUAL(":symbol", eval(":symbol"));
     BOOST_CHECK_EQUAL("60", eval("60"));
 }
@@ -44,6 +45,14 @@ BOOST_AUTO_TEST_CASE(string_interp)
     BOOST_CHECK_EQUAL("\"hello 10\"", eval("'hello #{3 + 7}'"));
     BOOST_CHECK_EQUAL("\"hello nested\"", eval("'hello #{'nested'}'"));
     BOOST_CHECK_EQUAL("\"hello 5 nested 10 interp\"", eval("'hello #{5.to_s + ' nested #{10} interp'}'"));
+}
+
+BOOST_AUTO_TEST_CASE(regex_interp)
+{
+    BOOST_CHECK_EQUAL("/hello world/", eval("/hello world/"));
+    BOOST_CHECK_EQUAL("/hello 5/", eval("/hello #{5}/"));
+    BOOST_CHECK_EQUAL("/hello 10/", eval("/hello #{3 + 7}/"));
+    BOOST_CHECK_EQUAL("/hello 5 nested 10 interp/", eval("/hello #{5.to_s + ' nested #{10} interp'}/"));
 }
 
 BOOST_AUTO_TEST_CASE(variables)

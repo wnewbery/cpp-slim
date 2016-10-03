@@ -206,5 +206,18 @@ namespace slim
         private:
             Nodes nodes;
         };
+        /**Regex literal using an InterpolatedString.*/
+        class InterpolatedRegex : public ExpressionNode
+        {
+        public:
+            InterpolatedRegex(std::unique_ptr<InterpolatedString> &&src, int opts)
+                : src(std::move(src)), opts(opts)
+            {}
+            virtual std::string to_string()const override;
+            virtual ObjectPtr eval(Scope &scope)const override;
+        private:
+            std::unique_ptr<InterpolatedString> src;
+            int opts;
+        };
     }
 }

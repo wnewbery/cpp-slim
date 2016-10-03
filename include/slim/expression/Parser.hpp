@@ -11,6 +11,8 @@ namespace slim
         class Lexer;
         class ExpressionNode;
         typedef std::unique_ptr<ExpressionNode> ExpressionNodePtr;
+        struct InterpolatedStringNode;
+        typedef std::vector<InterpolatedStringNode> InterpolatedStringNodes;
 
         /**Parsers tokens from the Lexer into an abstract syntax tree.*/
         class Parser
@@ -68,8 +70,15 @@ namespace slim
              * See conditional_op.
              */
             ExpressionNodePtr value(bool in_cond_op);
+
+            struct BaseInterpString;
+            /** Interpolated string or regex core.*/
+            BaseInterpString base_interp_string(char delim);
             /** An interpolated string literal. */
             ExpressionNodePtr interp_string();
+            /** An interpolated /regex/ literal.*/
+            ExpressionNodePtr regex_literal();
+
             /** Array [a, b, c] literal */
             ExpressionNodePtr array_literal();
             /** Hash {key: value, 'key2' => 5} literal */

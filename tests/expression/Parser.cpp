@@ -53,6 +53,9 @@ BOOST_AUTO_TEST_CASE(single_values)
     BOOST_CHECK(is_node_type<Literal>(parse("'true'")));
     BOOST_CHECK_EQUAL("\"true\"", parse("'true'")->to_string());
 
+    BOOST_CHECK(is_node_type<Literal>(parse("/true/")));
+    BOOST_CHECK_EQUAL("/true/", parse("/true/")->to_string());
+
     BOOST_CHECK_THROW(parse("55.5.5"), SyntaxError);
 
 
