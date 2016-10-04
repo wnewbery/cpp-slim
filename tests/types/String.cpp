@@ -277,6 +277,14 @@ BOOST_AUTO_TEST_CASE(slice)
     BOOST_CHECK_EQUAL("\"es\"", eval("'test'.slice 'es'"));
     BOOST_CHECK_EQUAL("\"es\"", eval("'test'['es']"));
     BOOST_CHECK_EQUAL("nil", eval("'test'['esx']"));
+    //slice regex
+    BOOST_CHECK_EQUAL("\"world\"", eval("'hello world'[/world/]"));
+    BOOST_CHECK_EQUAL("nil", eval("'hello world'[/test/]"));
+    BOOST_CHECK_EQUAL("\"world\"", eval("'hello world'[/w(orl)d/, 0]"));
+    BOOST_CHECK_EQUAL("\"orl\"", eval("'hello world'[/w(orl)d/, 1]"));
+    BOOST_CHECK_EQUAL("nil", eval("'hello world'[/w(orl)d/, 2]"));
+    BOOST_CHECK_EQUAL("nil", eval("'hello'[/w(orl)d/, 2]"));
+
 
     BOOST_CHECK_THROW(eval("'test'[true]"), ScriptError);
     BOOST_CHECK_THROW(eval("'test'[5, true]"), ScriptError);

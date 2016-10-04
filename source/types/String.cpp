@@ -3,6 +3,7 @@
 #include "types/Enumerator.hpp"
 #include "types/HtmlSafeString.hpp"
 #include "types/Proc.hpp"
+#include "types/Regexp.hpp"
 #include "Value.hpp"
 #include "Function.hpp"
 #include "FunctionHelpers.hpp"
@@ -72,25 +73,37 @@ namespace slim
         if (args.size() == 1)
         {
             //TODO: If range, if regex
-            auto index = dynamic_cast<Number*>(args[0].get());
-            if (index)
+            if (auto index = std::dynamic_pointer_cast<Number>(args[0]))
             {
                 return do_slice((int)index->get_value(), 1);
             }
-            auto match_str = std::dynamic_pointer_cast<String>(args[0]);
-            if (match_str)
+            else if (auto regex = std::dynamic_pointer_cast<Regexp>(args[0]))
+            {
+                auto match = regex->do_match(v, 0);
+                if (match) return match->to_string_obj();
+                else return NIL_VALUE;
+            }
+            else if (auto match_str = std::dynamic_pointer_cast<String>(args[0]))
             {
                 if (v.find(match_str->v) != std::string::npos) return match_str;
                 else return NIL_VALUE;
             }
-            throw ArgumentError(this, "slice");
+            else throw ArgumentError(this, "slice");
         }
         else if (args.size() == 2)
         {
-            //TODO: If regexp, capture
-            auto start = (int)coerce<Number>(args[0])->get_value();
-            auto length = (int)coerce<Number>(args[1])->get_value();
-            return do_slice(start, length);
+            if (auto regex = std::dynamic_pointer_cast<Regexp>(args[0]))
+            {
+                auto match = regex->do_match(v, 0);
+                if (match) return match->el_ref({args[1]});
+                else return NIL_VALUE;
+            }
+            else
+            {
+                auto start = (int)coerce<Number>(args[0])->get_value();
+                auto length = (int)coerce<Number>(args[1])->get_value();
+                return do_slice(start, length);
+            }
         }
         else throw ArgumentError(this, "slice");
     }

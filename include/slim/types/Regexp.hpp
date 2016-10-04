@@ -84,6 +84,8 @@ namespace slim
         virtual size_t hash()const override;
         //unary ~
 
+        /**Returns nullptr rather than NIL_VALUE*/
+        virtual Ptr<MatchData> do_match(const std::string &str, int pos);
         virtual Ptr<Object> match(const FunctionArgs &args);
 
         Ptr<Boolean> casefold_q();

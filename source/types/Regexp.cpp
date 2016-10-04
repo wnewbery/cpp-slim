@@ -213,13 +213,10 @@ namespace slim
         detail::hash_combine(h, opts);
         return h;
     }
-    Ptr<Object> Regexp::match(const FunctionArgs &args)
+    Ptr<MatchData> Regexp::do_match(const std::string &str, int pos)
     {
-        std::string str;
-        int pos = 0;
-        unpack<1>(args, &str, &pos);
         if (pos < 0) pos = (int)str.size() + pos;
-        if (pos < 0 || pos > (int)str.size()) return NIL_VALUE;
+        if (pos < 0 || pos >(int)str.size()) return nullptr;
 
         Ptr<MatchData> results(new MatchData(
             std::static_pointer_cast<Regexp>(shared_from_this()),
@@ -230,6 +227,15 @@ namespace slim
         {
             return results;
         }
+        else return nullptr;
+    }
+    Ptr<Object> Regexp::match(const FunctionArgs &args)
+    {
+        std::string str;
+        int pos = 0;
+        unpack<1>(args, &str, &pos);
+        auto ret = do_match(str, pos);
+        if (ret) return ret;
         else return NIL_VALUE;
     }
     Ptr<Boolean> Regexp::casefold_q()
