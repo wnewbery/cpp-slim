@@ -289,6 +289,9 @@ namespace slim
             case Token::SYMBOL:
             case Token::ATTR_NAME:
                 return true;
+            case Token::DIV:
+                if (lexer.peek_space()) return false;
+                else error("Ambiguous first argument with '/'. Use parentheses for regex or a space division.");
             default:
                 return false;
             }
@@ -640,11 +643,11 @@ namespace slim
             return lhs;
         }
 
-        void Parser::error(const std::string &msg)
+        void Parser::error(const std::string &msg)const
         {
             throw SyntaxError(lexer.file_name(), current_token.line, current_token.offset, msg);
         }
-        double Parser::parse_num()
+        double Parser::parse_num()const
         {
             size_t count = 0;
             double ret;

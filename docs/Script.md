@@ -20,6 +20,8 @@ String literals are supported including `#{}` interpolation.
 
 Symbol literals are supported with the colon (`:`) prefix.
 
+Regex literals use forward slash delimiters, e.g. `/Error: +(.+)/`.
+
 Boolean and nil values, `true`, `false` and `nil`.
 
 # Operators
@@ -56,3 +58,25 @@ Is the same as:
 Blocks can be passed to methods using the `{||}` syntax.
 Unlike Ruby there no special concept of a block parameter (`block_given?`, `yield`, `&block`, etc.).
 Blocks are always turned into a `Proc` instance and passed as the final method argument.
+
+# Division and Regex Literal Ambiguity
+When a division or regex literal is the first parameter to a method call, it is ambiguous as to if
+the forward slash is a division operator on the method result or variable, or the start of a regex.
+
+In Ruby, if there is a space after the forward slash then it is division, and if there is not a space
+then its a regex literal. But the regex case raises a syntax order.
+The template expression parser in this project however, disallows it and throws a `SyntaxError`.
+Use parentheses for a regex literal or a space after the division operator
+
+```
+$ irb -w
+
+ > "string".match /./
+warning: ambiguous first argument; put parentheses or a space even after `/' operator
+ > "string".match /5
+/> /
+warning: ambiguous first argument; put parentheses or a space even after `/' operator
+ > "string".match(/./)
+ > "string".match / 5
+ArgumentError: wrong number of arguments (given 0, expected 1..2)
+```

@@ -154,9 +154,9 @@ namespace slim
 
 
             /**Throw syntax error at current position.*/
-            [[noreturn]] void error(const std::string &msg);
+            [[noreturn]] void error(const std::string &msg)const;
             /**Parse current token as a number.*/
-            double parse_num();
+            double parse_num()const;
         };
     }
 }

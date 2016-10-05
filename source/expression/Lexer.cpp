@@ -167,6 +167,10 @@ namespace slim
             t.str = std::move(str);
             return t;
         }
+        bool Lexer::peek_space()const
+        {
+            return p < end && (*p == ' ' || *p == '\r' || *p == '\r' || *p == '\n');
+        }
         void Lexer::skip_ws()
         {
             while (p < end)

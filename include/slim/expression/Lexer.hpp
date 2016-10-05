@@ -15,6 +15,8 @@ namespace slim
             Token next();
             /**STRING_TEXT, STRING_INTERP_START, STRING_TERM*/
             Token next_str_interp(char delim);
+            /**See if there is a whitespace or note.*/
+            bool peek_space()const;
 
             /**Get current position.*/
             const char *get_pos() { return p; }

@@ -205,11 +205,19 @@ BOOST_AUTO_TEST_CASE(method_call)
     BOOST_CHECK_EQUAL("@a.f({|| 5})", parse("@a.f{|| 5}")->to_string());
     BOOST_CHECK_EQUAL("@a.f(4, {|x| x})", parse("@a.f(4){|x| x}")->to_string());
     BOOST_CHECK_EQUAL("@a.f({|x, y| (x * y)})", parse("@a.f{|x, y| x * y}")->to_string());
-
-    BOOST_CHECK_EQUAL("@a.to_a()[0]", parse("@a.to_a[0]")->to_string());
-    //TODO:
+    //TODO: Space before '[' is argument, without is [] operator
     //BOOST_CHECK_EQUAL("a.contains?([1, 2, 3])", parse("a.contains? [1,2,3]")->to_string());
-    //BOOST_CHECK_EQUAL("a.contains?({a: 5})", parse("a.contains? {a: 5}")->to_string());
+    BOOST_CHECK_EQUAL("@a.to_a()[0]", parse("@a.to_a[0]")->to_string());
+
+    //'{' as first argument is always a block
+    BOOST_CHECK_EQUAL("@a.contains?({:a => 5})", parse("@a.contains?({a: 5})")->to_string());
+    BOOST_CHECK_EQUAL("@a.contains?(1, {:a => 5})", parse("@a.contains? 1, {a: 5}")->to_string());
+    BOOST_CHECK_THROW(parse("@a.contains? {:a => 5}"), SyntaxError);
+
+    //Regex and division ambiguity
+    BOOST_CHECK_EQUAL("(@a.match() / 5)", parse("@a.match / 5")->to_string());
+    BOOST_CHECK_EQUAL("@a.match(/5/)", parse("@a.match(/5/)")->to_string());
+    BOOST_CHECK_THROW(parse("@a.match /5/"), SyntaxError);
 }
 
 BOOST_AUTO_TEST_CASE(precedence)
