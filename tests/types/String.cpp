@@ -502,7 +502,7 @@ BOOST_AUTO_TEST_CASE(sub)
     BOOST_CHECK_EQUAL("\"test\"", eval("'test'.sub(/[0-9]+/, '5')"));
     BOOST_CHECK_EQUAL("\"test 5 100\"", eval("'test 70 100'.sub(/[0-9]+/, '5')"));
     BOOST_CHECK_EQUAL("\"test -70- 100\"", eval("'test 70 100'.sub(/[0-9]+/, '-\\\\0-')"));
-    BOOST_CHECK_EQUAL("\"test -7:0- 100\"", eval("'test 70 100'.sub(/([0-9])([0-9])*/, '-\\\\1:\\\\2-')"));
+    BOOST_CHECK_EQUAL("\"test -7:0- 100\"", eval("'test 70 100'.sub(/([0-9])([0-9]*)/, '-\\\\1:\\\\2-')"));
     //regex with hash
     BOOST_CHECK_EQUAL("\"test\"", eval("'test'.sub(/x/, {'x' => 55})"));
     BOOST_CHECK_EQUAL("\"test 55 x\"", eval("'test x x'.sub(/x/, {'x' => 55})"));
@@ -512,6 +512,33 @@ BOOST_AUTO_TEST_CASE(sub)
     //invalid args
     BOOST_CHECK_THROW(eval("'test x'.sub 'x', 5"), ScriptError);
     BOOST_CHECK_THROW(eval("'test x'.sub 5, '5'"), ScriptError);
+}
+BOOST_AUTO_TEST_CASE(gsub)
+{
+    //string with string
+    BOOST_CHECK_EQUAL("\"test\"", eval("'test'.gsub 'x', '5'"));
+    BOOST_CHECK_EQUAL("\"test -x-- -x--\"", eval("'test x x'.gsub 'x', '-\\\\0-\\\\1-'"));
+    //string with hash
+    BOOST_CHECK_EQUAL("\"test\"", eval("'test'.gsub 'x', {'x' => 10}"));
+    BOOST_CHECK_EQUAL("\"test 10 10\"", eval("'test x x'.gsub 'x', {'x' => 10}"));
+    BOOST_CHECK_EQUAL("\"test  \"", eval("'test x x'.gsub 'x', {'y' => 10}"));
+    //string with block
+    BOOST_CHECK_EQUAL("\"test\"", eval("'test'.gsub 'x' {|str| \"-#{str}-\"}"));
+    BOOST_CHECK_EQUAL("\"test -x- -x-\"", eval("'test x x'.gsub 'x' {|str| \"-#{str}-\"}"));
+    //regex with string
+    BOOST_CHECK_EQUAL("\"test\"", eval("'test'.gsub(/[0-9]+/, '5')"));
+    BOOST_CHECK_EQUAL("\"test 5 5\"", eval("'test 70 100'.gsub(/[0-9]+/, '5')"));
+    BOOST_CHECK_EQUAL("\"test -70- -100-\"", eval("'test 70 100'.gsub(/[0-9]+/, '-\\\\0-')"));
+    BOOST_CHECK_EQUAL("\"test -7:0- -1:00-\"", eval("'test 70 100'.gsub(/([0-9])([0-9]*)/, '-\\\\1:\\\\2-')"));
+    //regex with hash
+    BOOST_CHECK_EQUAL("\"test\"", eval("'test'.gsub(/x/, {'x' => 55})"));
+    BOOST_CHECK_EQUAL("\"test 55 55\"", eval("'test x x'.gsub(/x/, {'x' => 55})"));
+    //regex with block
+    BOOST_CHECK_EQUAL("\"test\"", eval("'test'.gsub(/x/){|str| \"-#{str}-\"}"));
+    BOOST_CHECK_EQUAL("\"test -x- -x-\"", eval("'test x x'.gsub(/x/){|str| \"-#{str}-\"}"));
+    //invalid args
+    BOOST_CHECK_THROW(eval("'test x'.gsub 'x', 5"), ScriptError);
+    BOOST_CHECK_THROW(eval("'test x'.gsub 5, '5'"), ScriptError);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

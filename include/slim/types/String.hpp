@@ -88,7 +88,8 @@ namespace slim
         //encode, encode!
         std::shared_ptr<Boolean> end_with_q(const FunctionArgs &args);
         //eql?
-        //gsub, gsub!
+        Ptr<String> gsub(const FunctionArgs &args);
+        //gsub!
         std::shared_ptr<Number> hex();
         std::shared_ptr<Boolean> include_q(const String *rhs);
         ObjectPtr index(const FunctionArgs &args);
@@ -144,6 +145,7 @@ namespace slim
 
         std::shared_ptr<Array> do_partition(bool reverse, Object *sep);
         ObjectPtr do_slice(int start, int length);
+        Ptr<String> do_sub(const FunctionArgs &args, bool global);
         std::vector<std::string> split_lines()const;
         std::vector<std::string> split_lines(const std::string &sep)const;
     };

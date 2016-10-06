@@ -770,34 +770,51 @@ namespace slim
             else throw ArgumentError("Invalid replacement type");
         }
     }
+    Ptr<String> String::gsub(const FunctionArgs &args)
+    {
+        return do_sub(args, true);
+    }
     Ptr<String> String::substitute(const FunctionArgs &args)
+    {
+        return do_sub(args, false);
+    }
+    Ptr<String> String::do_sub(const FunctionArgs &args, bool global)
     {
         Object *pattern, *replace;
         unpack(args, &pattern, &replace);
         auto f = replace_func(replace);
         if (auto regex = dynamic_cast<Regexp*>(pattern))
         {
-            std::smatch match;
-            if (std::regex_search(v, match, regex->get()))
+            auto i = v.cbegin(), end = v.cend();
+            std::string out;
+            do
             {
-                std::string out(v.cbegin(), match[0].first);
+                std::smatch match;
+                if (!std::regex_search(i, end, match, regex->get())) break;
+                out.append(i, match[0].first);
                 out += f(match.str(0), &match);
-                out.append(match[0].second, v.cend());
-                return make_value(out);
+                i = match[0].second;
             }
-            else return make_value(v);
+            while (global);
+            out.append(i, end);
+            return make_value(out);
         }
-        else if (auto str = dynamic_cast<String*>(pattern))
+        else if (auto str_obj = dynamic_cast<String*>(pattern))
         {
-            auto i = v.find(str->get_value());
-            if (i != std::string::npos)
+            auto &str = str_obj->get_value();
+            size_t i = 0;
+            std::string out;
+            do
             {
-                std::string out = v.substr(0, i);
-                out += f(str->get_value(), nullptr);
-                out += v.substr(i + str->get_value().size());
-                return make_value(out);
+                auto next = v.find(str, i);
+                if (next == std::string::npos) break;
+                out += v.substr(i, next - i);
+                out += f(str, nullptr);
+                i = next + str.size();
             }
-            else return make_value(v);
+            while (global);
+            out += v.substr(i);
+            return make_value(out);
         }
         else throw ArgumentError("Expected String or Regexp");
     }
@@ -832,6 +849,7 @@ namespace slim
             { &String::each_line, "each_line" },
             { &String::empty_q, "empty?" },
             { &String::end_with_q, "end_with?" },
+            { &String::gsub, "gsub" },
             { &String::hex, "hex" },
             { &String::include_q, "include?" },
             { &String::index, "index" },
