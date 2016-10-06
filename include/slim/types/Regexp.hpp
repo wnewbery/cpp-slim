@@ -76,7 +76,7 @@ namespace slim
         virtual const std::string& type_name()const override { return name(); }
 
         Regexp(const Regexp &cp) = default;
-        Regexp(const std::string &str, int opts);
+        Regexp(const std::string &str, int opts = 0);
 
         virtual std::string to_string()const override;
         virtual std::string inspect()const override;
@@ -84,8 +84,19 @@ namespace slim
         virtual size_t hash()const override;
         //unary ~
 
+        const std::regex& get()const { return regex; }
         /**Returns nullptr rather than NIL_VALUE*/
-        virtual Ptr<MatchData> do_match(const std::string &str, int pos);
+        Ptr<MatchData> do_match(const std::string &str, int pos);
+        /**Search from the end of str.
+         * Note that this creates a temp regex.
+         * Also note that all capture groups are +1. As such this does not conform with MatchData
+         * so the plain std::smatch is returned instead.
+         */
+        std::smatch do_rmatch(const std::string &str, int pos);
+        std::smatch do_rmatch(const std::string &str)
+        {
+            return do_rmatch(str, (int)str.size());
+        }
         virtual Ptr<Object> match(const FunctionArgs &args);
 
         Ptr<Boolean> casefold_q();
@@ -99,6 +110,7 @@ namespace slim
     protected:
         virtual const MethodTable &method_table()const;
     private:
+        static std::regex_constants::syntax_option_type syntax_options(int opts);
         std::string src;
         int opts;
         std::regex regex;

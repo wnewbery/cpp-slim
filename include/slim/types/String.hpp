@@ -97,16 +97,16 @@ namespace slim
         std::shared_ptr<String> ljust(const FunctionArgs &args);
         std::shared_ptr<String> lstrip();
         //lstrip!
-        //match
+        Ptr<Object> match(const FunctionArgs &args);
         //next, next!
         //oct
         std::shared_ptr<Number> ord();
-        std::shared_ptr<Array> partition(String *obj);
+        std::shared_ptr<Array> partition(Object *obj);
         //prepend
         //replace
         std::shared_ptr<String> reverse();
         std::shared_ptr<String> rjust(const FunctionArgs &args);
-        std::shared_ptr<Array> rpartition(String *obj);
+        std::shared_ptr<Array> rpartition(Object *obj);
         std::shared_ptr<String> rstrip();
         //rstrip!
         //reverse!
@@ -116,7 +116,7 @@ namespace slim
         /** Also length */
         std::shared_ptr<Number> size();
         //slice!
-        std::shared_ptr<Array> split(const FunctionArgs &args);
+        Ptr<Array> split(const FunctionArgs &args);
         //std::shared_ptr<String> squeeze(const FunctionArgs &args);
         std::shared_ptr<Boolean> start_with_q(const FunctionArgs &args);
         std::shared_ptr<String> strip();
@@ -141,7 +141,7 @@ namespace slim
     private:
         std::string v;
 
-        std::shared_ptr<Array> do_partition(bool reverse, String * sep);
+        std::shared_ptr<Array> do_partition(bool reverse, Object *sep);
         ObjectPtr do_slice(int start, int length);
         std::vector<std::string> split_lines()const;
         std::vector<std::string> split_lines(const std::string &sep)const;

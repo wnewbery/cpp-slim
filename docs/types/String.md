@@ -9,7 +9,7 @@ Most methods are the same as the Ruby methods.
    * `to_f`, `to_d`: As a number converted using `std::stod`.
    * `to_i`: As a number converted using `std::stoi`.
    * `to_sym`: Returns a `Symbol` with the same value.
-   * `[index]`, `[match_str]`, `[start, length]`: Regex and range is not supported.
+   * `[]`: Range is not supported.
    * `ascii_only?`: True if all UTF-8 elements are in the range 0 to 127.
    * `bytes`
    * `byteslice`
@@ -35,7 +35,7 @@ Most methods are the same as the Ruby methods.
    * `getbyte index`
    * `hex`
    * `include? string`
-   * `index substring, offset=0`: Regex is not supported.
+   * `index`
    * `lines separator="\n"`: The default separator is always `\n`.
    * `lstrip`
    * `ord`
@@ -43,10 +43,10 @@ Most methods are the same as the Ruby methods.
    * `upcase`
    * `reverse`
    * `rpartition string`
-   * `rindex substring`, `rindex substring, offset`: Regex is not supported.
+   * `rindex`
    * `scrub replacement=U+FFFD`
    * `size`, `length`
-   * `split pattern=" ", limit=0`: Regex is not supported. The default pattern is always " ".
+   * `split`: The default pattern is always " ".
    * `start_with? ([prefixes+])`
    * `strip`
    * `rstrip`

@@ -461,17 +461,27 @@ namespace slim
         return make_value(v.find(rhs->v) != std::string::npos);
     }
 
-    ObjectPtr String::index(const FunctionArgs & args)
+    ObjectPtr String::index(const FunctionArgs &args)
     {
-        std::string pattern;
+        Object *pattern;
         int offset = 0;
         unpack<1>(args, &pattern, &offset);
 
         if (offset < 0) offset = ((int)v.size()) + offset;
-        if (offset < 0 || offset >= (int)v.size()) return NIL_VALUE;
-        auto p = v.find(pattern, (size_t)offset);
-        if (p == std::string::npos) return NIL_VALUE;
-        else return make_value((double)p);
+        if (offset < 0 || offset > (int)v.size()) return NIL_VALUE;
+        if (auto regex = dynamic_cast<Regexp*>(pattern))
+        {
+            auto match = regex->do_match(v, offset);
+            if (match) return match->begin(make_value(0).get());
+            else return NIL_VALUE;
+        }
+        else if (auto substring = dynamic_cast<String*>(pattern))
+        {
+            auto p = v.find(substring->get_value(), (size_t)offset);
+            if (p != std::string::npos) return make_value((double)p);
+            else return NIL_VALUE;
+        }
+        else throw ArgumentError("Expected String or Regexp");
     }
 
     std::shared_ptr<Array> String::lines(const FunctionArgs & args)
@@ -491,9 +501,9 @@ namespace slim
         else return make_value((double)v[0]);
     }
 
-    std::shared_ptr<Array> String::partition(String * sep)
+    std::shared_ptr<Array> String::partition(Object *obj)
     {
-        return do_partition(false, sep);
+        return do_partition(false, obj);
     }
 
     std::shared_ptr<String> String::reverse()
@@ -503,26 +513,33 @@ namespace slim
         return make_value(ret);
     }
 
-    std::shared_ptr<Array> String::rpartition(String * sep)
+    std::shared_ptr<Array> String::rpartition(Object *obj)
     {
-        return do_partition(true, sep);
+        return do_partition(true, obj);
     }
 
-    ObjectPtr String::rindex(const FunctionArgs & args)
+    ObjectPtr String::rindex(const FunctionArgs &args)
     {
-        if (args.size() < 1 && args.size() > 2) throw ArgumentError(this, "index");
-        auto pattern = coerce<String>(args[0]);
+        Object *pattern;
         int offset = (int)v.size();
-        if (args.size() == 2)
-        {
-            offset = (int)coerce<Number>(args[1])->get_value();
-            if (offset < 0) offset = ((int)v.size()) + offset;
-        }
+        unpack<1>(args, &pattern, &offset);
+
+        if (offset < 0) offset = ((int)v.size()) + offset;
         if (offset < 0) return NIL_VALUE;
-        if (offset >= (int)v.size()) offset = (int)v.size();
-        auto p = v.rfind(pattern->v, (size_t)offset);
-        if (p == std::string::npos) return NIL_VALUE;
-        else return make_value((double)p);
+        if (auto regex = dynamic_cast<Regexp*>(pattern))
+        {
+            if (offset >= (int)v.size()) offset = (int)v.size() - 1;
+            auto match = regex->do_rmatch(v, offset + 1);
+            if (match.size()) return make_value(match[1].first - v.begin());
+            else return NIL_VALUE;
+        }
+        else if (auto substring = dynamic_cast<String*>(pattern))
+        {
+            auto p = v.rfind(substring->get_value(), (size_t)offset);
+            if (p != std::string::npos) return make_value((double)p);
+            else return NIL_VALUE;
+        }
+        else throw ArgumentError("Expected String or Regexp");
     }
 
     std::shared_ptr<Number> String::size()
@@ -530,46 +547,115 @@ namespace slim
         return make_value((double)v.size());
     }
 
-    std::shared_ptr<Array> String::split(const FunctionArgs & args)
+    std::shared_ptr<Array> String::split(const FunctionArgs &args)
     {
-        std::string pattern = " ";
+        //TODO: Suppress trailing nulls
+        //TODO: Negative limit trailing null suppression
+        //TODO: Single space
+        Ptr<Object> pattern = make_value(" ");
         int limit = 0;
+        bool suppress_nulls;
         unpack<0>(args, &pattern, &limit);
-
-        if (limit == 1) return make_array({make_value(v)});
-        if (pattern.empty())
+        if (limit < 0)
         {
-            std::vector<ObjectPtr> out;
-            for (auto c : v) out.push_back(make_value(std::string(&c, 1)));
-            return make_array(out);
+            limit = 0;
+            suppress_nulls = false;
+        }
+        else suppress_nulls = true;
+
+        std::vector<std::string> out;
+
+        if (auto str_obj = dynamic_cast<String*>(pattern.get()))
+        {
+            auto &str = str_obj->get_value();
+            if (str.empty())
+            {
+                for (size_t p = 0; p < v.size(); ++p)
+                {
+                    if (limit > 0 && limit == (int)out.size() + 1)
+                    {
+                        //hit limit, add the rest and finish
+                        out.push_back(v.substr(p));
+                        break;
+                    }
+                    else out.push_back(v.substr(p, 1));
+                }
+            }
+            else if (str == " ")
+            {
+                static const auto WS = " \t\n\r";
+                auto p = v.find_first_not_of(WS);
+                while (p < v.size())
+                {
+                    if (limit > 0 && limit == (int)out.size() + 1)
+                    {
+                        //hit limit, add the rest and finish
+                        out.push_back(v.substr(p));
+                        break;
+                    }
+                    auto next = v.find_first_of(WS, p);
+                    if (next != std::string::npos)
+                    {
+                        out.push_back(v.substr(p, next - p));
+                        p = v.find_first_not_of(WS, next);
+                    }
+                    else //not found, finish
+                    {
+                        out.push_back(v.substr(p));
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                size_t p = 0;
+                while (limit == 0 || limit > (int)out.size() + 1)
+                {
+                    auto next = v.find(str, p);
+                    if (next == std::string::npos) break;
+                    out.push_back(v.substr(p, next - p));
+                    p = next + str.size();
+                }
+                out.push_back(v.substr(p));
+            }
+        }
+        else if (auto regex_obj = dynamic_cast<Regexp*>(pattern.get()))
+        {
+            auto &regex = regex_obj->get();
+            auto i = v.cbegin(), end = v.cend();
+            while ((limit == 0 || limit > (int)out.size() + 1) && i != end)
+            {
+                std::smatch match;
+                std::regex_search(i, end, match, regex);
+                if (match.empty()) break;
+                if (match[0].first == match[0].second)
+                {
+                    out.emplace_back(i, match[0].first + 1);
+                    i = match[0].first + 1;
+                }
+                else
+                {
+                    out.emplace_back(i, match[0].first);
+                    i = match[0].second;
+                }
+                //captures
+                for (size_t j = 1; j < match.size(); ++j)
+                    out.push_back(match.str(j));
+            }
+            out.emplace_back(i, end);
+        }
+        else throw ArgumentError("Expected String or Regexp");
+
+        if (suppress_nulls)
+        {
+            while (out.size() && out.back().empty())
+                out.pop_back();
         }
 
-        std::vector<ObjectPtr> out;
-        auto add = [&out, limit](size_t p, const std::string &str) -> void
-        {
-            if (limit != 0 || !str.empty() || p == 0) out.push_back(make_value(str));
-        };
-        size_t p = 0;
-        while (true)
-        {
-            size_t p_end = pattern == " " ? v.find_first_of(WHITESPACE, p) : v.find(pattern, p);
-            if (p_end == std::string::npos)
-            {
-                add(p, v.substr(p));
-                break;
-            }
-            
-            add(p, v.substr(p, p_end - p));
-            p = p_end + pattern.size();
-
-            if (limit > 0 && out.size() + 1 == (size_t)limit)
-            {
-                add(p, v.substr(p));
-                break;
-            }
-        }
-
-        return make_array(out);
+        auto arr = create_object<Array>();
+        for (auto &&str : out)
+            arr->push_back(make_value(std::move(str)));
+        return arr;
     }
 
     std::shared_ptr<Boolean> String::start_with_q(const FunctionArgs & args)
@@ -594,6 +680,18 @@ namespace slim
         auto p = v.find_first_not_of(WHITESPACE);
         if (p == std::string::npos) return make_value("");
         else return make_value(v.substr(p));
+    }
+    Ptr<Object> String::match(const FunctionArgs &args)
+    {
+        std::string str;
+        Ptr<Regexp> regex;
+        Ptr<Number> pos = nullptr;
+        if (try_unpack<1>(args, &str, &pos))
+            regex = create_object<Regexp>(str);
+        else unpack<1>(args, &regex, &pos);
+        
+        if (pos) return regex->match({shared_from_this(), pos});
+        else return regex->match({shared_from_this()});
     }
     std::shared_ptr<String> String::rstrip()
     {
@@ -645,6 +743,7 @@ namespace slim
             { &String::lines, "lines" },
             { &String::ljust, "ljust" },
             { &String::lstrip, "lstrip" },
+            { &String::match, "match" },
             { &String::ord, "ord" },
             { &String::partition, "partition" },
             { &String::reverse, "reverse" },
@@ -662,20 +761,45 @@ namespace slim
         return table;
     }
 
-    std::shared_ptr<Array> String::do_partition(bool reverse, String * sep)
+    std::shared_ptr<Array> String::do_partition(bool reverse, Object *sep)
     {
-        auto p = reverse ? v.rfind(sep->v) : v.find(sep->v);
-        if (p == std::string::npos)
+        if (auto str = dynamic_cast<String*>(sep))
         {
-            if (!reverse) return make_array({ shared_from_this(), make_value(""), make_value("") });
-            else return make_array({ make_value(""), make_value(""), shared_from_this() });
+            auto p = reverse ? v.rfind(str->v) : v.find(str->v);
+            if (p != std::string::npos)
+            {
+                auto before = v.substr(0, p);
+                auto after = v.substr(p + str->v.size());
+                return make_array({make_value(before), str->shared_from_this(), make_value(after)});
+            }
         }
         else
         {
-            auto before = v.substr(0, p);
-            auto after = v.substr(p + sep->v.size());
-            return make_array({ make_value(before), sep->shared_from_this(), make_value(after) });
+            auto regex = coerce<Regexp>(sep);
+            if (reverse)
+            {
+                auto match = regex->do_rmatch(v);
+                if (match.size() > 1)
+                {
+                    auto begin = match[1].first;
+                    auto end = match[1].second;
+                    return make_array({
+                        make_value(std::string(v.cbegin(), begin)),
+                        make_value(std::string(begin, end)),
+                        make_value(std::string(end, v.cend()))
+                    });
+                }
+            }
+            else
+            {
+                auto match = regex->do_match(v, 0);
+                if (match)
+                    return make_array({match->pre_match(), match->to_string_obj(), match->post_match()});
+            }
         }
+        //no match
+        if (!reverse) return make_array({ shared_from_this(), make_value(""), make_value("") });
+        else return make_array({ make_value(""), make_value(""), shared_from_this() });
     }
 
     std::vector<std::string> String::split_lines() const

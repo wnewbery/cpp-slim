@@ -221,39 +221,6 @@ BOOST_AUTO_TEST_CASE(size)
     BOOST_CHECK_EQUAL("true", eval("''.empty?"));
     BOOST_CHECK_EQUAL("false", eval("'test'.empty?"));
 }
-
-BOOST_AUTO_TEST_CASE(access)
-{
-    BOOST_CHECK_EQUAL("2", eval("'hello world'.index 'l'"));
-    BOOST_CHECK_EQUAL("nil", eval("'hello world'.index 'x'"));
-    BOOST_CHECK_EQUAL("nil", eval("'hello world'.index 'llx'"));
-    BOOST_CHECK_EQUAL("2", eval("'hello world'.index 'l', 2"));
-    BOOST_CHECK_EQUAL("2", eval("'hello world'.index 'll', 2"));
-    BOOST_CHECK_EQUAL("3", eval("'hello world'.index 'l', 3"));
-    BOOST_CHECK_EQUAL("nil", eval("'hello world'.index 'll', 3"));
-    BOOST_CHECK_EQUAL("9", eval("'hello world'.index 'l', 4"));
-    BOOST_CHECK_EQUAL("nil", eval("'hello world'.index 'l', 10"));
-    
-    BOOST_CHECK_EQUAL("9", eval("'hello world'.rindex 'l'"));
-    BOOST_CHECK_EQUAL("nil", eval("'hello world'.rindex 'x'"));
-    BOOST_CHECK_EQUAL("nil", eval("'hello world'.rindex 'llx'"));
-    BOOST_CHECK_EQUAL("nil", eval("'hello world'.rindex 'l', 1"));
-    BOOST_CHECK_EQUAL("2", eval("'hello world'.rindex 'l', 2"));
-    BOOST_CHECK_EQUAL("2", eval("'hello world'.rindex 'll', 2"));
-    BOOST_CHECK_EQUAL("3", eval("'hello world'.rindex 'l', 3"));
-    BOOST_CHECK_EQUAL("2", eval("'hello world'.rindex 'll', 3"));
-    BOOST_CHECK_EQUAL("9", eval("'hello world'.rindex 'l', 9"));
-    BOOST_CHECK_EQUAL("9", eval("'hello world'.rindex 'l', 10"));
-
-
-    BOOST_CHECK_EQUAL("[\"hello\", \" \", \"world\"]", eval("'hello world'.partition ' '"));
-    BOOST_CHECK_EQUAL("[\"hello world\", \"\", \"\"]", eval("'hello world'.partition 'x'"));
-
-    BOOST_CHECK_EQUAL("[\"hello\", \" \", \"world test\"]", eval("'hello world test'.partition ' '"));
-    BOOST_CHECK_EQUAL("[\"hello world\", \" \", \"test\"]", eval("'hello world test'.rpartition ' '"));
-    BOOST_CHECK_EQUAL("[\"\", \"\", \"hello world\"]", eval("'hello world'.rpartition 'x'"));
-
-}
 BOOST_AUTO_TEST_CASE(slice)
 {
     //slice index
@@ -290,21 +257,6 @@ BOOST_AUTO_TEST_CASE(slice)
     BOOST_CHECK_THROW(eval("'test'[5, true]"), ScriptError);
     BOOST_CHECK_THROW(eval("'test'[true, 5]"), ScriptError);
     BOOST_CHECK_THROW(eval("'test'[1, 2, 3]"), ScriptError);
-}
-BOOST_AUTO_TEST_CASE(split)
-{
-    BOOST_CHECK_EQUAL("[\"unit\", \"test\", \"string\", \"split\"]", eval("'unit  test\\nstring\\tsplit'.split"));
-    BOOST_CHECK_EQUAL("[\"unit\", \"test\", \"string\", \"split\"]", eval("'unit  test\\nstring\\tsplit'.split ' '"));
-    BOOST_CHECK_EQUAL("[\"\", \"es\"]", eval("'test'.split 't'"));
-    BOOST_CHECK_EQUAL("[\"1\", \"2\", \"3\", \"5\"]", eval("'1,2,3,,5,'.split ','"));
-    BOOST_CHECK_EQUAL("[\"\", \"es\", \"\"]", eval("'test'.split 't', -1"));
-    BOOST_CHECK_EQUAL("[\"test\"]", eval("'test'.split 't', 1"));
-    BOOST_CHECK_EQUAL("[\"test\"]", eval("'test'.split '', 1"));
-    BOOST_CHECK_EQUAL("[\"t\", \"e\", \"s\", \"t\"]", eval("'test'.split ''"));
-    BOOST_CHECK_EQUAL("[\"1\", \"2\", \"3\", \"\", \"5\", \"\"]", eval("'1,2,3,,5,'.split ',', -1"));
-    BOOST_CHECK_EQUAL("[\"1\", \"2\", \"3,,5,\"]", eval("'1,2,3,,5,'.split ',', 3"));
-    BOOST_CHECK_EQUAL("[\"1\", \"2\", \"3\", \"\", \"5,\"]", eval("'1,2,3,,5,'.split ',', 5"));
-    BOOST_CHECK_EQUAL("[\"1\", \"2\", \"3\", \"\", \"5\", \"\"]", eval("'1,2,3,,5,'.split ',', 10"));
 }
 
 BOOST_AUTO_TEST_CASE(justify)
@@ -390,6 +342,48 @@ BOOST_AUTO_TEST_CASE(lines)
     BOOST_CHECK_EQUAL("[\"hello\\nworld\\n\\n\\n\", \"lines\\n\"]", eval("'hello\\nworld\\n\\n\\nlines\\n'.lines ''"));
 }
 
+BOOST_AUTO_TEST_CASE(index)
+{
+    BOOST_CHECK_EQUAL("2", eval("'hello world'.index 'l'"));
+    BOOST_CHECK_EQUAL("nil", eval("'hello world'.index 'x'"));
+    BOOST_CHECK_EQUAL("nil", eval("'hello world'.index 'llx'"));
+    BOOST_CHECK_EQUAL("2", eval("'hello world'.index 'l', 2"));
+    BOOST_CHECK_EQUAL("2", eval("'hello world'.index 'll', 2"));
+    BOOST_CHECK_EQUAL("3", eval("'hello world'.index 'l', 3"));
+    BOOST_CHECK_EQUAL("nil", eval("'hello world'.index 'll', 3"));
+    BOOST_CHECK_EQUAL("9", eval("'hello world'.index 'l', 4"));
+    BOOST_CHECK_EQUAL("nil", eval("'hello world'.index 'l', 10"));
+    BOOST_CHECK_EQUAL("4", eval("'test'.index '', 4"));
+
+    BOOST_CHECK_EQUAL("9", eval("'hello world'.rindex 'l'"));
+    BOOST_CHECK_EQUAL("nil", eval("'hello world'.rindex 'x'"));
+    BOOST_CHECK_EQUAL("nil", eval("'hello world'.rindex 'llx'"));
+    BOOST_CHECK_EQUAL("nil", eval("'hello world'.rindex 'l', 1"));
+    BOOST_CHECK_EQUAL("2", eval("'hello world'.rindex 'l', 2"));
+    BOOST_CHECK_EQUAL("2", eval("'hello world'.rindex 'll', 2"));
+    BOOST_CHECK_EQUAL("3", eval("'hello world'.rindex 'l', 3"));
+    BOOST_CHECK_EQUAL("2", eval("'hello world'.rindex 'll', 3"));
+    BOOST_CHECK_EQUAL("9", eval("'hello world'.rindex 'l', 9"));
+    BOOST_CHECK_EQUAL("9", eval("'hello world'.rindex 'l', 10"));
+    BOOST_CHECK_EQUAL("4", eval("'test'.rindex '', 4"));
+
+    BOOST_CHECK_EQUAL("9", eval("'hello world'.rindex 'l', 20"));
+    BOOST_CHECK_EQUAL("nil", eval("'hello world'.rindex 'l', -20"));
+    //regex
+    BOOST_CHECK_EQUAL("2", eval("'hello world'.index(/l/)"));
+    BOOST_CHECK_EQUAL("nil", eval("'hello world'.index 'x'"));
+    BOOST_CHECK_EQUAL("2", eval("'hello world'.index(/l/, 2)"));
+    BOOST_CHECK_EQUAL("4", eval("'test'.index(//, 4)"));
+
+    BOOST_CHECK_EQUAL("9", eval("'hello world'.rindex(/l/)"));
+    BOOST_CHECK_EQUAL("nil", eval("'hello world'.rindex 'x'"));
+    BOOST_CHECK_EQUAL("2", eval("'hello world'.rindex(/l/, 2)"));
+    BOOST_CHECK_EQUAL("4", eval("'test'.rindex(//, 4)"));
+    //invalid
+    BOOST_CHECK_THROW(eval("''.index 5"), ScriptError);
+    BOOST_CHECK_THROW(eval("''.rindex 5"), ScriptError);
+}
+
 BOOST_AUTO_TEST_CASE(each_line)
 {
     auto model = create_view_model();
@@ -425,6 +419,70 @@ BOOST_AUTO_TEST_CASE(each_line)
     BOOST_CHECK_EQUAL("[\"test,\", \"csv\"]", data->check());
 
     BOOST_CHECK_THROW(eval(model, "'test,csv'.each_line('\\n').each ',' {|x| @data.store x}"), ArgumentCountError);
+}
+
+BOOST_AUTO_TEST_CASE(match)
+{
+    BOOST_CHECK_EQUAL("\"world\"", eval("'hello world'.match('world').to_s"));
+    BOOST_CHECK_EQUAL("\"world\"", eval("'hello world'.match(/world/).to_s"));
+    BOOST_CHECK_EQUAL("nil", eval("'hello world'.match('test')"));
+
+    BOOST_CHECK_EQUAL("\"world\"", eval("'hello world'.match('world', 6).to_s"));
+    BOOST_CHECK_EQUAL("\"world\"", eval("'hello world'.match(/world/, 6).to_s"));
+    BOOST_CHECK_EQUAL("nil", eval("'hello world'.match('world', 7)"));
+}
+
+BOOST_AUTO_TEST_CASE(partition)
+{
+    BOOST_CHECK_EQUAL("[\"hello\", \" \", \"world\"]", eval("'hello world'.partition ' '"));
+    BOOST_CHECK_EQUAL("[\"hello world\", \"\", \"\"]", eval("'hello world'.partition 'x'"));
+
+    BOOST_CHECK_EQUAL("[\"hello\", \" \", \"world test\"]", eval("'hello world test'.partition ' '"));
+    BOOST_CHECK_EQUAL("[\"hello world\", \" \", \"test\"]", eval("'hello world test'.rpartition ' '"));
+    BOOST_CHECK_EQUAL("[\"\", \"\", \"hello world\"]", eval("'hello world'.rpartition 'x'"));
+
+    BOOST_CHECK_EQUAL("[\"hello\", \" \", \"world\"]", eval("'hello world'.partition(/ /)"));
+    BOOST_CHECK_EQUAL("[\"hello test\\nworld\", \" \", \"test\"]", eval("'hello test\\nworld test'.rpartition(/ /)"));
+    BOOST_CHECK_EQUAL("[\"\", \"\", \"hello test\\nworld test\"]", eval("'hello test\\nworld test'.rpartition(/^ /)"));
+    BOOST_CHECK_EQUAL("[\"hello test\\n\", \"test\", \" world\"]", eval("'hello test\\ntest world'.rpartition(/^test/)"));
+}
+
+BOOST_AUTO_TEST_CASE(split)
+{
+    //empty
+    BOOST_CHECK_EQUAL("[\"t\", \"e\", \"s\", \"t\"]", eval("'test'.split('')"));
+    BOOST_CHECK_EQUAL("[\"t\", \"e\", \"s\", \"t\"]", eval("'test'.split(//)"));
+    BOOST_CHECK_EQUAL("[\"t\", \"e\", \"st\"]", eval("'test'.split('', 3)"));
+    BOOST_CHECK_EQUAL("[\"t\", \"e\", \"st\"]", eval("'test'.split(//, 3)"));
+    //strings
+    BOOST_CHECK_EQUAL("[\"unit\", \"test\", \"string\", \"split\"]", eval("'unit  test\\nstring\\tsplit'.split"));
+    BOOST_CHECK_EQUAL("[\"unit\", \"test\", \"string\", \"split\"]", eval("'unit  test\\nstring\\tsplit'.split ' '"));
+    BOOST_CHECK_EQUAL("[\"\", \"es\"]", eval("'test'.split 't'"));
+    BOOST_CHECK_EQUAL("[\"1\", \"2\", \"3\", \"\", \"5\"]", eval("'1,2,3,,5,'.split ','"));
+    BOOST_CHECK_EQUAL("[\"\", \"es\", \"\"]", eval("'test'.split 't', -1"));
+    BOOST_CHECK_EQUAL("[\"test\"]", eval("'test'.split 't', 1"));
+    BOOST_CHECK_EQUAL("[\"test\"]", eval("'test'.split '', 1"));
+    BOOST_CHECK_EQUAL("[\"1\", \"2\", \"3\", \"\", \"5\", \"\"]", eval("'1,2,3,,5,'.split ',', -1"));
+    BOOST_CHECK_EQUAL("[\"1\", \"2\", \"3,,5,\"]", eval("'1,2,3,,5,'.split ',', 3"));
+    BOOST_CHECK_EQUAL("[\"1\", \"2\", \"3\", \"\", \"5,\"]", eval("'1,2,3,,5,'.split ',', 5"));
+    BOOST_CHECK_EQUAL("[\"1\", \"2\", \"3\", \"\", \"5\"]", eval("'1,2,3,,5,'.split ',', 10"));
+    //regex
+    BOOST_CHECK_EQUAL("[\"test\"]", eval("'test'.split(/ /)"));
+    BOOST_CHECK_EQUAL("[]", eval("'test'.split(/.*/)"));
+    BOOST_CHECK_EQUAL("[\"test\", \"test\"]", eval("'test test'.split(/ /)"));
+    BOOST_CHECK_EQUAL("[\"\", \"test\", \"test\"]", eval("' test test'.split(/ /)"));
+
+    BOOST_CHECK_EQUAL("[\"\", \"test\", \"test\"]", eval("' test test'.split(/ /, 0)"));
+    BOOST_CHECK_EQUAL("[\" test test\"]", eval("' test test'.split(/ / , 1)"));
+    BOOST_CHECK_EQUAL("[\"\", \"test test\"]", eval("' test test'.split(/ / , 2)"));
+    //regex captures
+    BOOST_CHECK_EQUAL("[\"\", \"test\"]", eval("'test'.split(/(.*)/)"));
+    BOOST_CHECK_EQUAL("[\"\", \"test\", \"\"]", eval("'test'.split(/(.*)/, -1)"));
+    BOOST_CHECK_EQUAL("[\"test\"]", eval("'test'.split(/(.)(.)/, 1)"));
+    BOOST_CHECK_EQUAL("[\"\", \"t\", \"e\", \"st\"]", eval("'test'.split(/(.)(.)/, 2)"));
+    //invalid
+    BOOST_CHECK_THROW(eval("''.split 5"), ScriptError);
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()

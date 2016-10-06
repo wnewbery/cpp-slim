@@ -177,14 +177,17 @@ namespace slim
         unpack<1>(args, &src, &opts);
         return create_object<Regexp>(src, opts);
     }
-    Regexp::Regexp(const std::string &str, int opts)
-        : src(str), opts(opts)
+    std::regex_constants::syntax_option_type Regexp::syntax_options(int opts)
     {
         auto flags = std::regex_constants::ECMAScript;
         if (opts & IGNORECASE) flags |= std::regex_constants::icase;
         if (opts & EXTENDED) throw ScriptError("Regexp::EXTENDED is not supported");
         if (opts & MULTILINE) throw ScriptError("Regex multiline mode not supported by std::regex");
-        regex.assign(str, flags);
+        return flags;
+    }
+    Regexp::Regexp(const std::string &str, int opts)
+        : src(str), opts(opts), regex(str, syntax_options(opts))
+    {
     }
     std::string Regexp::to_string() const
     {
@@ -228,6 +231,17 @@ namespace slim
             return results;
         }
         else return nullptr;
+    }
+    std::smatch Regexp::do_rmatch(const std::string &str, int pos)
+    {
+        if (pos < 0) pos = (int)str.size() + pos;
+        if (pos < 0 || pos >(int)str.size()) return {};
+
+        auto new_src = "^[\\s\\S]*(" + src + ")";
+        std::regex regex(new_src, syntax_options(opts));
+        std::smatch match;
+        std::regex_search(str.cbegin(), str.cbegin() + pos, match, regex);
+        return match;
     }
     Ptr<Object> Regexp::match(const FunctionArgs &args)
     {

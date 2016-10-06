@@ -291,7 +291,7 @@ namespace slim
                 return true;
             case Token::DIV:
                 if (lexer.peek_space()) return false;
-                else error("Ambiguous first argument with '/'. Use parentheses for regex or a space division.");
+                else error("Ambiguous first argument with '/'. Use parentheses for regex or a space after division.");
             default:
                 return false;
             }
