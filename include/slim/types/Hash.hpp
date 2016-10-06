@@ -40,6 +40,7 @@ namespace slim
         const_iterator begin() { return list.begin(); }
         const_iterator end() { return list.end(); }
 
+        ObjectPtr get(ObjectPtr key);
         void set(ObjectPtr key, ObjectPtr val);
         /**Gets a value by key if it exists, else creates a new blank one with
          * create_object.

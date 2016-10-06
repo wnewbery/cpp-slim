@@ -121,7 +121,8 @@ namespace slim
         std::shared_ptr<Boolean> start_with_q(const FunctionArgs &args);
         std::shared_ptr<String> strip();
         //strip!
-        //sub, sub!
+        Ptr<String> substitute(const FunctionArgs &args);
+        //sub!
         //succ, succ!
         //sum
         //swapcase, sawpcase!

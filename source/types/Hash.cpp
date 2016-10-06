@@ -53,6 +53,12 @@ namespace slim
         return h;
     }
 
+    ObjectPtr Hash::get(ObjectPtr key)
+    {
+        auto it = map.find(key);
+        if (it != map.end()) return list[it->second].second;
+        else return NIL_VALUE;
+    }
     void Hash::set(ObjectPtr key, ObjectPtr val)
     {
         auto x = map.emplace(key, 0);

@@ -707,6 +707,101 @@ namespace slim
         return make_value(ret);
     }
 
+    namespace
+    {
+        typedef std::function<std::string(const std::string &, const std::smatch *)> ReplaceFunc;
+        ReplaceFunc replace_func(Object *replace)
+        {
+            if (auto str_obj = dynamic_cast<String*>(replace))
+            {
+                auto &str = str_obj->get_value();
+                struct Part
+                {
+                    int sub; //-1 for literal string
+                    std::string str;
+                };
+                std::vector<Part> parts;
+                size_t i = 0, last = 0;
+                while (true)
+                {
+                    auto next = str.find('\\', i);
+                    if (next >= str.size() - 1) break;
+                    auto c = str[next + 1];
+                    if (c < '0' || c > '9')
+                    {
+                        i = next + 2;
+                        continue;
+                    }
+
+                    if (next > i) parts.push_back({-1, str.substr(i, next - i)});
+                    parts.push_back({c - '0', {}});
+                    last = i = next + 2;
+                }
+                if (last != std::string::npos)
+                    parts.push_back({-1, str.substr(last)});
+
+                return [parts](const std::string &str, const std::smatch *match) -> std::string
+                {
+                    std::string out;
+                    for (auto &part : parts)
+                    {
+                        if (part.sub < 0) out += part.str;
+                        else if (part.sub == 0) out += str;
+                        else if (match && (size_t)part.sub < match->size())
+                            out += match->str((size_t)part.sub);
+                    }
+                    return out;
+                };
+            }
+            else if (auto hash = dynamic_cast<Hash*>(replace))
+            {
+                return [hash](const std::string &str, const std::smatch *) -> std::string
+                {
+                    return hash->get(make_value(str))->to_string();
+                };
+            }
+            else if (auto proc = dynamic_cast<Proc*>(replace))
+            {
+                return [proc](const std::string &str, const std::smatch *) -> std::string
+                {
+                    return coerce<String>(proc->call({make_value(str)}))->get_value();
+                };
+            }
+            else throw ArgumentError("Invalid replacement type");
+        }
+    }
+    Ptr<String> String::substitute(const FunctionArgs &args)
+    {
+        Object *pattern, *replace;
+        unpack(args, &pattern, &replace);
+        auto f = replace_func(replace);
+        if (auto regex = dynamic_cast<Regexp*>(pattern))
+        {
+            std::smatch match;
+            if (std::regex_search(v, match, regex->get()))
+            {
+                std::string out(v.cbegin(), match[0].first);
+                out += f(match.str(0), &match);
+                out.append(match[0].second, v.cend());
+                return make_value(out);
+            }
+            else return make_value(v);
+        }
+        else if (auto str = dynamic_cast<String*>(pattern))
+        {
+            auto i = v.find(str->get_value());
+            if (i != std::string::npos)
+            {
+                std::string out = v.substr(0, i);
+                out += f(str->get_value(), nullptr);
+                out += v.substr(i + str->get_value().size());
+                return make_value(out);
+            }
+            else return make_value(v);
+        }
+        else throw ArgumentError("Expected String or Regexp");
+    }
+
     const MethodTable &String::method_table()const
     {
         static const MethodTable table(Object::method_table(),
@@ -756,6 +851,7 @@ namespace slim
             { &String::split, "split" },
             { &String::start_with_q, "start_with?" },
             { &String::strip, "strip" },
+            { &String::substitute, "sub" },
             { &String::upcase, "upcase" }
         });
         return table;

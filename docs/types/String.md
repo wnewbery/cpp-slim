@@ -42,14 +42,15 @@ Most methods are the same as the Ruby methods.
    * `partition string`
    * `upcase`
    * `reverse`
-   * `rpartition string`
    * `rindex`
+   * `rpartition string`
+   * `rstrip`
    * `scrub replacement=U+FFFD`
    * `size`, `length`
    * `split`: The default pattern is always " ".
    * `start_with? ([prefixes+])`
    * `strip`
-   * `rstrip`
+   * `sub`
 
 ## Methods
 ### `html_safe`
