@@ -52,6 +52,7 @@
     <ClInclude Include="include\slim\types\Nil.hpp" />
     <ClInclude Include="include\slim\types\Number.hpp" />
     <ClInclude Include="include\slim\types\Proc.hpp" />
+    <ClInclude Include="include\slim\types\Range.hpp" />
     <ClInclude Include="include\slim\types\Regexp.hpp" />
     <ClInclude Include="include\slim\types\String.hpp" />
     <ClInclude Include="include\slim\types\Object.hpp" />
@@ -81,6 +82,7 @@
     <ClCompile Include="source\types\Array.cpp" />
     <ClCompile Include="source\types\Enumerable.cpp" />
     <ClCompile Include="source\types\Math.cpp" />
+    <ClCompile Include="source\types\Range.cpp" />
     <ClCompile Include="source\types\Regexp.cpp" />
     <ClCompile Include="source\types\String.cpp" />
     <ClCompile Include="source\types\Symbol.cpp" />

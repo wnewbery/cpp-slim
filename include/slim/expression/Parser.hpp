@@ -127,6 +127,8 @@ namespace slim
              * syntax error as an unexpected symbol.
              */
             ExpressionNodePtr conditional_op();
+            /** .., ...*/
+            ExpressionNodePtr range_op(bool in_cond_op);
             /** || */
             ExpressionNodePtr logical_or_op(bool in_cond_op);
             /** && */

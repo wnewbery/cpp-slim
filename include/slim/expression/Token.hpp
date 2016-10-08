@@ -41,6 +41,10 @@ namespace slim
                 R_CURLY_BRACKET,
                 COMMA,
                 DOT,
+                /**.. inclusive range.*/
+                INCLUSIVE_RANGE,
+                /**... exclusive range.*/
+                EXCLUSIVE_RANGE,
                 /**::, double colon for type::Const, e.g. Math::PI*/
                 CONST_NAV,
                 /**&.*/

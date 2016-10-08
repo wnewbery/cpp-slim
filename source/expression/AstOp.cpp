@@ -6,6 +6,7 @@
 #include "types/HtmlSafeString.hpp"
 #include "types/Proc.hpp"
 #include "types/Regexp.hpp"
+#include "types/Range.hpp"
 #include "types/String.hpp"
 #include "template/Template.hpp"
 #include <sstream>
@@ -136,6 +137,19 @@ namespace slim
         {
             auto args = eval_args(scope);
             return make_hash(args);
+        }
+
+        ObjectPtr InclusiveRangeOp::eval(Scope &scope)const
+        {
+            auto lhs_v = lhs->eval(scope);
+            auto rhs_v = rhs->eval(scope);
+            return create_object<Range>(lhs_v, rhs_v, false);
+        }
+        ObjectPtr ExclusiveRangeOp::eval(Scope &scope)const
+        {
+            auto lhs_v = lhs->eval(scope);
+            auto rhs_v = rhs->eval(scope);
+            return create_object<Range>(lhs_v, rhs_v, true);
         }
 
         std::string Block::to_string() const

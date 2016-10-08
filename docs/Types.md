@@ -13,6 +13,7 @@ These provide most of the script functionality, and use the same method names an
    * Nil
    * Number
    * Object
+   * Range
    * Regexp
    * [String](types/String.md)
    * Symbol
@@ -154,11 +155,31 @@ There is also currently no `$~` or related global variables.
    * `::quote`
    * `::IGNORECASE`
    * `==`
+   * `hash`
    * `casefold?`
    * `match`
    * `options`
    * `source`
    * `to_s`
+
+#Range
+Numeric float range object using `..` and `...` literals. Include Enumerable.
+
+Similar to the Ruby range object, but without custom type support.
+
+   * `==`
+   * `hash`
+   * `begin`
+   * `cover?`
+   * `each`
+   * `end`
+   * `exclude_end?`
+   * `first`
+   * `include?`
+   * `last`
+   * `member?`
+   * `size`
+   * `step`
 
 # Symbol
 The `Symbol` type represents process-wide unique strings, allowing for fast comparison via identity, but somewhat slower creation. The script parser creates instances at compile time to avoid the expense on every execution.

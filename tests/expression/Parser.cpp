@@ -99,6 +99,8 @@ BOOST_AUTO_TEST_CASE(const_nav)
 
 BOOST_AUTO_TEST_CASE(single_ops)
 {
+    BOOST_CHECK_EQUAL("(5 .. 10)", parse("5 .. 10")->to_string());
+    BOOST_CHECK_EQUAL("(5 ... 10)", parse("5 ... 10")->to_string());
     BOOST_CHECK_EQUAL("(5 && 10)", parse("5 && 10")->to_string());
     BOOST_CHECK_EQUAL("(5 || 10)", parse("5 || 10")->to_string());
 

@@ -46,12 +46,17 @@ namespace slim
             case '{': return make_tok(1, Token::L_CURLY_BRACKET);
             case '}': return make_tok(1, Token::R_CURLY_BRACKET);
             case ',': return make_tok(1, Token::COMMA);
-            case '.': return make_tok(1, Token::DOT);
             case '+': return make_tok(1, Token::PLUS);
             case '/': return make_tok(1, Token::DIV);
             case '%': return make_tok(1, Token::MOD);
             case '~': return make_tok(1, Token::NOT);
             case '^': return make_tok(1, Token::XOR);
+            case '.':
+                if (p + 2 < end && p[1] == '.' && p[2] == '.')
+                    return make_tok(3, Token::EXCLUSIVE_RANGE);
+                else if (p + 1 < end && p[1] == '.')
+                    return make_tok(2, Token::INCLUSIVE_RANGE);
+                else return make_tok(1, Token::DOT);
             case ':':
                 if (p + 1 < end && p[1] == ':') return make_tok(2, Token::CONST_NAV);
                 else return make_tok(1, Token::COLON);

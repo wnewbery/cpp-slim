@@ -417,11 +417,11 @@ namespace slim
 
         ExpressionNodePtr Parser::conditional_op()
         {
-            auto lhs = logical_or_op(false);
+            auto lhs = range_op(false);
             if (current_token.type == Token::CONDITIONAL)
             {
                 next();
-                auto true_expr = logical_or_op(true);
+                auto true_expr = range_op(true);
 
                 if (current_token.type != Token::COLON) error("Expected ':'");
                 next();
@@ -431,6 +431,20 @@ namespace slim
                 lhs = slim::make_unique<Conditional>(std::move(lhs), std::move(true_expr), std::move(false_expr));
             }
             return lhs;
+        }
+
+        ExpressionNodePtr Parser::range_op(bool in_cond_op)
+        {
+            auto lhs = logical_or_op(in_cond_op);
+            while (true)
+            {
+                switch (current_token.type)
+                {
+                case Token::INCLUSIVE_RANGE: next_binary_op<InclusiveRangeOp>(in_cond_op, lhs, &Parser::logical_or_op); break;
+                case Token::EXCLUSIVE_RANGE: next_binary_op<ExclusiveRangeOp>(in_cond_op, lhs, &Parser::logical_or_op); break;
+                default: return lhs;
+                }
+            }
         }
 
         ExpressionNodePtr Parser::logical_or_op(bool in_cond_op)

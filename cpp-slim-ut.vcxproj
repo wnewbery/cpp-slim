@@ -173,6 +173,7 @@
     <ClCompile Include="tests\types\Math.cpp" />
     <ClCompile Include="tests\types\Number.cpp" />
     <ClCompile Include="tests\types\Object.cpp" />
+    <ClCompile Include="tests\types\Range.cpp" />
     <ClCompile Include="tests\types\Regexp.cpp" />
     <ClCompile Include="tests\types\String.cpp" />
     <ClCompile Include="tests\types\Symbol.cpp" />

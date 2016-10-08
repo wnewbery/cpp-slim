@@ -142,6 +142,28 @@ namespace slim
             virtual ObjectPtr eval(Scope &scope)const override;
         };
 
+        class RangeOp : public BinaryOp
+        {
+        public:
+            using BinaryOp::BinaryOp;
+        };
+        /**x..y range*/
+        class InclusiveRangeOp : public RangeOp
+        {
+        public:
+            using RangeOp::RangeOp;
+            virtual const char *symbol()const override { return ".."; }
+            virtual ObjectPtr eval(Scope &scope)const override;
+        };
+        /**x...y range*/
+        class ExclusiveRangeOp : public RangeOp
+        {
+        public:
+            using RangeOp::RangeOp;
+            virtual const char *symbol()const override { return "..."; }
+            virtual ObjectPtr eval(Scope &scope)const override;
+        };
+
         /**A code block that creates a Proc which captures the local variables in the blocks scope.*/
         class Block : public ExpressionNode
         {
