@@ -1,6 +1,7 @@
 #include "types/Array.hpp"
 #include "types/Enumerator.hpp"
 #include "types/Proc.hpp"
+#include "types/Range.hpp"
 #include "Value.hpp"
 #include "Function.hpp"
 #include "Operators.hpp"
@@ -265,34 +266,47 @@ namespace slim
         }
         else return make_enumerator(this, { &Array::reverse_each, "reverse_each" });
     }
+
     std::shared_ptr<Object> Array::slice(const FunctionArgs & args)
     {
+        auto do_slice = [&](int start, int length) -> Ptr<Object>
+        {
+            if (start < 0 || length < 0 || start > (int)arr.size())
+                return NIL_VALUE;
+            std::vector<ObjectPtr> out;
+            for (int i = start; i < start + length && i < (int)arr.size(); ++i)
+            {
+                out.push_back(arr[(size_t)i]);
+            }
+            return make_value(std::move(out));
+        };
         if (args.size() == 1)
         {
-            int i = (int)as_number(args[0]);
-            if (i < 0) i = ((int)arr.size() + i);
-            if (i >= 0 && i < (int)arr.size()) return arr[(size_t)i];
-            else return NIL_VALUE;
+            if (auto range = dynamic_cast<Range*>(args[0].get()))
+            {
+                int start, length;
+                if (range->get_beg_len(&start, &length, (int)arr.size()))
+                    return do_slice(start, length);
+                else return NIL_VALUE;
+            }
+            else
+            {
+                int i = (int)as_number(args[0]);
+                if (i < 0) i = ((int)arr.size() + i);
+                if (i >= 0 && i < (int)arr.size()) return arr[(size_t)i];
+                else return NIL_VALUE;
+            }
         }
         else if (args.size() == 2)
         {
             int start = (int)as_number(args[0]);
             int length = (int)as_number(args[1]);
             if (start < 0) start = ((int)arr.size()) + start;
-            if (start >= 0 && start < (int)arr.size())
-            {
-                std::vector<ObjectPtr> out;
-                for (int i = start; i < start + length && i < (int)arr.size(); ++i)
-                {
-                    out.push_back(arr[(size_t)i]);
-                }
-                return make_value(std::move(out));
-            }
-            else if (start == (int)arr.size()) return make_array({});
-            else return NIL_VALUE;
+            return do_slice(start, length);
         }
         else throw ArgumentError(this, "slice");
     }
+
     Ptr<Array> Array::sort(const FunctionArgs &args)
     {
         Proc *proc = nullptr;

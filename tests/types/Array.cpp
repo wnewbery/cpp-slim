@@ -190,7 +190,16 @@ BOOST_AUTO_TEST_CASE(basic_access)
 
     BOOST_CHECK_EQUAL("[1, 2, 3, 5, 8, 11]", eval("a[-6, 10]", scope));
     BOOST_CHECK_EQUAL("nil", eval("a[7, 3]", scope));
-    //TODO: slice(range)
+    //slice(range)
+    BOOST_CHECK_EQUAL("[2, 3, 5]", eval("a.slice(1...4)", scope));
+    BOOST_CHECK_EQUAL("[2, 3, 5]", eval("a[1...4]", scope));
+    BOOST_CHECK_EQUAL("[8, 11]", eval("a.slice(4...12)", scope));
+    BOOST_CHECK_EQUAL("[11]", eval("a.slice(-1..-1)", scope));
+    BOOST_CHECK_EQUAL("[1, 2, 3, 5, 8]", eval("a.slice(-6..4)", scope));
+    BOOST_CHECK_EQUAL("[]", eval("a.slice(6...9)", scope));
+    BOOST_CHECK_EQUAL("[1, 2, 3]", eval("a.slice(-6...3)", scope));
+    BOOST_CHECK_EQUAL("nil", eval("a.slice(-7...3)", scope));
+    BOOST_CHECK_EQUAL("nil", eval("a.slice(7...3)", scope));
 
     //take(count)
     BOOST_CHECK_EQUAL("[1]", eval("a.take(1)", scope));
