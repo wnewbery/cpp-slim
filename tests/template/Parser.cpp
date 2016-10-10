@@ -263,6 +263,37 @@ BOOST_AUTO_TEST_CASE(cond)
     BOOST_CHECK_THROW(parse_str("-if true\n  p\n-else x\n  p\n"), TemplateSyntaxError);
 }
 
+BOOST_AUTO_TEST_CASE(each)
+{
+    BOOST_CHECK_EQUAL(
+        "<% [0, 1, 2, 3].each({|| %>"
+        "<img/>"
+        "<%}) %>",
+        parse_str(
+            "-[0,1,2,3].each do\n"
+            "  img\n"
+        ));
+    BOOST_CHECK_EQUAL(
+        "<% [0, 1, 2, 3].each({|| %>"
+        "<img/>"
+        "<%}) %>",
+        parse_str(
+            "-[0,1,2,3].each do ||\n"
+            "  img\n"
+        ));
+    BOOST_CHECK_EQUAL(
+        "<% [0, 1, 2, 3].each({|x| %>"
+        "<img<%=attr('width', x)%>/>"
+        "<%}) %>",
+        parse_str(
+            "-[0,1,2,3].each do |x|\n"
+            "  img width=x\n"
+        ));
+
+    BOOST_CHECK_THROW(parse_str("-'not a method' do\ndiv"), TemplateSyntaxError);
+    BOOST_CHECK_THROW(parse_str("-[0,1,2]\ndiv"), TemplateSyntaxError);
+}
+
 BOOST_AUTO_TEST_CASE(syntax_error_info)
 {
     //start

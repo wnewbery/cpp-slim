@@ -68,6 +68,17 @@ namespace slim
              * Returns the script source string.
              */
             std::string parse_code_src();
+            /**Parse a code line, with possible ',' or '\' line continuation, and any ending "do"
+             * block.
+             * The next token should be code text, as parsed by parse_code_src.
+             * @param had_do Output. Set to true if "do" was encountered at the end of the parsed
+             * source.
+             * @param param_names If had_do is true, then the names of any parameters for the block.
+             */
+            void parse_code_line_expr(
+                std::unique_ptr<expr::ExpressionNode> *expr,
+                bool *had_do,
+                std::vector<Ptr<Symbol>> *param_names);
             /**Parses a code line, and uses parse_lines to build a block for the final method call.*/
             void parse_code_line(int base_indent, OutputFrame &output);
 

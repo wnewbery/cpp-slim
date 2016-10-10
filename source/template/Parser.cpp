@@ -341,18 +341,19 @@ namespace slim
             if (trailing_space) output << ' ';
         }
 
-        void Parser::parse_code_line(int base_indent, OutputFrame &output)
+        void  Parser::parse_code_line_expr(std::unique_ptr<expr::ExpressionNode> *expr,
+            bool *had_do, std::vector<Ptr<Symbol>> *param_names)
         {
-            auto ws = parse_ws_control();
+            *had_do = false;
+            *expr = nullptr;
+            param_names->clear();
             auto line = current_token.line;
             auto offset = current_token.offset;
             auto src = parse_code_src();
 
-            std::vector<SymPtr> params;
             //See if there is a do block, but avoid breaking constructs that contain those letters in a word
             auto do_pos = src.rfind(" do");
-            bool had_do = false;
-            if(do_pos != std::string::npos)
+            if (do_pos != std::string::npos)
             {
                 //Check do is either at end, or has a |params| only after. Otherwise might have found
                 //somthing inside the expression
@@ -360,20 +361,19 @@ namespace slim
                 auto p = src.find(' ', after);
                 if (p >= src.size() - 1)
                 {   //" do *"
-                    had_do = true;
+                    *had_do = true;
                 }
-                else if(src[p + 1] == '|')
+                else if (src[p + 1] == '|')
                 {   //Expect a second '|' after this, and then only whitespace
                     auto p2 = src.find('|', p + 2);
                     if (p2 != std::string::npos && src.find_first_not_of(" \t\r\n", p2 + 1) == std::string::npos)
-                    { 
-                        had_do = true;
+                    {
+                        *had_do = true;
                     }
                 }
 
-                if (had_do)
+                if (*had_do)
                 {
-                    had_do = true;
                     auto left = src.size() - do_pos;
                     auto start = src.data() + do_pos + 3;
                     auto end = src.data() + src.find_last_not_of("\n\r") + 1;
@@ -394,7 +394,7 @@ namespace slim
                     expr_lexer.file_name(lexer.file_name());
                     expr_lexer.set_reported_pos(do_line, do_offset);
                     expr::Parser expr_parser(local_vars, expr_lexer);
-                    params = expr_parser.param_list();
+                    *param_names = expr_parser.param_list();
 
                     if (expr_parser.get_last_token().pos != end)
                     {
@@ -410,7 +410,17 @@ namespace slim
             expr_lexer.file_name(lexer.file_name());
             expr_lexer.set_reported_pos(line, offset);
             expr::Parser expr_parser(local_vars, expr_lexer);
-            auto expr = expr_parser.full_expression();
+
+            *expr = expr_parser.full_expression();
+        }
+
+        void Parser::parse_code_line(int base_indent, OutputFrame &output)
+        {
+            auto ws = parse_ws_control();
+            std::unique_ptr<expr::ExpressionNode> expr;
+            bool had_do;
+            std::vector<Ptr<Symbol>> params;
+            parse_code_line_expr(&expr, &had_do, &params);
 
             // See if there is further content to turn into a block
             if (current_token.type == Token::INDENT && current_indent() > base_indent)
@@ -427,11 +437,11 @@ namespace slim
                 //Create the executable template
                 auto block_tpl = block_frame.make_tpl();
                 //Turn it into a expr::Block and TemplateBlock AST node
-                auto expr = create_tpl_block(std::move(params), std::move(block_tpl));
+                auto block_expr = create_tpl_capture_block(std::move(params), std::move(block_tpl));
                 //Put variables back
                 local_vars = old_vars;
                 //Add it as a block param to the function call
-                func_call->args.push_back(std::move(expr));
+                func_call->args.push_back(std::move(block_expr));
             }
             else if (had_do) error("Previous code line started 'do' block, but has no content");
 
@@ -498,11 +508,37 @@ namespace slim
                         std::move(else_body)
                         );
                 }
-                else
+                else if (Token::EACH_START)
                 {
-                    //In case of "each do |a, b, c|" block, update local_vars within this scope only
-                    error("Unexpected control code start");
+                    std::unique_ptr<expr::ExpressionNode> expr;
+                    bool had_do;
+                    std::vector<Ptr<Symbol>> params;
+                    parse_code_line_expr(&expr, &had_do, &params);
+                    if (!had_do) error("Expected conditional or 'do' block");
+
+                    auto func_call = dynamic_cast<expr::FuncCall*>(expr.get());
+                    if (!func_call) error("Found 'do' at end of line, but does not follow method call");
+
+                    //add new local variables for block call
+                    auto old_vars = local_vars;
+                    local_vars.add("output_buffer");
+                    for (auto &param : params)
+                        local_vars.add(param->str());
+                    //Pass the indented contents into a new block
+                    OutputFrame block_frame;
+                    parse_lines(base_indent, block_frame);
+                    //Create the executable template
+                    auto block_tpl = block_frame.make_tpl();
+                    //Turn it into a expr::Block and TemplateBlock AST node
+                    auto block_expr = create_tpl_output_block(std::move(params), std::move(block_tpl));
+                    //Put variables back
+                    local_vars = old_vars;
+                    //Add it as a block param to the function call
+                    func_call->args.push_back(std::move(block_expr));
+
+                    output << slim::make_unique<TemplateEachExpr>(std::move(expr));
                 }
+                else error("Unexpected control code start");
             }
         }
 

@@ -28,6 +28,27 @@ namespace slim
         }
 
 
+        TemplateEachExpr::TemplateEachExpr(std::unique_ptr<Expression>&& expression)
+            : expression(std::move(expression))
+        {}
+        TemplateEachExpr::~TemplateEachExpr()
+        {}
+        std::string TemplateEachExpr::to_string() const
+        {
+            return "<% " + expression->to_string() + " %>";
+        }
+        void TemplateEachExpr::render(std::string & buffer, expr::Scope &scope) const
+        {
+            //TODO: This is somewhat a workaround because String always owns the std::string.
+            //It may be better just to always use the String object for template rendering
+            auto tmp = create_object<String>(std::move(buffer));
+            expr::Scope new_scope(scope);
+            new_scope.set("output_buffer", tmp);
+            auto val = expression->eval(new_scope);
+            buffer = std::move(tmp->get_value());
+        }
+
+
         TemplateTagAttr::TemplateTagAttr(
             const std::string &attr,
             std::vector<std::string> &&static_values,

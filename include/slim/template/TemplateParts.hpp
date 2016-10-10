@@ -53,6 +53,18 @@ namespace slim
         protected:
             std::unique_ptr<Expression> expression;
         };
+        /**A script enumeration expression where the block writes to the buffer.*/
+        class TemplateEachExpr : public TemplatePart
+        {
+        public:
+            TemplateEachExpr(std::unique_ptr<Expression> &&expression);
+            ~TemplateEachExpr();
+
+            virtual std::string to_string()const override;
+            virtual void render(std::string &buffer, expr::Scope &scope)const override;
+        protected:
+            std::unique_ptr<Expression> expression;
+        };
         /**Attribute with dynamic value.
          *
          * Handles boolean as well as string attributes.

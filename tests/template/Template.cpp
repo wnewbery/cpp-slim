@@ -239,4 +239,24 @@ BOOST_AUTO_TEST_CASE(cond_if)
         ));
 }
 
+BOOST_AUTO_TEST_CASE(each)
+{
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<ul><li>1</li><li>5</li></ul>",
+        render_tpl(
+            "ul\n"
+            "  -[1, 5].each do |x|\n"
+            "    li =x"
+        ));
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<ul><li>a: 5</li><li>b: 15</li></ul>",
+        render_tpl(
+            "ul\n"
+            "  -{a: 5, b: 15}.each do |k, v|\n"
+            "    li #{k}: #{v}\n"
+        ));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -34,6 +34,7 @@ namespace slim
         {
             return v.compare(((const String*)rhs)->v);
         }
+        std::string& get_value() { return v; }
         const std::string& get_value()const { return v; }
 
         virtual ObjectPtr add(Object *rhs);
