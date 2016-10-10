@@ -42,6 +42,26 @@ namespace slim
         return h;
     }
 
+    bool Range::get_beg_len(int *range_begin, int *range_len, int seq_len)
+    {
+        //The cast means a range such a "(0.0)...(1.5)" ends up only having "0" rather than "[0, 1]"
+        //as with #each, #to_a, etc. This is intentional as is what Ruby 2.3 does.
+        int b = (int)_begin;
+        int e = (int)_end;
+
+        if (b < 0)
+            b += seq_len;
+        if (e < 0)
+            e += seq_len;
+
+        if (!exclude_end) e += 1;
+        if (e < b) e = b;
+
+        *range_begin = b;
+        *range_len = e - b;
+        return 0 <= b && b <= seq_len && 0 <= *range_len;
+    }
+
     Ptr<Object> Range::begin()
     {
         return make_value(_begin);

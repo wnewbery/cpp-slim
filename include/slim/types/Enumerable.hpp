@@ -54,6 +54,7 @@ namespace slim
         ObjectPtr first(const FunctionArgs &args);
         ObjectPtr flat_map(const FunctionArgs &args);
         //grep
+        //grep_v
         ObjectPtr group_by(const FunctionArgs &args);
         Ptr<Boolean> include_q(Object *obj);
         //lazy

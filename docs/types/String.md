@@ -9,7 +9,7 @@ Most methods are the same as the Ruby methods.
    * `to_f`, `to_d`: As a number converted using `std::stod`.
    * `to_i`: As a number converted using `std::stoi`.
    * `to_sym`: Returns a `Symbol` with the same value.
-   * `[]`: Range is not supported.
+   * `[]`
    * `ascii_only?`: True if all UTF-8 elements are in the range 0 to 127.
    * `bytes`
    * `byteslice`

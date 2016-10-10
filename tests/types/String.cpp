@@ -57,6 +57,16 @@ BOOST_AUTO_TEST_CASE(bytes)
 }
 BOOST_AUTO_TEST_CASE(byteslice)
 {
+    //range
+    BOOST_CHECK_EQUAL("\"es\"", eval("'test'.byteslice 1..2"));
+    BOOST_CHECK_EQUAL("\"t\"", eval("'test'.byteslice 3...5"));
+    BOOST_CHECK_EQUAL("\"es\"", eval("'test'.byteslice -3...-1"));
+    BOOST_CHECK_EQUAL("\"\"", eval("'test'.byteslice 4...6"));
+    BOOST_CHECK_EQUAL("nil", eval("'test'.byteslice -5...-3"));
+    BOOST_CHECK_EQUAL("nil", eval("'test'.byteslice 5...7"));
+    BOOST_CHECK_EQUAL("\"\"", eval("'test'.byteslice 2...2"));
+    BOOST_CHECK_EQUAL("\"s\"", eval("'test'.byteslice 2...-1"));
+    //offset, offset len
     BOOST_CHECK_EQUAL("\"s\"", eval("'test'.byteslice 2"));
     BOOST_CHECK_EQUAL("\"st\"", eval("'test'.byteslice 2, 2"));
     BOOST_CHECK_EQUAL("nil", eval("'test'.byteslice -5"));
@@ -240,6 +250,17 @@ BOOST_AUTO_TEST_CASE(slice)
     BOOST_CHECK_EQUAL("nil", eval("'test'[5, 2]"));
     BOOST_CHECK_EQUAL("\"\"", eval("'test'[2, 0]"));
     BOOST_CHECK_EQUAL("nil", eval("'test'[2, -1]"));
+    //slice range
+    BOOST_CHECK_EQUAL("\"es\"", eval("'test'.slice 1..2"));
+    BOOST_CHECK_EQUAL("\"es\"", eval("'test'.slice 1...3"));
+    BOOST_CHECK_EQUAL("\"es\"", eval("'test'[1..2]"));
+    BOOST_CHECK_EQUAL("\"t\"", eval("'test'[3...5]"));
+    BOOST_CHECK_EQUAL("\"es\"", eval("'test'[-3...-1]"));
+    BOOST_CHECK_EQUAL("\"\"", eval("'test'[4...6]"));
+    BOOST_CHECK_EQUAL("nil", eval("'test'[-5...-3]"));
+    BOOST_CHECK_EQUAL("nil", eval("'test'[5...7]"));
+    BOOST_CHECK_EQUAL("\"\"", eval("'test'[2...2]"));
+    BOOST_CHECK_EQUAL("\"s\"", eval("'test'[2...-1]"));
     //slice match_str
     BOOST_CHECK_EQUAL("\"es\"", eval("'test'.slice 'es'"));
     BOOST_CHECK_EQUAL("\"es\"", eval("'test'['es']"));

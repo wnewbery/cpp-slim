@@ -3,6 +3,7 @@
 #include "types/Enumerator.hpp"
 #include "types/HtmlSafeString.hpp"
 #include "types/Proc.hpp"
+#include "types/Range.hpp"
 #include "types/Regexp.hpp"
 #include "Value.hpp"
 #include "Function.hpp"
@@ -72,7 +73,6 @@ namespace slim
     {
         if (args.size() == 1)
         {
-            //TODO: If range, if regex
             if (auto index = std::dynamic_pointer_cast<Number>(args[0]))
             {
                 return do_slice((int)index->get_value(), 1);
@@ -86,6 +86,13 @@ namespace slim
             else if (auto match_str = std::dynamic_pointer_cast<String>(args[0]))
             {
                 if (v.find(match_str->v) != std::string::npos) return match_str;
+                else return NIL_VALUE;
+            }
+            else if (auto range = std::dynamic_pointer_cast<Range>(args[0]))
+            {
+                int start, length;
+                if (range->get_beg_len(&start, &length, (int)v.size()))
+                    return make_value(v.substr((size_t)start, (size_t)length));
                 else return NIL_VALUE;
             }
             else throw ArgumentError(this, "slice");
@@ -132,11 +139,22 @@ namespace slim
     }
     Ptr<Object> String::byteslice(const FunctionArgs &args)
     {
-        int offset, len = 1;
-        unpack<1>(args, &offset, &len);
-        if (offset < 0) offset = (int)v.size() + offset;
-        if (offset < 0 || offset >= (int)v.size() || len < 0) return NIL_VALUE;
-        return make_value(v.substr((size_t)offset, (size_t)len));
+        Range *range;
+        if (args.size() == 1 && (range = dynamic_cast<Range*>(args[0].get())))
+        {
+            int start, length;
+            if (range->get_beg_len(&start, &length, (int)v.size()))
+                return make_value(v.substr((size_t)start, (size_t)length));
+            else return NIL_VALUE;
+        }
+        else
+        {
+            int offset, len = 1;
+            unpack<1>(args, &offset, &len);
+            if (offset < 0) offset = (int)v.size() + offset;
+            if (offset < 0 || offset >= (int)v.size() || len < 0) return NIL_VALUE;
+            return make_value(v.substr((size_t)offset, (size_t)len));
+        }
     }
     Ptr<Array> String::chars()
     {

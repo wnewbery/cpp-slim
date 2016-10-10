@@ -25,6 +25,14 @@ namespace slim
         virtual bool eq(const Object *rhs)const override;
         virtual size_t hash()const override;
 
+        /**Get as an offset and length for sequence slicing such as strings.
+         * If either begin or end are negative, they are used as offsets from the end of the sequence.
+         * If end is less than begin, then the length is considered 0.
+         * @param seq_len Used to calculate negative offsets. Does *not* constrain range_begin and range_len.
+         * @return true if "0 <= range_begin <= seq_len && 0 <= range_len"
+         */
+        bool get_beg_len(int *range_begin, int *range_len, int seq_len);
+
         //bsearch
         Ptr<Object> begin();
         Ptr<Boolean> cover_q(Object *obj);
