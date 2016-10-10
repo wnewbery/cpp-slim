@@ -46,6 +46,7 @@ namespace slim
              * May return:
              *    - ADD_*_WHITESPACE
              *    - ATTR_NAME
+             *    - SPLAT_ATTR
              *    - END
              *    - EOL
              *    - NAME

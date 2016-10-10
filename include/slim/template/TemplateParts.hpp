@@ -85,6 +85,27 @@ namespace slim
             std::vector<std::string> static_values;
             std::vector<std::unique_ptr<Expression>> dynamic_values;
         };
+        /**Renders all attributes for a tag with at least one splat attribute.*/
+        class TemplateTagSplatAttrs: public TemplatePart
+        {
+        public:
+            typedef std::unordered_multimap<std::string, std::string> Static;
+            typedef std::unordered_multimap<std::string, std::unique_ptr<Expression>> Dynamic;
+            typedef std::vector<std::unique_ptr<Expression>> Splat;
+
+            TemplateTagSplatAttrs(
+                Static &&static_attrs,
+                Dynamic &&dynamic_attrs,
+                Splat &&splat_attrs);
+            ~TemplateTagSplatAttrs();
+
+            virtual std::string to_string()const override;
+            virtual void render(std::string &buffer, expr::Scope &scope)const override;
+        private:
+            Static static_attrs;
+            Dynamic dynamic_attrs;
+            Splat splat_attrs;
+        };
         /**A script for loop, containing a template body.*/
         class TemplateForExpr : public TemplatePart
         {

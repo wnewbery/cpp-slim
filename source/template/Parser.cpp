@@ -197,6 +197,7 @@ namespace slim
                 std::vector<expr::ExpressionNodePtr> dynamic_values;
             };
             std::vector<Attr> attributes;
+            std::vector<expr::ExpressionNodePtr> splat_attributes;
             auto get_attr = [&attributes](const std::string &name) -> Attr&
             {
                 for (auto &attr : attributes) if (attr.name == name) return attr;
@@ -248,7 +249,7 @@ namespace slim
             output << '<' << tag_name; //TODO: attributes, empty tag
 
             //attributes
-            while (current_token.type == Token::ATTR_NAME)
+            while (current_token.type == Token::ATTR_NAME || current_token.type == Token::SPLAT_ATTR)
             {
 
                 expr::Lexer expr_lexer(lexer.get_pos(), lexer.get_end());
@@ -262,46 +263,74 @@ namespace slim
 
                 lexer.set_pos(expr_parser.get_last_token().pos);
 
-                if (auto lit = dynamic_cast<expr::Literal*>(expr.get()))
+                if (current_token.type == Token::ATTR_NAME)
                 {
-                    if (lit->value == TRUE_VALUE)
+                    if (auto lit = dynamic_cast<expr::Literal*>(expr.get()))
                     {
-                        output << ' ' << attr;
-                    }
-                    else if (lit->value == FALSE_VALUE || lit->value == NIL_VALUE)
-                    {
-                        //skip attribute
+                        if (lit->value == TRUE_VALUE)
+                        {
+                            output << ' ' << attr;
+                        }
+                        else if (lit->value == FALSE_VALUE || lit->value == NIL_VALUE)
+                        {
+                            //skip attribute
+                        }
+                        else
+                        {
+                            get_attr(attr).static_values.push_back(lit->value->to_string());
+                        }
                     }
                     else
                     {
-                        get_attr(attr).static_values.push_back(lit->value->to_string());
+                        get_attr(attr).dynamic_values.push_back(std::move(expr));
                     }
                 }
                 else
                 {
-                    get_attr(attr).dynamic_values.push_back(std::move(expr));
+                    assert(current_token.type == Token::SPLAT_ATTR);
+                    splat_attributes.push_back(std::move(expr));
                 }
 
                 current_token = lexer.next_tag_content();
             }
 
-            for (auto &attr : attributes)
+            //where an attribute is known to not have a dynamic value, its value is written directly
+            //to output. In the case where all attributes are known, this means the entire tag is
+            //already a complete string and no runtime execution is required.
+            //However because a splat attribute function can return a hash containing any attribute,
+            //in their presence all attributes must be deffered to runtime.
+            if (splat_attributes.empty())
             {
-                if (attr.dynamic_values.empty())
+                for (auto &attr : attributes)
                 {
-                    assert(attr.static_values.size() > 0);
-                    output << attr_str(attr.name, attr.static_values);
+                    if (attr.dynamic_values.empty())
+                    {
+                        assert(attr.static_values.size() > 0);
+                        output << attr_str(attr.name, attr.static_values);
+                    }
+                }
+                for (auto &attr : attributes)
+                {
+                    if (!attr.dynamic_values.empty())
+                    {
+                        output << slim::make_unique<TemplateTagAttr>(
+                            attr.name,
+                            std::move(attr.static_values),
+                            std::move(attr.dynamic_values));
+                    }
                 }
             }
-            for (auto &attr : attributes)
+            else
             {
-                if (!attr.dynamic_values.empty())
+                TemplateTagSplatAttrs::Static static_attrs;
+                TemplateTagSplatAttrs::Dynamic dynamic_attrs;
+                for (auto &attr : attributes)
                 {
-                    output << slim::make_unique<TemplateTagAttr>(
-                        attr.name,
-                        std::move(attr.static_values),
-                        std::move(attr.dynamic_values));
+                    for (auto &i : attr.static_values) static_attrs.emplace(attr.name, i);
+                    for (auto &i : attr.dynamic_values) dynamic_attrs.emplace(attr.name, std::move(i));
                 }
+                output << slim::make_unique<TemplateTagSplatAttrs>(
+                    std::move(static_attrs), std::move(dynamic_attrs), std::move(splat_attributes));
             }
 
 

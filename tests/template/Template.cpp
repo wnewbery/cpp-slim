@@ -165,6 +165,31 @@ BOOST_AUTO_TEST_CASE(attributes)
         render_tpl("p class=@e.html_safe", model));
 }
 
+BOOST_AUTO_TEST_CASE(splat_attributes)
+{
+    auto model = create_view_model();
+    //single
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p class=\"a\"></p>",
+        render_tpl("p *{class: 'a'}", model));
+    //array
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p class=\"a b\"></p>",
+        render_tpl("p *{class: ['a', 'b']}", model));
+    //merge static
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p class=\"c d a b\"></p>",
+        render_tpl("p.c *{class: ['a', 'b']} class='d'", model));
+    //merge dynamic
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p class=\"c dd a b\"></p>",
+        render_tpl("p.c *{class: ['a', 'b']} class=('d' + 'd')", model));
+}
+
 BOOST_AUTO_TEST_CASE(cond_if)
 {
     BOOST_CHECK_EQUAL(

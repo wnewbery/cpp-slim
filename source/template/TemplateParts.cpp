@@ -3,10 +3,11 @@
 #include "expression/Expression.hpp"
 #include "types/Array.hpp"
 #include "types/Boolean.hpp"
-#include "types/Nil.hpp"
 #include "types/Enumerator.hpp"
-#include "types/Symbol.hpp"
+#include "types/Hash.hpp"
+#include "types/Nil.hpp"
 #include "types/Proc.hpp"
+#include "types/Symbol.hpp"
 #include "Util.hpp"
 namespace slim
 {
@@ -48,6 +49,20 @@ namespace slim
             buffer = std::move(tmp->get_value());
         }
 
+        namespace
+        {
+            /**Adds value to out.
+             * If value is an array, then all elements are added.
+             */
+            void add_attr_value(std::vector<Ptr<Object>> &out, Ptr<Object> value)
+            {
+                if (auto arr = dynamic_cast<Array*>(value.get()))
+                {
+                    for (auto val2 : arr->get_value())out.push_back(val2);
+                }
+                else out.push_back(value);
+            }
+        }
 
         TemplateTagAttr::TemplateTagAttr(
             const std::string &attr,
@@ -74,11 +89,7 @@ namespace slim
             for (auto &expr : dynamic_values)
             {
                 auto val = expr->eval(scope);
-                if (auto arr = dynamic_cast<Array*>(val.get()))
-                {
-                    for (auto val2 : arr->get_value()) values.push_back(val2);
-                }
-                else values.push_back(val);
+                add_attr_value(values, val);
             }
 
             if (static_values.empty() && values.empty()) return;
@@ -97,6 +108,75 @@ namespace slim
             for (auto &v : values) strings.push_back(html_escape(v));
 
             buffer += attr_str(attr, strings);
+        }
+
+        TemplateTagSplatAttrs::TemplateTagSplatAttrs(
+            Static &&static_attrs,
+            Dynamic &&dynamic_attrs,
+            Splat &&splat_attrs)
+            : static_attrs(std::move(static_attrs))
+            , dynamic_attrs(std::move(dynamic_attrs))
+            , splat_attrs(std::move(splat_attrs))
+        {}
+        TemplateTagSplatAttrs::~TemplateTagSplatAttrs()
+        {}
+        std::string TemplateTagSplatAttrs::to_string()const
+        {
+            return "<splat attrs>";
+        }
+        void TemplateTagSplatAttrs::render(std::string &buffer, expr::Scope &scope)const
+        {
+            std::unordered_map<std::string, std::vector<Ptr<Object>>> attrs;
+            //Determine all attributes
+            for (auto &i : static_attrs)
+                attrs[i.first].push_back(make_value(i.second));
+
+            for (auto &i : dynamic_attrs)
+            {
+                auto &attr = attrs[i.first];
+                auto val = i.second->eval(scope);
+                add_attr_value(attr, val);
+            }
+
+            for (auto &splat : splat_attrs)
+            {
+                auto hash = coerce<Hash>(splat->eval(scope));
+                for (auto &i : *hash)
+                {
+                    auto &attr = attrs[i.first->to_string()];
+                    auto val = i.second;
+                    add_attr_value(attr, val);
+                }
+            }
+            //Output attributes
+            for (auto &i : attrs)
+            {
+                auto &name = html_escape(i.first);
+                auto &values = i.second;
+
+                if (values.empty()) continue; //empty / no value
+                else if (values.size() == 1)
+                {
+                    auto val = values[0];
+                    if (val == TRUE_VALUE) //true boolean attr
+                    {
+                        buffer += ' ';
+                        buffer += name;
+                    }
+                    else if (val == FALSE_VALUE || val == NIL_VALUE) //false boolean attr
+                    {
+                        continue;
+                    }
+                    else buffer += attr_str(name, {val->to_string()});
+                }
+                else
+                {
+                    //array of values, e.g. "class"
+                    std::vector<std::string> strings;
+                    for (auto &j : values) strings.push_back(j->to_string());
+                    buffer += attr_str(name, strings);
+                }
+            }
         }
 
         TemplateForExpr::TemplateForExpr(

@@ -47,6 +47,8 @@ namespace slim
                 OUTPUT_LINE,
                 /** name=. '=' is not included in str. */
                 ATTR_NAME,
+                /**'*'*/
+                SPLAT_ATTR,
 
                 /** '-' control line.*/
                 CONTROL_LINE,

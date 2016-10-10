@@ -123,7 +123,12 @@ namespace slim
                 t.type = Token::OUTPUT_LINE;
                 return t;
             }
-
+            else if (*p == '*')
+            {
+                ++p;
+                t.type = Token::SPLAT_ATTR;
+                return t;
+            }
 
             auto start = p;
             //try to find attribute first
