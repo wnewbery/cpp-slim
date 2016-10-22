@@ -23,6 +23,8 @@ namespace slim
                 TAG_ID,
                 /**'.'*/
                 TAG_CLASS,
+                /**'(', '[' or '{'*/
+                ATTR_WRAPPER_START,
                 /**'>' symbol after an element name.*/
                 ADD_TRAILING_WHITESPACE,
                 /**'<' symbol after an element name.*/

@@ -46,6 +46,7 @@ namespace slim
              * May return:
              *    - ADD_*_WHITESPACE
              *    - ATTR_NAME
+             *    - ATTR_WRAPPER_START
              *    - SPLAT_ATTR
              *    - END
              *    - EOL
@@ -58,6 +59,16 @@ namespace slim
              *    - close tag ("/")
              */
             Token next_tag_content();
+            /**
+             * @param start_delim Delimiter from ATTR_WRAPPER_START
+             * @return Empty string if end is found, else attribute name.
+             */
+            std::string next_wrapped_attr_name(char start_delim);
+            /**Advance past the '=' after a wrapped attribute name.
+             * An error is thrown if any other non-whitespace character is found.
+             */
+            void next_wrapped_attr_assignment();
+
             /**Rest of line as text.*/
             Token next_text_content();
             /**Rest of the line, including the line terminator if present.

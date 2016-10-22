@@ -129,6 +129,13 @@ namespace slim
                 t.type = Token::SPLAT_ATTR;
                 return t;
             }
+            else if (*p == '(' || *p == '[' || *p == '{')
+            {
+                t.str.assign(p, 1);
+                ++p;
+                t.type = Token::ATTR_WRAPPER_START;
+                return t;
+            }
 
             auto start = p;
             //try to find attribute first
@@ -148,6 +155,37 @@ namespace slim
             t.type = Token::TEXT_CONTENT;
             t.str = std::string(start, p2 - start);
             return t;
+        }
+        std::string Lexer::next_wrapped_attr_name(char start_delim)
+        {
+            do { skip_spaces(); }
+            while (try_newline());
+
+            if (p >= end) error("Unexpected end");
+            char c = *p;
+            switch (start_delim)
+            {
+            case '(':
+                if (c == ')') return ++p, std::string();
+                break;
+            case '[':
+                if (c == ']') return ++p, std::string();
+                break;
+            case '{':
+                if (c == '}') return ++p, std::string();
+                break;
+            default: assert(false); std::terminate();
+            }
+            auto tok = next_name();
+            assert(tok.str.size() > 0);
+            return tok.str;
+        }
+        void Lexer::next_wrapped_attr_assignment()
+        {
+            do { skip_spaces(); } while (try_newline());
+            if (p >= end) error("Unexpected end");
+            if (*p == '=') ++p;
+            else error("Expected '=' for attribute example");
         }
 
         Token Lexer::next_text_content()

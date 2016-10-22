@@ -204,6 +204,28 @@ namespace slim
                 attributes.push_back({ name,{},{} });
                 return attributes.back();
             };
+            auto add_attr = [&](const std::string &name, expr::ExpressionNodePtr &&expr)
+            {
+                if (auto lit = dynamic_cast<expr::Literal*>(expr.get()))
+                {
+                    if (lit->value == TRUE_VALUE)
+                    {
+                        output << ' ' << name;
+                    }
+                    else if (lit->value == FALSE_VALUE || lit->value == NIL_VALUE)
+                    {
+                        //skip attribute
+                    }
+                    else
+                    {
+                        get_attr(name).static_values.push_back(lit->value->to_string());
+                    }
+                }
+                else
+                {
+                    get_attr(name).dynamic_values.push_back(std::move(expr));
+                }
+            };
 
             std::string tag_name;
             if (current_token.type == Token::NAME)
@@ -249,49 +271,52 @@ namespace slim
             output << '<' << tag_name; //TODO: attributes, empty tag
 
             //attributes
-            while (current_token.type == Token::ATTR_NAME || current_token.type == Token::SPLAT_ATTR)
+            if (current_token.type == Token::ATTR_WRAPPER_START)
             {
-
-                expr::Lexer expr_lexer(lexer.get_pos(), lexer.get_end());
-                expr_lexer.file_name(lexer.file_name());
-                expr_lexer.set_reported_pos(lexer.line(), lexer.line_offset());
-                expr::Parser expr_parser(local_vars, expr_lexer); //TODO: Allow custom functions
-
-
-                auto attr = current_token.str;
-                auto expr = expr_parser.expression();
-
-                lexer.set_pos(expr_parser.get_last_token().pos);
-
-                if (current_token.type == Token::ATTR_NAME)
+                assert(current_token.str.size() == 1);
+                char delim = current_token.str[0];
+                std::string name;
+                while ((name = lexer.next_wrapped_attr_name(delim)).size() > 0)
                 {
-                    if (auto lit = dynamic_cast<expr::Literal*>(expr.get()))
+                    lexer.next_wrapped_attr_assignment();
+
+                    expr::Lexer expr_lexer(lexer.get_pos(), lexer.get_end());
+                    expr_lexer.file_name(lexer.file_name());
+                    expr_lexer.set_reported_pos(lexer.line(), lexer.line_offset());
+                    expr::Parser expr_parser(local_vars, expr_lexer);
+
+                    auto expr = expr_parser.expression();
+                    lexer.set_pos(expr_parser.get_last_token().pos);
+
+                    add_attr(name, std::move(expr));
+                }
+                current_token = lexer.next_tag_content();
+            }
+            else
+            {
+                while (current_token.type == Token::ATTR_NAME || current_token.type == Token::SPLAT_ATTR)
+                {
+                    expr::Lexer expr_lexer(lexer.get_pos(), lexer.get_end());
+                    expr_lexer.file_name(lexer.file_name());
+                    expr_lexer.set_reported_pos(lexer.line(), lexer.line_offset());
+                    expr::Parser expr_parser(local_vars, expr_lexer);
+
+                    auto expr = expr_parser.expression();
+
+                    lexer.set_pos(expr_parser.get_last_token().pos);
+
+                    if (current_token.type == Token::ATTR_NAME)
                     {
-                        if (lit->value == TRUE_VALUE)
-                        {
-                            output << ' ' << attr;
-                        }
-                        else if (lit->value == FALSE_VALUE || lit->value == NIL_VALUE)
-                        {
-                            //skip attribute
-                        }
-                        else
-                        {
-                            get_attr(attr).static_values.push_back(lit->value->to_string());
-                        }
+                        add_attr(current_token.str, std::move(expr));
                     }
                     else
                     {
-                        get_attr(attr).dynamic_values.push_back(std::move(expr));
+                        assert(current_token.type == Token::SPLAT_ATTR);
+                        splat_attributes.push_back(std::move(expr));
                     }
-                }
-                else
-                {
-                    assert(current_token.type == Token::SPLAT_ATTR);
-                    splat_attributes.push_back(std::move(expr));
-                }
 
-                current_token = lexer.next_tag_content();
+                    current_token = lexer.next_tag_content();
+                }
             }
 
             //where an attribute is known to not have a dynamic value, its value is written directly

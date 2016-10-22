@@ -129,10 +129,32 @@ BOOST_AUTO_TEST_CASE(next_tag_content)
     BOOST_CHECK_EQUAL(Token::SPLAT_ATTR, lexer("*").next_tag_content().type);
     BOOST_CHECK_EQUAL(Token::SPLAT_ATTR, lexer("   *").next_tag_content().type);
 
+    BOOST_CHECK_EQUAL(Token::ATTR_WRAPPER_START, lexer("   (").next_tag_content().type);
+    BOOST_CHECK_EQUAL(Token::ATTR_WRAPPER_START, lexer("   [").next_tag_content().type);
+    BOOST_CHECK_EQUAL(Token::ATTR_WRAPPER_START, lexer("   {").next_tag_content().type);
+
     auto a = lexer("Text");
     BOOST_CHECK_EQUAL(a.next_tag_content().type, Token::TEXT_CONTENT);
     BOOST_CHECK_EQUAL(a.next_tag_content().type, Token::END);
     BOOST_CHECK_THROW(a.next_tag_content(), TemplateSyntaxError);
+}
+
+BOOST_AUTO_TEST_CASE(next_wrapped_attr)
+{
+    BOOST_CHECK_EQUAL("", lexer("    )").next_wrapped_attr_name('('));
+    BOOST_CHECK_EQUAL("", lexer("    ]").next_wrapped_attr_name('['));
+    BOOST_CHECK_EQUAL("", lexer("    }").next_wrapped_attr_name('{'));
+    BOOST_CHECK_EQUAL("", lexer(" \n }").next_wrapped_attr_name('{'));
+
+    BOOST_CHECK_EQUAL("name", lexer("    name =").next_wrapped_attr_name('{'));
+
+    BOOST_CHECK_THROW(lexer("    }").next_wrapped_attr_name('('), TemplateSyntaxError);
+    BOOST_CHECK_THROW(lexer("    =").next_wrapped_attr_name('{'), TemplateSyntaxError);
+    BOOST_CHECK_THROW(lexer("").next_wrapped_attr_name('{'), TemplateSyntaxError);
+
+    BOOST_CHECK_NO_THROW(lexer("   =   ").next_wrapped_attr_assignment());
+    BOOST_CHECK_THROW(lexer("   )").next_wrapped_attr_assignment(), TemplateSyntaxError);
+    BOOST_CHECK_THROW(lexer("   name").next_wrapped_attr_assignment(), TemplateSyntaxError);
 }
 
 BOOST_AUTO_TEST_CASE(next_text_content)
