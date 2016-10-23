@@ -2,6 +2,7 @@
 #include "Object.hpp"
 namespace slim
 {
+    class Proc;
     class String;
     /**Symbol instances as in Ruby are globally unique instances for any given string value.
      *
@@ -46,6 +47,8 @@ namespace slim
         const std::shared_ptr<String> &str_obj()const { return _str; }
         const std::string &str()const;
         const char *c_str()const;
+
+        Ptr<Proc> to_proc();
     protected:
         virtual const MethodTable &method_table()const;
     private:

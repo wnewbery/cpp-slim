@@ -65,6 +65,7 @@ namespace slim
         virtual ObjectPtr inspect_obj();
         /**Returns if this object instance should be considered true in a boolean context.*/
         virtual bool is_true()const { return true; }
+        virtual bool is_false()const { return !is_true(); }
         /**Compare with another object of the same type.
          * Default is identity equality.
          */
@@ -77,6 +78,11 @@ namespace slim
          * Default throws UnorderableTypeError.
          */
         virtual int cmp(const Object *rhs)const;
+        bool ne(const Object *rhs)const { return !eq(rhs); }
+        bool cmp_lt(const Object *rhs)const { return cmp(rhs) < 0; }
+        bool cmp_le(const Object *rhs)const { return cmp(rhs) <= 0; }
+        bool cmp_gt(const Object *rhs)const { return cmp(rhs) > 0; }
+        bool cmp_ge(const Object *rhs)const { return cmp(rhs) >= 0; }
 
         //operators
         virtual ObjectPtr el_ref(const FunctionArgs &args);
@@ -86,6 +92,7 @@ namespace slim
         virtual ObjectPtr pow(Object *rhs);
         virtual ObjectPtr add(Object *rhs);
         virtual ObjectPtr sub(Object *rhs);
+        virtual ObjectPtr unary_plus() { return shared_from_this(); }
         virtual ObjectPtr negate();
         virtual ObjectPtr bit_lshift(Object *rhs);
         virtual ObjectPtr bit_rshift(Object *rhs);

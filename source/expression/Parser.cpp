@@ -64,7 +64,7 @@ namespace slim
                 {
                     while (true)
                     {
-                        if (current_token.type != Token::SYMBOL) error("Expected symbol");
+                        if (current_token.type != Token::NAME) error("Expected symbol");
                         out.push_back(symbol(current_token.str));
                         next();
 
@@ -103,7 +103,7 @@ namespace slim
             case Token::STRING_DELIM: return interp_string();
             case Token::DIV: return regex_literal();
             case Token::NUMBER: return lit(make_value(parse_num()));
-            case Token::SYMBOL:
+            case Token::NAME:
                 if (current_token.str == "true") return lit(TRUE_VALUE);
                 else if (current_token.str == "false") return lit(FALSE_VALUE);
                 else if (current_token.str == "nil") return lit(NIL_VALUE);
@@ -141,9 +141,7 @@ namespace slim
             case Token::LPAREN: return sub_expression();
             case Token::L_SQ_BRACKET: return array_literal();
             case Token::L_CURLY_BRACKET: return hash_literal();
-            case Token::COLON:
-                next();
-                if (current_token.type != Token::SYMBOL) error("Expected symbol");
+            case Token::SYMBOL:
                 return lit(symbol(current_token.str));
             default: error("Expected value");
             }
@@ -286,8 +284,9 @@ namespace slim
             case Token::HASH_SYMBOL:
             case Token::NUMBER:
             case Token::STRING_DELIM:
-            case Token::SYMBOL:
+            case Token::NAME:
             case Token::ATTR_NAME:
+            case Token::SYMBOL:
                 return true;
             case Token::DIV:
                 if (lexer.peek_space()) return false;
@@ -594,6 +593,10 @@ namespace slim
                     next();
                     rhs = unary_op(in_cond_op);
                     return slim::make_unique<LogicalNot>(std::move(rhs));
+                case Token::AND:
+                    next();
+                    rhs = unary_op(in_cond_op);
+                    return slim::make_unique<MemberFuncCall>(std::move(rhs), symbol("to_proc"), FuncCall::Args());
                 default: return pow_op(in_cond_op);
                 }
             }
@@ -617,7 +620,7 @@ namespace slim
                 if (current_token.type == Token::DOT)
                 {
                     next();
-                    if (current_token.type != Token::SYMBOL) error("Expected symbol");
+                    if (current_token.type != Token::NAME) error("Expected symbol");
                     auto name = symbol(current_token.str);
 
                     next();
@@ -627,7 +630,7 @@ namespace slim
                 else if (current_token.type == Token::SAFE_NAV)
                 {
                     next();
-                    if (current_token.type != Token::SYMBOL) error("Expected symbol");
+                    if (current_token.type != Token::NAME) error("Expected symbol");
                     auto name = symbol(current_token.str);
 
                     next();
@@ -647,7 +650,7 @@ namespace slim
                 else if (current_token.type == Token::CONST_NAV)
                 {
                     next();
-                    if (current_token.type != Token::SYMBOL || !is_constant(current_token.str))
+                    if (current_token.type != Token::NAME || !is_constant(current_token.str))
                         error("Expected constant name");
                     lhs = slim::make_unique<ConstantNav>(std::move(lhs), symbol(current_token.str));
                     next();

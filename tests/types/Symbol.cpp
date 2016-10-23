@@ -39,4 +39,39 @@ BOOST_AUTO_TEST_CASE(test)
     BOOST_CHECK_EQUAL("-1", eval(":a <=> :b"));
     BOOST_CHECK_EQUAL("1", eval(":b <=> :a"));
 }
+
+BOOST_AUTO_TEST_CASE(to_proc)
+{
+    BOOST_CHECK_EQUAL("[4, 1]", eval("['test', 'x'].map(:size.to_proc)"));
+    BOOST_CHECK_EQUAL("[4, 1]", eval("['test', 'x'].map(&:size)"));
+
+    BOOST_CHECK_EQUAL("[false, true, false]", eval("[true, false, 5].map(&:!)"));
+
+    BOOST_CHECK_EQUAL("50", eval("[10, 5].reduce(&:*)"));
+    BOOST_CHECK_EQUAL("2", eval("[10, 5].reduce(&:/)"));
+    BOOST_CHECK_EQUAL("0", eval("[10, 5].reduce(&:%)"));
+    BOOST_CHECK_EQUAL("15", eval("[10, 5].reduce(&:+)"));
+    BOOST_CHECK_EQUAL("5", eval("[10, 5].reduce(&:-)"));
+
+    BOOST_CHECK_EQUAL("[-12, -5]", eval("[11, 4].map(&:~)"));
+    BOOST_CHECK_EQUAL("[-11, -4]", eval("[11, 4].map(&:-@)"));
+    BOOST_CHECK_EQUAL("[11, 4]", eval("[11, 4].map(&:+@)"));
+    BOOST_CHECK_EQUAL("0", eval("[11, 4].reduce(&:>>)"));
+    BOOST_CHECK_EQUAL("176", eval("[11, 4].reduce(&:<<)"));
+    BOOST_CHECK_EQUAL("4", eval("[12, 6].reduce(&:&)"));
+    BOOST_CHECK_EQUAL("14", eval("[12, 6].reduce(&:|)"));
+    BOOST_CHECK_EQUAL("4", eval("[12, 8].reduce(&:^)"));
+
+    BOOST_CHECK_EQUAL("false", eval("[12, 8].reduce(&:==)"));
+    BOOST_CHECK_EQUAL("true", eval("[12, 8].reduce(&:!=)"));
+    BOOST_CHECK_EQUAL("false", eval("[12, 8].reduce(&:<)"));
+    BOOST_CHECK_EQUAL("false", eval("[12, 8].reduce(&:<=)"));
+    BOOST_CHECK_EQUAL("true", eval("[12, 8].reduce(&:>)"));
+    BOOST_CHECK_EQUAL("true", eval("[12, 8].reduce(&:>=)"));
+    BOOST_CHECK_EQUAL("1", eval("[12, 8].reduce(&:<=>)"));
+
+
+    BOOST_CHECK_EQUAL("[4, 1]", eval("['test', 'x'].map(&:size)"));
+    BOOST_CHECK_EQUAL("[4, 1]", eval("['test', 'x'].map(&:size)"));
+}
 BOOST_AUTO_TEST_SUITE_END()

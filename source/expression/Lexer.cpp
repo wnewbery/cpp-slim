@@ -58,8 +58,109 @@ namespace slim
                     return make_tok(2, Token::INCLUSIVE_RANGE);
                 else return make_tok(1, Token::DOT);
             case ':':
-                if (p + 1 < end && p[1] == ':') return make_tok(2, Token::CONST_NAV);
-                else return make_tok(1, Token::COLON);
+                if (p + 1 < end)
+                {
+                    t.type = Token::SYMBOL;
+                    char c2 = p[1];
+                    switch(c2)
+                    {
+                    case ':': return make_tok(2, Token::CONST_NAV);
+
+                    case '~':
+                    case '*': case '/': case '%':
+                    case '&': case '|': case '^':
+                        t.str.assign(&c2, 1);
+                        p += 2;
+                        return t;
+                    case '=':
+                        if (p + 2 < end && (p[2] == '='))
+                        {
+                            t.str = "==";
+                            p += 3;
+                            return t;
+                        }
+                        else if (p + 2 < end && p[2] == '~')
+                        {
+                            p += 3;
+                            t.str = "=~";
+                            return t;
+                        }
+                        else break; //not symbol
+                    case '!':
+                        if (p + 2 < end && (p[2] == '='))
+                        {
+                            t.str = "!=";
+                            p += 3;
+                        }
+                        else
+                        {
+                            t.str = "!";
+                            p += 2;
+                        }
+                        return t;
+                    case '+':
+                        if (p + 2 < end && p[2] == '@')
+                        {
+                            t.str = "+@";
+                            p += 3;
+                        }
+                        else
+                        {
+                            t.str = "+";
+                            p += 2;
+                        }
+                        return t;
+                    case '-':
+                        if (p + 2 < end && p[2] == '@')
+                        {
+                            t.str = "-@";
+                            p += 3;
+                        }
+                        else
+                        {
+                            t.str = "-";
+                            p += 2;
+                        }
+                        return t;
+                    case '>':
+                        if (p + 2 < end && (p[2] == '>' || p[2] == '='))
+                        {
+                            t.str.assign(p + 1, p + 3);
+                            p += 3;
+                        }
+                        else
+                        {
+                            t.str = ">";
+                            p += 2;
+                        }
+                        return t;
+                    case '<':
+                        if (p + 3 < end && p[2] == '=' && p[3] == '>')
+                        {
+                            t.str = "<=>";
+                            p += 4;
+                        }
+                        else if (p + 2 < end && (p[2] == '<' || p[2] == '='))
+                        {
+                            t.str.assign(p + 1, p + 3);
+                            p += 3;
+                        }
+                        else
+                        {
+                            t.str = "<";
+                            p += 2;
+                        }
+                        return t;
+                    }
+
+                    if (is_symbol_start_chr(c2))
+                    {
+                        ++p;
+                        t.str = symbol_str();
+                        return t;
+                    }
+                }
+                return make_tok(1, Token::COLON);
             case '?': return make_tok(1, Token::CONDITIONAL);
             case '\'':
             case '\"':
@@ -189,7 +290,7 @@ namespace slim
         Token Lexer::symbol(const char *start)
         {
             assert(is_symbol_start_chr(*p));
-            auto t = token(Token::SYMBOL);
+            auto t = token(Token::NAME);
             t.pos = start;
             t.str = symbol_str();
 

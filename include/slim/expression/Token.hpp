@@ -20,12 +20,14 @@ namespace slim
                 STRING_INTERP_START,
                 /**A non-negative number literal. Unparsed value stored in str.*/
                 NUMBER,
-                /**A symbol.
+                /**A method or variable name.
                  * May be a value such as 'true', a variable name, function name, etc.
                  */
-                SYMBOL,
+                NAME,
                 /**An attribute name, using \@symbol.*/
                 ATTR_NAME,
+                /**A colon folow directly by any single operator, or by a name.*/
+                SYMBOL,
                 /**A symbol followed directly by a colon. Used for hashes. e.g:
                  * key: "value"
                  */

@@ -130,6 +130,7 @@ BOOST_AUTO_TEST_CASE(single_ops)
     BOOST_CHECK_EQUAL("(!10)", parse("! 10")->to_string());
     BOOST_CHECK_EQUAL("-10", parse("-10")->to_string());
     BOOST_CHECK_EQUAL("10", parse("+10")->to_string());
+    BOOST_CHECK_EQUAL(":name.to_proc()", parse("&:name")->to_string());
 
     BOOST_CHECK_EQUAL("(5 ? @a : @b)", parse("5 ? @a : @b")->to_string());
     BOOST_CHECK_EQUAL("(5 ? :a : :b)", parse("5 ? :a : :b")->to_string());

@@ -87,11 +87,11 @@ BOOST_AUTO_TEST_CASE(single_tokens)
     BOOST_CHECK_EQUAL("-5.5", tok.str);
 
     tok = single_token("test_func55");
-    BOOST_CHECK_EQUAL(Token::SYMBOL, tok.type);
+    BOOST_CHECK_EQUAL(Token::NAME, tok.type);
     BOOST_CHECK_EQUAL("test_func55", tok.str);
 
     tok = single_token("empty?");
-    BOOST_CHECK_EQUAL(Token::SYMBOL, tok.type);
+    BOOST_CHECK_EQUAL(Token::NAME, tok.type);
     BOOST_CHECK_EQUAL("empty?", tok.str);
 
     tok = single_token("test_func55:");
@@ -99,12 +99,42 @@ BOOST_AUTO_TEST_CASE(single_tokens)
     BOOST_CHECK_EQUAL("test_func55", tok.str);
 
     tok = single_token("test_func55::"); //double colon is constant lookup, not hash key symbol
-    BOOST_CHECK_EQUAL(Token::SYMBOL, tok.type);
+    BOOST_CHECK_EQUAL(Token::NAME, tok.type);
     BOOST_CHECK_EQUAL("test_func55", tok.str);
 
     tok = single_token("@my_attr");
     BOOST_CHECK_EQUAL(Token::ATTR_NAME, tok.type);
     BOOST_CHECK_EQUAL("my_attr", tok.str);
+
+    tok = single_token(":sym");
+    BOOST_CHECK_EQUAL(Token::SYMBOL, tok.type);
+    BOOST_CHECK_EQUAL("sym", tok.str);
+    BOOST_CHECK_EQUAL("!", single_token(":!").str);
+    BOOST_CHECK_EQUAL("~", single_token(":~").str);
+    BOOST_CHECK_EQUAL("*", single_token(":*").str);
+    BOOST_CHECK_EQUAL("/", single_token(":/").str);
+    BOOST_CHECK_EQUAL("%", single_token(":%").str);
+    BOOST_CHECK_EQUAL("+", single_token(":+").str);
+    BOOST_CHECK_EQUAL("-", single_token(":-").str);
+    BOOST_CHECK_EQUAL("&", single_token(":&").str);
+    BOOST_CHECK_EQUAL("|", single_token(":|").str);
+    BOOST_CHECK_EQUAL("^", single_token(":^").str);
+
+    BOOST_CHECK_EQUAL("+@",  single_token(":+@").str);
+    BOOST_CHECK_EQUAL("-@",  single_token(":-@").str);
+    BOOST_CHECK_EQUAL("==",  single_token(":==").str);
+    BOOST_CHECK_EQUAL("!=",  single_token(":!=").str);
+    BOOST_CHECK_EQUAL("=~",  single_token(":=~").str);
+    BOOST_CHECK_EQUAL("<",   single_token(":<").str);
+    BOOST_CHECK_EQUAL("<<",  single_token(":<<").str);
+    BOOST_CHECK_EQUAL("<=",  single_token(":<=").str);
+    BOOST_CHECK_EQUAL("<=>", single_token(":<=>").str);
+    BOOST_CHECK_EQUAL("<=>", single_token(":<=>x").str);
+    BOOST_CHECK_EQUAL(">",   single_token(":>").str);
+    BOOST_CHECK_EQUAL(">>",  single_token(":>>").str);
+    BOOST_CHECK_EQUAL(">=",  single_token(":>=").str);
+    BOOST_CHECK_EQUAL(">=",  single_token(":>=5").str);
+    BOOST_CHECK_EQUAL(">",   single_token(":><5").str);
     
     // invalid tokens
     BOOST_CHECK_EQUAL(Token::UNKNOWN, single_token("= ").type);
