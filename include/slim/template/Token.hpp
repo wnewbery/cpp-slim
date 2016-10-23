@@ -63,7 +63,9 @@ namespace slim
                 /** 'else' */
                 ELSE,
                 /** '' */
-                EACH_START
+                EACH_START,
+                /** Filter block start. e.g. ruby: or css: */
+                FILTER
             };
             Type type;
 

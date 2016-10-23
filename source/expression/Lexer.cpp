@@ -191,9 +191,9 @@ namespace slim
                 else return make_tok(1, Token::LOGICAL_NOT);
             case '=':
                 if (p + 1 >= end) error("Unexpected end");
-                if (p[1] == '=') return make_tok(2, Token::CMP_EQ);
-                if (p[1] == '>') return make_tok(2, Token::HASH_KEY_VALUE_SEP);
-                else return make_tok(1, Token::UNKNOWN);
+                else if (p[1] == '=') return make_tok(2, Token::CMP_EQ);
+                else if (p[1] == '>') return make_tok(2, Token::HASH_KEY_VALUE_SEP);
+                else return make_tok(1, Token::ASSIGN);
             case '<':
                 if (p + 1 >= end) error("Unexpected end");
                 if (p[1] == '<') return make_tok(2, Token::LSHIFT);

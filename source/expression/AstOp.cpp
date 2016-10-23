@@ -28,6 +28,17 @@ namespace slim
             return scope.get(name);
         }
 
+        std::string Assignment::to_string()const
+        {
+            return name->to_string() + " = " + expr->to_string();
+        }
+        ObjectPtr Assignment::eval(Scope &scope)const
+        {
+            auto val = expr->eval(scope);
+            scope.set(name, val);
+            return val;
+        }
+
         ObjectPtr Attribute::eval(Scope & scope) const
         {
             return scope.self()->get_attr(name);

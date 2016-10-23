@@ -45,6 +45,26 @@ namespace slim
         {
             return conditional_op();
         }
+        ExpressionNodePtr Parser::statement()
+        {
+            if (current_token.type == Token::NAME)
+            {
+                auto saved = lexer.save_pos();
+                auto assign = lexer.next();
+                if (assign.type == Token::ASSIGN)
+                {
+                    auto name = current_token.str;
+                    vars.add(name);
+
+                    next();
+                    auto rhs = full_expression();
+
+                    return slim::make_unique<Assignment>(symbol(name), std::move(rhs));
+                }
+                else lexer.restore_pos(saved);
+            }
+            return full_expression();
+        }
 
         std::vector<SymPtr> Parser::param_list()
         {

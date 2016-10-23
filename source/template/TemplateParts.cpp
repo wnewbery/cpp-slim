@@ -27,7 +27,20 @@ namespace slim
             auto val = expression->eval(scope);
             buffer += html_escape(val);
         }
-
+        
+        TemplateCodeBlock::TemplateCodeBlock(std::unique_ptr<Expression>&& expression)
+            : expression(std::move(expression))
+        {}
+        TemplateCodeBlock::~TemplateCodeBlock()
+        {}
+        std::string TemplateCodeBlock::to_string() const
+        {
+            return "<% " + expression->to_string() + " %>";
+        }
+        void TemplateCodeBlock::render(std::string & buffer, expr::Scope &scope) const
+        {
+            expression->eval(scope);
+        }
 
         TemplateEachExpr::TemplateEachExpr(std::unique_ptr<Expression>&& expression)
             : expression(std::move(expression))

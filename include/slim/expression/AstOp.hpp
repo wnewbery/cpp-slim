@@ -31,6 +31,18 @@ namespace slim
             virtual ObjectPtr eval(Scope &scope)const override;
             SymPtr name;
         };
+        /**Assigns a variable value.*/
+        class Assignment : public ExpressionNode
+        {
+        public:
+            Assignment(const SymPtr &name, ExpressionNodePtr &&expr)
+                : name(name), expr(std::move(expr))
+            {}
+            virtual std::string to_string()const override;
+            virtual ObjectPtr eval(Scope &scope)const override;
+            SymPtr name;
+            ExpressionNodePtr expr;
+        };
         /**Gets an attribute value (on "self").*/
         class Attribute : public ExpressionNode
         {

@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(interpolated_text_lines)
         parse_str("p Hello #{\"nested #{@name}\"}"));
 }
 
-BOOST_AUTO_TEST_CASE(code_lines)
+BOOST_AUTO_TEST_CASE(code_output_lines)
 {
     BOOST_CHECK_EQUAL("<p></p>", parse_str("p"));
     BOOST_CHECK_EQUAL("<p><%= 5 %></p>", parse_str("p\n  =5\n"));
@@ -122,6 +122,12 @@ BOOST_AUTO_TEST_CASE(code_lines)
 
     BOOST_CHECK_EQUAL("<%= @a.f(5, 2) %>", parse_str("= @a.f 5,\n  2"));
     BOOST_CHECK_EQUAL("<p><%= @a.f(5, 2) %></p>", parse_str("p= @a.f 5,\n  2"));
+}
+
+BOOST_AUTO_TEST_CASE(code_lines)
+{
+    BOOST_CHECK_EQUAL("<p><% x = 5 %></p>", parse_str("p\n  ruby: x = 5\n"));
+    BOOST_CHECK_EQUAL("<p><% x = 5 %><%= x %></p>", parse_str("p\n  ruby: x = 5\n  =x"));
 }
 
 BOOST_AUTO_TEST_CASE(void_tags)

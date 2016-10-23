@@ -58,6 +58,7 @@ BOOST_AUTO_TEST_CASE(single_tokens)
     BOOST_CHECK_EQUAL(Token::CMP_GT, single_token(">  ").type);
     BOOST_CHECK_EQUAL(Token::CMP_GE, single_token(">= ").type);
     BOOST_CHECK_EQUAL(Token::CMP, single_token("<=>").type);
+    BOOST_CHECK_EQUAL(Token::ASSIGN, single_token("= ").type);
 
     BOOST_CHECK_EQUAL(Token::STRING_DELIM, single_token("'").type);
     BOOST_CHECK_EQUAL(Token::STRING_DELIM, single_token("\"").type);
@@ -137,8 +138,7 @@ BOOST_AUTO_TEST_CASE(single_tokens)
     BOOST_CHECK_EQUAL(">",   single_token(":><5").str);
     
     // invalid tokens
-    BOOST_CHECK_EQUAL(Token::UNKNOWN, single_token("= ").type);
-    BOOST_CHECK_EQUAL(Token::UNKNOWN, single_token("=+").type);
+    BOOST_CHECK_EQUAL(Token::UNKNOWN, single_token("` ").type);
     BOOST_CHECK_THROW(single_token("@").type, SyntaxError);
     BOOST_CHECK_THROW(Lexer("\\g'").next_str_interp('\''), SyntaxError);
 }

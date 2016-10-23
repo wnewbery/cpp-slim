@@ -27,6 +27,13 @@ std::string parse_part(const std::string &str)
     Parser parser(vars, lexer);
     return parser.expression()->to_string();
 }
+std::string parse_stmt(const std::string &str)
+{
+    Lexer lexer(str);
+    LocalVarNames vars;
+    Parser parser(vars, lexer);
+    return parser.statement()->to_string();
+}
 
 template<class T> bool is_node_type(ExpressionNodePtr ptr)
 {
@@ -351,6 +358,13 @@ BOOST_AUTO_TEST_CASE(partial_expression)
     BOOST_CHECK_EQUAL("(5 - 5)", parse_part("5 - 5 unexpected"));
     BOOST_CHECK_EQUAL("(5 - 5)", parse_part("5 - 5 =unexpected"));
     BOOST_CHECK_EQUAL("\"str\"", parse_part("\"str\" unexpected"));
+}
+
+BOOST_AUTO_TEST_CASE(statement)
+{
+    BOOST_CHECK_EQUAL("a = 5", parse_stmt("a = 5"));
+    BOOST_CHECK_EQUAL("a()", parse_stmt("a"));
+    BOOST_CHECK_EQUAL("a = @x.foo(6)", parse_stmt("a = @x.foo 6"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

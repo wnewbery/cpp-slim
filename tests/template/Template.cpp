@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(interpolated_text_lines)
 }
 
 
-BOOST_AUTO_TEST_CASE(code_lines)
+BOOST_AUTO_TEST_CASE(code_output_lines)
 {
     auto model = create_view_model();
     model->set_attr("a", make_value(10.0));
@@ -119,6 +119,14 @@ BOOST_AUTO_TEST_CASE(code_lines)
         "<!DOCTYPE html>\n"
         "<p>HTML <b>Safe</b></p>",
         render_tpl("p\n  =@b.html_safe\n", model));
+}
+
+BOOST_AUTO_TEST_CASE(code_lines)
+{
+    BOOST_CHECK_EQUAL(
+        "<!DOCTYPE html>\n"
+        "<p>Number: 15</p>",
+        render_tpl("ruby: x = 5 * 3\n p Number: #{x}\n"));
 }
 
 BOOST_AUTO_TEST_CASE(attributes)

@@ -81,6 +81,9 @@ namespace slim
                 LOGICAL_AND,
                 LOGICAL_OR,
 
+                /**'='*/
+                ASSIGN,
+
                 /**Empty token for unknown content.*/
                 UNKNOWN
             };

@@ -160,6 +160,10 @@ namespace slim
                 case Token::CONTROL_LINE:
                     parse_control_code(my_indent, output);
                     break;
+                case Token::FILTER:
+                    if (current_token.str == "ruby") parse_code_block(my_indent, output);
+                    else error("Unknown filter line " + current_token.str);
+                    break;
                 default: error("Unexpected symbol");
                 }
             }
@@ -689,6 +693,27 @@ namespace slim
                 }
             }
             if (p < text.size()) output << text.substr(p);
+        }
+
+        void Parser::parse_code_block(int base_indent, OutputFrame &output)
+        {
+            auto line = lexer.line();
+            auto offset = lexer.line_offset();
+            current_token = lexer.next_text_line();
+            if (current_token.type == Token::TEXT_CONTENT)
+            {
+                expr::Lexer expr_lexer(current_token.str);
+                expr_lexer.set_reported_pos(line, offset);
+                expr_lexer.file_name(lexer.file_name());
+                expr::Parser expr_parser(local_vars, expr_lexer);
+
+                auto stmt = expr_parser.statement();
+                output << slim::make_unique<TemplateCodeBlock>(std::move(stmt));
+
+                local_vars = expr_parser.get_var_names(); // Code block may introduce new variables
+
+                current_token = lexer.next_indent();
+            }
         }
 
         void Parser::error(const std::string &msg)

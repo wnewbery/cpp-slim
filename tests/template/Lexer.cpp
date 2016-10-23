@@ -89,6 +89,8 @@ BOOST_AUTO_TEST_CASE(next_line_start)
     BOOST_CHECK_EQUAL(Token::TAG_CLASS, lexer(".").next_line_start().type);
     BOOST_CHECK_EQUAL(Token::OUTPUT_LINE, lexer("=").next_line_start().type);
     BOOST_CHECK_EQUAL(Token::CONTROL_LINE, lexer("-").next_line_start().type);
+    BOOST_CHECK_EQUAL(Token::FILTER, lexer("ruby: ").next_line_start().type);
+    BOOST_CHECK_EQUAL("ruby", lexer("ruby: ").next_line_start().str);
     BOOST_CHECK_THROW(lexer("").next_line_start(), TemplateSyntaxError);
     BOOST_CHECK_THROW(lexer("@").next_line_start(), TemplateSyntaxError);
 }

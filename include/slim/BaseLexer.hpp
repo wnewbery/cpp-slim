@@ -55,6 +55,24 @@ namespace slim
         int line()const { return _line; }
         /**Get the current line offset.*/
         int line_offset()const { return (int)(p - line_begin) + 1; }
+
+        struct SavedPosition
+        {
+            const char *p, *line_begin;
+            int line;
+        };
+        SavedPosition save_pos()const
+        {
+            return {p, line_begin, _line};
+        }
+        void restore_pos(SavedPosition &pos)
+        {
+            p = pos.p;
+            line_begin = pos.line_begin;
+            _line = pos.line;
+            assert(p >= line_begin && line_begin <= end);
+            assert(p >= line_begin && p <= end);
+        }
     protected:
         std::string _file_name;
         const char *begin, *p, *end, *line_begin;

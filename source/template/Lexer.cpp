@@ -80,7 +80,16 @@ namespace slim
                 else ++p, t.type = Token::COMMENT_LINE;
                 break;
             default:
-                if (is_name_chr(*p)) return next_name();
+                if (is_name_chr(*p))
+                {
+                    auto name = next_name();
+                    if (p < end && p[0] == ':')
+                    {
+                        ++p;
+                        name.type = Token::FILTER;
+                    }
+                    return name;
+                }
                 else error("Unexpected symbol at line start");
                 break;
             }

@@ -34,6 +34,9 @@ namespace slim
              */
             ExpressionNodePtr expression();
 
+            /**Parsers a single statement, such as an expression or assignment.*/
+            ExpressionNodePtr statement();
+
             /**Parse a list of parameters in a |params| for blocks.
              * Also used explicitly by the template parser as "do |params|" or "{|params|"
              * is not a valid expression due to the lack of a body and end.
