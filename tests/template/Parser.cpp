@@ -159,13 +159,16 @@ BOOST_AUTO_TEST_CASE(attributes)
 {
     BOOST_CHECK_EQUAL("<div<%=attr('id', @x)%>></div>", parse_str("div id=@x"));
     BOOST_CHECK_EQUAL("<div id=\"x\"></div>", parse_str("div id=\"x\""));
-    BOOST_CHECK_EQUAL("<div<%=attr('id', (@x + \"-name\"))%>></div>", parse_str("div id=@x + \"-name\""));
+    BOOST_CHECK_EQUAL("<div<%=attr('id', (@x + \"-name\"))%>></div>", parse_str("div id=(@x + \"-name\")"));
     BOOST_CHECK_EQUAL("<div<%=attr('id', \"x-#{@name}\")%>></div>", parse_str("div id=\"x-#{@name}\""));
     BOOST_CHECK_EQUAL("<div disabled></div>", parse_str("div disabled=true"));
     BOOST_CHECK_EQUAL("<div></div>", parse_str("div disabled=false"));
     BOOST_CHECK_EQUAL("<div></div>", parse_str("div disabled=nil"));
     BOOST_CHECK_EQUAL("<div class=\"a b c d\"></div>", parse_str("div.a.b class=\"c d\""));
     BOOST_CHECK_EQUAL("<div<%=attr('class', 'a', 'b', @d)%>></div>", parse_str("div.a.b class=@d"));
+
+    BOOST_CHECK_EQUAL("<div<%=attr('data-id', func())%><%=attr('data-name', @b)%>></div>",
+        parse_str("div data-id=func data-name=@b"));
 }
 
 BOOST_AUTO_TEST_CASE(wrapped_attributes)
@@ -177,6 +180,10 @@ BOOST_AUTO_TEST_CASE(wrapped_attributes)
     BOOST_CHECK_EQUAL("<div></div>", parse_str("div {}"));
     BOOST_CHECK_EQUAL("<div<%=attr('id', @x)%>></div>", parse_str("div (\n  id =\n@x )"));
     BOOST_CHECK_EQUAL("<div<%=attr('id', @x)%><%=attr('title', @y)%>></div>", parse_str("div { id = @x title=@y }"));
+
+
+    BOOST_CHECK_EQUAL("<div<%=attr('data-id', func())%><%=attr('data-name', @b)%>></div>",
+        parse_str("div [data-id=func data-name = @b]"));
 
     BOOST_CHECK_THROW(parse_str("div {"), TemplateSyntaxError);
     BOOST_CHECK_THROW(parse_str("div { id"), TemplateSyntaxError);

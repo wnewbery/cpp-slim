@@ -18,7 +18,7 @@ namespace slim
 
             /**The number of spaces at the start of the next line.
              * Empty lines are skiped and ignored, tabs are banned (SyntaxError)
-             * 
+             *
              * Note, assumes currently positioned at a line start.
              */
             Token next_indent();
@@ -29,7 +29,7 @@ namespace slim
              */
             Token next_line();
             /**Start of a line after indent.
-             * 
+             *
              *    - TEXT_LINE
              *    - TEXT_LINE_WITH_TRAILING_SPACE
              *    - HTML_LINE
@@ -68,6 +68,14 @@ namespace slim
              * An error is thrown if any other non-whitespace character is found.
              */
             void next_wrapped_attr_assignment();
+            /**Attribute value source.
+             *
+             * Either a single word ending with a newline or space, or a balanced delimited block.
+             * Delimiters are: '"', "'", '(' => ')', '[' => ']', '{' => '}'.
+             *
+             * An error is thrown if there is no source.
+             */
+            std::string next_attr_code_src();
 
             /**Rest of line as text.*/
             Token next_text_content();

@@ -195,6 +195,70 @@ namespace slim
             if (p >= end) error("Unexpected end");
             if (*p == '=') ++p;
             else error("Expected '=' for attribute example");
+            skip_spaces();
+        }
+
+        std::string Lexer::next_attr_code_src()
+        {
+            if (p >= end) error("Unexpected end");
+
+            std::string src;
+            if (*p == '"' || *p == '\'') //quoted attribute, ends on matching quote
+            {
+                char delim = *p;
+                src += delim;
+                bool escape = false;
+                ++p;
+                for (;; src += *p++)
+                {
+                    if (p >= end) error("Unexpected end in attribute value string");
+                    bool escape2 = escape;
+                    escape = false;
+                    if (*p == '\\') escape = !escape2;
+                    else if (*p == delim && !escape2)
+                    {
+                        src += *p++;
+                        break;
+                    }
+                }
+            }
+            else //code
+            {
+                char open = '\0', close = '\0';
+                int count = 0;
+                while (true)
+                {
+                    if (p >= end)
+                    {
+                        if (count) error("Unexpected end in delimited attribute value");
+                        else break;
+                    }
+                    auto c = *p;
+                    if (count)
+                    {
+                        if (c == open) ++count;
+                        if (c == close) --count;
+                    }
+                    else if (c == ' ' || c == '\t') break;
+                    else if (c == ')' || c == '}' || c == ']') break;
+                    else if (c == '(')
+                    {
+                        open = '('; close = ')'; count = 1;
+                    }
+                    else if (c == '[')
+                    {
+                        open = '['; close = ']'; count = 1;
+                    }
+                    else if (c == '{')
+                    {
+                        open = '{'; close = '}'; count = 1;
+                    }
+
+                    src += *p++;
+                }
+            }
+            assert(!src.empty());
+            return src;
         }
 
         Token Lexer::next_text_content()
@@ -256,7 +320,7 @@ namespace slim
             skip_spaces();
             auto t = token(Token::END);
             if (p >= end) error("Unexpected end");
-            
+
             if (starts_with("if ")) t.type = Token::IF;
             else if (starts_with("elsif ")) t.type = Token::ELSIF;
             else if (starts_with("else")) t.type = Token::ELSE;

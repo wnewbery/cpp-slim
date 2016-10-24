@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(next_tag_content)
     BOOST_CHECK_EQUAL(lexer(".").next_tag_content().type, Token::TAG_CLASS);
     BOOST_CHECK_EQUAL(lexer("=").next_tag_content().type, Token::OUTPUT_LINE);
     BOOST_CHECK_EQUAL(lexer("   =").next_tag_content().type, Token::OUTPUT_LINE);
-    
+
     tok = lexer("text").next_tag_content();
     BOOST_CHECK_EQUAL(Token::TEXT_CONTENT, tok.type);
     BOOST_CHECK_EQUAL("text", tok.str);
@@ -168,7 +168,7 @@ BOOST_AUTO_TEST_CASE(next_text_content)
 
     Token tok;
     BOOST_CHECK_EQUAL(lexer("").next_text_content().type, Token::END);
-    
+
     tok = lexer("text content").next_text_content();
     BOOST_CHECK_EQUAL(Token::TEXT_CONTENT, tok.type);
     BOOST_CHECK_EQUAL("text content", tok.str);
@@ -199,6 +199,23 @@ BOOST_AUTO_TEST_CASE(control_code_start)
     BOOST_CHECK_EQUAL(lexer("x").control_code_start().type, Token::EACH_START);
     BOOST_CHECK_THROW(lexer("").control_code_start(), TemplateSyntaxError);
     BOOST_CHECK_THROW(lexer("  \t ").control_code_start(), TemplateSyntaxError);
+}
+
+BOOST_AUTO_TEST_CASE(attribute_value)
+{
+    BOOST_CHECK_EQUAL("true", lexer("true").next_attr_code_src());
+    BOOST_CHECK_EQUAL("true", lexer("true attrb=5").next_attr_code_src());
+
+    BOOST_CHECK_EQUAL("'quoted string'", lexer("'quoted string' attrb=5").next_attr_code_src());
+    BOOST_CHECK_EQUAL("'quoted\\'string'", lexer("'quoted\\'string' attrb=5").next_attr_code_src());
+
+    BOOST_CHECK_EQUAL("func(a, b, (x + y))", lexer("func(a, b, (x + y)) attrb=5").next_attr_code_src());
+    BOOST_CHECK_EQUAL("arr[x + y]", lexer("arr[x + y] attrb=5").next_attr_code_src());
+    BOOST_CHECK_EQUAL("[a, b, c]", lexer("[a, b, c] attrb=5").next_attr_code_src());
+    BOOST_CHECK_EQUAL("{a: x, b: [1, 2]}", lexer("{a: x, b: [1, 2]} attrb=5").next_attr_code_src());
+
+    BOOST_CHECK_EQUAL("last", lexer("last] =@content").next_attr_code_src());
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()

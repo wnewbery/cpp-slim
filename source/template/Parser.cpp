@@ -104,7 +104,7 @@ namespace slim
                     this->text_content += '>';
                 }
             }
-        }; 
+        };
 
         Parser::Parser(Lexer &lexer)
             : lexer(lexer)
@@ -275,6 +275,19 @@ namespace slim
             output << '<' << tag_name; //TODO: attributes, empty tag
 
             //attributes
+            auto attr_value_expr = [this]()
+            {
+                int line = lexer.line();
+                int offset = lexer.line_offset();
+                std::string src = lexer.next_attr_code_src();
+
+                expr::Lexer expr_lexer(src);
+                expr_lexer.file_name(lexer.file_name());
+                expr_lexer.set_reported_pos(line, offset);
+                expr::Parser expr_parser(local_vars, expr_lexer);
+
+                return expr_parser.full_expression();
+            };
             if (current_token.type == Token::ATTR_WRAPPER_START)
             {
                 assert(current_token.str.size() == 1);
@@ -284,15 +297,7 @@ namespace slim
                 {
                     lexer.next_wrapped_attr_assignment();
 
-                    expr::Lexer expr_lexer(lexer.get_pos(), lexer.get_end());
-                    expr_lexer.file_name(lexer.file_name());
-                    expr_lexer.set_reported_pos(lexer.line(), lexer.line_offset());
-                    expr::Parser expr_parser(local_vars, expr_lexer);
-
-                    auto expr = expr_parser.expression();
-                    lexer.set_pos(expr_parser.get_last_token().pos);
-
-                    add_attr(name, std::move(expr));
+                    add_attr(name, attr_value_expr());
                 }
                 current_token = lexer.next_tag_content();
             }
@@ -300,14 +305,7 @@ namespace slim
             {
                 while (current_token.type == Token::ATTR_NAME || current_token.type == Token::SPLAT_ATTR)
                 {
-                    expr::Lexer expr_lexer(lexer.get_pos(), lexer.get_end());
-                    expr_lexer.file_name(lexer.file_name());
-                    expr_lexer.set_reported_pos(lexer.line(), lexer.line_offset());
-                    expr::Parser expr_parser(local_vars, expr_lexer);
-
-                    auto expr = expr_parser.expression();
-
-                    lexer.set_pos(expr_parser.get_last_token().pos);
+                    auto expr = attr_value_expr();
 
                     if (current_token.type == Token::ATTR_NAME)
                     {
