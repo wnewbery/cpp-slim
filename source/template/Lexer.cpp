@@ -240,6 +240,7 @@ namespace slim
                         if (c == close) --count;
                     }
                     else if (c == ' ' || c == '\t') break;
+                    else if (c == '\r' || c == '\n') break;
                     else if (c == ')' || c == '}' || c == ']') break;
                     else if (c == '(')
                     {
@@ -257,7 +258,7 @@ namespace slim
                     src += *p++;
                 }
             }
-            assert(!src.empty());
+            if(src.empty()) error("Expected attribute value");
             return src;
         }
 

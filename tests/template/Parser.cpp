@@ -169,6 +169,11 @@ BOOST_AUTO_TEST_CASE(attributes)
 
     BOOST_CHECK_EQUAL("<div<%=attr('data-id', func())%><%=attr('data-name', @b)%>></div>",
         parse_str("div data-id=func data-name=@b"));
+
+    BOOST_CHECK_EQUAL("<div<%=attr('data-id', func())%>><p>child</p></div>",
+        parse_str("div data-id=func\n  p child"));
+
+    BOOST_CHECK_THROW(parse_str("div title= class=@a"), TemplateSyntaxError);
 }
 
 BOOST_AUTO_TEST_CASE(wrapped_attributes)
@@ -178,7 +183,7 @@ BOOST_AUTO_TEST_CASE(wrapped_attributes)
     BOOST_CHECK_EQUAL("<div<%=attr('id', @x)%>></div>", parse_str("div { id = @x }"));
     BOOST_CHECK_EQUAL("<div<%=attr('id', @x)%>>Test</div>", parse_str("div { id = @x } Test"));
     BOOST_CHECK_EQUAL("<div></div>", parse_str("div {}"));
-    BOOST_CHECK_EQUAL("<div<%=attr('id', @x)%>></div>", parse_str("div (\n  id =\n@x )"));
+    BOOST_CHECK_EQUAL("<div<%=attr('id', @x)%>></div>", parse_str("div (\n  id =@x )"));
     BOOST_CHECK_EQUAL("<div<%=attr('id', @x)%><%=attr('title', @y)%>></div>", parse_str("div { id = @x title=@y }"));
 
 
