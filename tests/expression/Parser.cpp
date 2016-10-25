@@ -141,7 +141,10 @@ BOOST_AUTO_TEST_CASE(single_ops)
 
     BOOST_CHECK_EQUAL("(5 ? @a : @b)", parse("5 ? @a : @b")->to_string());
     BOOST_CHECK_EQUAL("(5 ? :a : :b)", parse("5 ? :a : :b")->to_string());
+    BOOST_CHECK_EQUAL("(5 ? @a.func() : @b.func())", parse("5 ? @a.func : @b.func")->to_string());
     BOOST_CHECK_THROW(parse("true ? @a.f :x :y"), SyntaxError);
+    BOOST_CHECK_THROW(parse("true ? @a.f f 5 : y"), SyntaxError);
+    BOOST_CHECK_THROW(parse("true ? @a.f :x : f 5"), SyntaxError);
 }
 
 BOOST_AUTO_TEST_CASE(associativity_single)
@@ -189,7 +192,7 @@ BOOST_AUTO_TEST_CASE(method_call)
     BOOST_CHECK_EQUAL("f({:a => 5, :b => 6})", parse("f({a: 5, b: 6})")->to_string());
     BOOST_CHECK_EQUAL("f({:a => 5, :b => 6})", parse("f a: 5, b: 6")->to_string());
     BOOST_CHECK_EQUAL("f({:a => 5, :b => 6})", parse("f :a => 5, :b => 6")->to_string());
-    
+
     BOOST_CHECK_EQUAL("@a.f()", parse("@a.f")->to_string());
     BOOST_CHECK_EQUAL("@a.f()", parse("@a.f()")->to_string());
     BOOST_CHECK_EQUAL("@a.f(5)", parse("@a.f(5)")->to_string()); //because groups dont exist in the AST
@@ -279,7 +282,7 @@ BOOST_AUTO_TEST_CASE(basic_syntax_errors)
     BOOST_CHECK_THROW(parse("@a[,@a]"), SyntaxError);
     BOOST_CHECK_THROW(parse("@a["), SyntaxError);
     BOOST_CHECK_THROW(parse("@a[@a"), SyntaxError);
-    
+
     BOOST_CHECK_THROW(parse("@a.f{"), SyntaxError);
     BOOST_CHECK_THROW(parse("@a.f{|"), SyntaxError);
     BOOST_CHECK_THROW(parse("@a.f{|x"), SyntaxError);

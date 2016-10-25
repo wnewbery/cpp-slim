@@ -243,7 +243,7 @@ namespace slim
                 next();
                 return slim::make_unique<ArrayLiteral>(FuncCall::Args());
             }
-            
+
             FuncCall::Args args;
             while (true)
             {
@@ -300,7 +300,6 @@ namespace slim
         {
             switch (current_token.type)
             {
-            case Token::COLON: // assuming :symbol
             case Token::HASH_SYMBOL:
             case Token::NUMBER:
             case Token::STRING_DELIM:
@@ -328,19 +327,18 @@ namespace slim
                     return {};
                 }
             }
-            else if (in_cond_op)
-            {
-                error(
-                    "Function calls within a conditional operators right side "
-                    "expression must use parenthesis");
-            }
             else parens = false;
 
             FuncCall::Args args;
             if (parens || is_func_arg_start())
             {
+                if (!parens && in_cond_op)
+                {
+                    error("Function calls within a conditional operators expression must use parenthesis");
+                }
+
                 args = func_args_inner();
-                if (parens) 
+                if (parens)
                 {
                     if (current_token.type != Token::RPAREN)
                         error("Expected ')'");
@@ -382,7 +380,7 @@ namespace slim
         {
             FuncCall::Args args;
             assert(first_key);
-            
+
             args.push_back(std::move(first_key));
             args.push_back(expression());
 
