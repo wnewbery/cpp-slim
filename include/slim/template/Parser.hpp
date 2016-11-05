@@ -3,9 +3,9 @@
 #include <stack>
 #include <string>
 #include <vector>
-#include "Function.hpp"
+#include "../Function.hpp"
 #include "Token.hpp"
-#include "expression/Scope.hpp"
+#include "../expression/Scope.hpp"
 namespace slim
 {
     class Template;
