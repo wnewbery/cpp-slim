@@ -109,6 +109,10 @@ namespace slim
         Parser::Parser(Lexer &lexer)
             : lexer(lexer)
         {}
+
+        Parser::Parser(Lexer &lexer, const expr::LocalVarNames &local_vars)
+            : lexer(lexer), local_vars(local_vars)
+        {}
         Parser::~Parser()
         {}
 

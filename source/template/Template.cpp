@@ -22,6 +22,12 @@ namespace slim
         root->render(buffer, scope);
         return buffer;
     }
+    std::string Template::render_partial(expr::Scope &scope)
+    {
+        std::string buffer;
+        root->render(buffer, scope);
+        return buffer;
+    }
     std::string Template::render_layout(Template &layout, ViewModelPtr model, bool doctype)const
     {
         auto main_content = render(model, false);

@@ -163,6 +163,7 @@
     <ClCompile Include="tests\template\Layout.cpp" />
     <ClCompile Include="tests\template\Lexer.cpp" />
     <ClCompile Include="tests\template\Parser.cpp" />
+    <ClCompile Include="tests\template\Partial.cpp" />
     <ClCompile Include="tests\template\Template.cpp" />
     <ClCompile Include="tests\types\Array.cpp" />
     <ClCompile Include="tests\types\BasicTypes.cpp" />

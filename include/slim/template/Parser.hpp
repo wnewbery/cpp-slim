@@ -20,7 +20,10 @@ namespace slim
         class Parser
         {
         public:
-            Parser(Lexer &lexer);
+            /**Simple parser with lexer.*/
+            explicit Parser(Lexer &lexer);
+            /**Parser with existing local variables for partials and includes.*/
+            Parser(Lexer &lexer, const expr::LocalVarNames &local_vars);
             ~Parser();
 
             Template parse();

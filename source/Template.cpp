@@ -1,4 +1,5 @@
 #include "Template.hpp"
+#include "expression/Scope.hpp"
 #include "template/Lexer.hpp"
 #include "template/Parser.hpp"
 #include <fstream>
@@ -12,6 +13,14 @@ namespace slim
         return parser.parse();
     }
 
+    Template parse_template(const std::string &source, const std::vector<std::string> &local_vars)
+    {
+        expr::LocalVarNames vars;
+        vars.add(local_vars);
+        tpl::Lexer lexer(source.c_str(), source.c_str() + source.size());
+        tpl::Parser parser(lexer, vars);
+        return parser.parse();
+    }
     Template parse_template(const std::string &source)
     {
         return parse_template(source.c_str(), source.size());

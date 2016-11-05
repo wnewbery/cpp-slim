@@ -1,6 +1,7 @@
 #pragma once
 #include "../types/Object.hpp"
 #include "../types/Nil.hpp"
+#include "../types/Hash.hpp"
 #include "../types/Symbol.hpp"
 #include "../types/ViewModel.hpp"
 #include "../Function.hpp"
@@ -40,6 +41,17 @@ namespace slim { namespace expr
         {
             set(symbol(name), val);
         }
+        void set(Hash *hash)
+        {
+            for (auto &i : *hash)
+            {
+                if (auto sym = coerce<Symbol>(i.first))
+                {
+                    set(sym, i.second);
+                }
+                else set(i.first->to_string(), i.second);
+            }
+        }
         /**Gets a variable from this or any parent scope.*/
         ObjectPtr get(const SymPtr &name)
         {
@@ -70,9 +82,9 @@ namespace slim { namespace expr
     };
     /**Local variable symbol names in scope. Used to tell at parse time if a symbol refers
      * to a local variable or a global/self method.
-     * 
+     *
      * Unlike the Scope object this is used at parse time, and so no values are known.
-     * 
+     *
      * Note that the variable "self" is always defined (as variable 0).
      */
     class LocalVarNames
@@ -87,6 +99,10 @@ namespace slim { namespace expr
         void add(const std::string &name)
         {
             if (!is_var(name)) names.push_back(name);
+        }
+        void add(const std::vector<std::string> &names)
+        {
+            for (auto &name : names) add(name);
         }
         bool is_var(const std::string &name)
         {
