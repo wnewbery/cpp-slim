@@ -30,7 +30,7 @@ namespace slim
         template<size_t...> struct Indices {};
         /**Recursively build a parameter pack from 0 to N - 1.
          * Fully resolves to a type derived from Indices containing those values as template parameters.
-         * 
+         *
          * e.g.
          * BuildIndices<3> : BuildIndices<2, 2>
          * BuildIndices<2, 2> : BuildIndices<1, 1, 2>
@@ -42,6 +42,15 @@ namespace slim
         /**BuildIndices terminal case which is a Indices<>.*/
         template<size_t... Is> struct BuildIndices<0, Is...> : Indices<Is...> {};
 
+        /**Converts a function return value to a Slim object.*/
+        template<class T> Ptr<T> convert_return_type(Ptr<T> &&ptr)
+        {
+            return std::move(ptr);
+        }
+        template<class T> auto convert_return_type(T &&ret)
+        {
+            return make_value(std::move(ret));
+        }
 
         /**Call and handle void returns. For std::true_type return NIL_VALUE.*/
         template<class SelfType, class Func, class... Args>
@@ -62,14 +71,14 @@ namespace slim
         template<class SelfType, class Func, class... Args>
         static ObjectPtr do_call_void_ret(SelfType *self, Func func, std::false_type, Args &&... args)
         {
-            return (self->*func)(std::forward<Args>(args)...);
+            return convert_return_type((self->*func)(std::forward<Args>(args)...));
         }
         template<class Func, class... Args>
         static ObjectPtr do_call_void_ret(Func func, std::false_type, Args &&... args)
         {
-            return func(std::forward<Args>(args)...);
+            return convert_return_type(func(std::forward<Args>(args)...));
         }
- 
+
         /**Call a function with the correct self (C++ this) type given already correct arguments.*/
         template<class Func, class... Args>
         ObjectPtr do_call(Object *self, Func func, Args &&... args)
@@ -81,7 +90,7 @@ namespace slim
                 typename Traits::is_void_result(),
                 std::forward<Args>(args)...);
         }
-        
+
         /**Call a static/global function with correct arguments, but unconverted return type.*/
         template<class RetType, class... Args>
         ObjectPtr do_static_call(RetType(*func)(Args...), Args &&... args)
@@ -157,7 +166,7 @@ namespace slim
             RawMember(RawMethod method) : method(method) {}
             RawMember(RawProp prop) : prop(prop) {}
         };
-        
+
         /**Call a method with the correct member function pointer type.
          * The function signature does not include the template type, allowing a pointer to
          * instantiations to be stored in the non-template Method class.
@@ -232,7 +241,7 @@ namespace slim
          * types and may not be correct for the call. The method checks the number of types and
          * throws an exception if they are wrong. Arguments may not be nullptr, use NIL_VALUE.
          *
-         * If the underlying function has specific types rather than FunctionArgs, then args is 
+         * If the underlying function has specific types rather than FunctionArgs, then args is
          * converted in a manner similar to slim::unpack, calling try_unpack_arg for each one with
          * ADL.
          *

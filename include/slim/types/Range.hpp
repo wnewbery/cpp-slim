@@ -35,12 +35,12 @@ namespace slim
 
         //bsearch
         Ptr<Object> begin();
-        Ptr<Boolean> cover_q(Object *obj);
+        bool cover_q(Object *obj);
         virtual ObjectPtr each(const FunctionArgs &args)override;
         Ptr<Object> end();
-        Ptr<Boolean> exclude_end_q();
+        bool exclude_end_q();
         Ptr<Object> first(const FunctionArgs &args);
-        Ptr<Boolean> include_q(Object *obj);
+        bool include_q(Object *obj);
         Ptr<Object> last(const FunctionArgs &args);
         Ptr<Object> size();
         Ptr<Object> step(const FunctionArgs &args);

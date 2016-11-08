@@ -66,11 +66,11 @@ namespace slim
     {
         return make_value(_begin);
     }
-    Ptr<Boolean> Range::cover_q(Object *obj)
+    bool Range::cover_q(Object *obj)
     {
         auto num = coerce<Number>(obj)->get_value();
-        if (exclude_end) return make_value(_begin <= num && num < _end);
-        else return make_value(_begin <= num && num <= _end);
+        if (exclude_end) return _begin <= num && num < _end;
+        else return _begin <= num && num <= _end;
     }
     ObjectPtr Range::each(const FunctionArgs &args)
     {
@@ -96,9 +96,9 @@ namespace slim
     {
         return make_value(_end);
     }
-    Ptr<Boolean> Range::exclude_end_q()
+    bool Range::exclude_end_q()
     {
-        return make_value(exclude_end);
+        return exclude_end;
     }
     Ptr<Object> Range::first(const FunctionArgs &args)
     {
@@ -123,7 +123,7 @@ namespace slim
         }
         else return make_value(_begin);
     }
-    Ptr<Boolean> Range::include_q(Object *obj)
+    bool Range::include_q(Object *obj)
     {
         return cover_q(obj);
     }
