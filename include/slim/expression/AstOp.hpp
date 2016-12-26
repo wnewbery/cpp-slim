@@ -1,6 +1,7 @@
 #pragma once
 #include "Ast.hpp"
-#include "Function.hpp"
+#include "../CachedMethod.hpp"
+#include "../Function.hpp"
 namespace slim
 {
     namespace tpl
@@ -92,7 +93,10 @@ namespace slim
         {
         public:
             MethodCall(const SymPtr &name, Args &&args) : FuncCall(std::move(args)), name(name) {}
+            const Method* method(Object *obj)const;
+
             SymPtr name;
+            mutable CachedMethod cache;
         };
         /**Calls a method without an explicit context (will use "self").*/
         class GlobalFuncCall : public MethodCall
@@ -136,7 +140,7 @@ namespace slim
 
             ExpressionNodePtr lhs;
         };
-        
+
         /**[...] array literal. Each argument becomes an array element.*/
         class ArrayLiteral : public FuncCall
         {

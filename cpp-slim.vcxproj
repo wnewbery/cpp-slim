@@ -33,6 +33,7 @@
     <ClInclude Include="include\slim\expression\Token.hpp" />
     <ClInclude Include="include\slim\Function.hpp" />
     <ClInclude Include="include\slim\FunctionHelpers.hpp" />
+    <ClInclude Include="include\slim\CachedMethod.hpp" />
     <ClInclude Include="include\slim\Operators.hpp" />
     <ClInclude Include="include\slim\Template.hpp" />
     <ClInclude Include="include\slim\template\Attributes.hpp" />

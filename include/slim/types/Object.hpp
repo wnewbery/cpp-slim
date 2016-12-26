@@ -33,9 +33,9 @@ namespace slim
     {
     public:
         /**Create an instance of this object.
-         * 
+         *
          * Used by slim::create_object<T> via T::create.
-         * 
+         *
          * The default implementation simply uses std::make_shared and forwards to the constructor,
          * but types may provide an alternative implementation. For example Null and Boolean are
          * immutable types, and always return a reference to singleton null, true and false
@@ -102,6 +102,10 @@ namespace slim
         virtual ObjectPtr bit_not();
 
         const Method *find_method(SymPtr name)const;
+        /**Gets a method by its symbol.
+         * @throws NoMethodError
+         */
+        const Method *get_method(SymPtr name)const;
         ObjectPtr call_method(SymPtr name, const FunctionArgs &args);
 
         /**Gets a constant, throws NameError if not found.*/
@@ -112,9 +116,9 @@ namespace slim
     };
 
     /**Create an instance of an object of type T.
-     * 
+     *
      * T should derive from Object.
-     * 
+     *
      * See Object::create for details on providing custom implementations.
      */
     template<class T, class... Args>

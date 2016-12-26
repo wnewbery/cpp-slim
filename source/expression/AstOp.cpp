@@ -74,6 +74,11 @@ namespace slim
             return ret;
         }
 
+        const Method* MethodCall::method(Object *obj)const
+        {
+            return cache.get(obj, name);
+        }
+
         std::string GlobalFuncCall::to_string() const
         {
             return name->str() + "(" + FuncCall::to_string() + ")";
@@ -82,7 +87,7 @@ namespace slim
         {
             auto self = scope.self();
             auto args = eval_args(scope);
-            return self->call_method(name, args);
+            return (*method(self.get()))(self.get(), args);
         }
 
         std::string MemberFuncCall::to_string() const
@@ -93,7 +98,7 @@ namespace slim
         {
             auto self = lhs->eval(scope);
             auto args = eval_args(scope);
-            return self->call_method(name, args);
+            return (*method(self.get()))(self.get(), args);
         }
 
         std::string SafeNavMemberFuncCall::to_string() const
