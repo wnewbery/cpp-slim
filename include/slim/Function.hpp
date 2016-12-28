@@ -47,9 +47,17 @@ namespace slim
         {
             return std::move(ptr);
         }
+        template<class T> Ptr<T> convert_return_type(Ptr<T> &ptr)
+        {
+            return ptr;
+        }
         template<class T> auto convert_return_type(T &&ret)
         {
             return make_value(std::move(ret));
+        }
+        template<class T> auto convert_return_type(T &ret)
+        {
+            return make_value(ret);
         }
 
         /**Call and handle void returns. For std::true_type return NIL_VALUE.*/
@@ -223,7 +231,8 @@ namespace slim
             {
                 if (!args.empty()) throw ArgumentCountError(args.size(), 0, 0);
                 auto prop = (T Self::*)raw.prop;
-                return make_value(((Self*)self)->*prop);
+                auto &tmp = ((Self*)self)->*prop;
+                return detail::convert_return_type(tmp);
             };
 
             return Method(raw, caller, name);
