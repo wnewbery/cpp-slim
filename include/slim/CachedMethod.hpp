@@ -1,8 +1,10 @@
 #pragma once
 #include "Function.hpp"
-#include <intrin.h>
 #include <typeinfo>
 #include <cassert>
+#ifdef _WIN32
+    #include <intrin.h>
+#endif
 
 namespace slim
 {
@@ -14,46 +16,69 @@ namespace slim
     public:
         const Method *get(Object *obj, const SymPtr &name)
         {
-            typedef long long Value;
-            assert(((unsigned long long)(&data) % 16) == 0);
-            Data cached;
-
-            // Atomic read
-            while (true)
-            {
-                auto high = (Value)(cached.method = data.method);
-                auto low = (Value)(cached.type = data.type);
-                if (_InterlockedCompareExchange128((Value*)&data, high, low, (Value*)&cached))
-                    break;
-            }
+            assert(((size_t)(&data) % (sizeof(void*)*2)) == 0);
+            auto cached = atomic_read();
             // Check
             auto obj_type = &typeid(*obj);
             if (obj_type == cached.type)
                 return cached.method;
             // Update
             auto method = obj->get_method(name);
-            // Atomic write
-            while (true)
-            {
-                cached = data;
-                auto high = (Value)obj_type;
-                auto low = (Value)method;
-                if (_InterlockedCompareExchange128((Value*)&data, high, low, (Value*)&cached))
-                    break;
-            }
+            atomic_write({ method, obj_type });
+
             return method;
         }
     private:
         #if defined(_WIN32)
             __declspec(align(sizeof(void*) * 2))
         #else
-        #error Not supported
+            __attribute__((aligned(sizeof(void*) * 2)))
         #endif
         struct Data
         {
-            Method *method = nullptr;
-            const std::type_info *type = nullptr;
+            const Method *method;
+            const std::type_info *type;
         };
-        Data data;
+        Data data = { nullptr, nullptr };
+        #if defined _WIN64
+        Data atomic_read()
+        {
+            // Out always contains the value of data (note, docs for InterlockedCompareExchange128 appear to be wrong)
+            Data out;
+            _InterlockedCompareExchange128((intptr_t*)&data, 0, 0, (intptr_t*)&out);
+            return out;
+        }
+        void atomic_write(const Data &value)
+        {
+            // There is a chance the compare fails and the result is not written, just let the other thread win
+            auto cached = data;
+            _InterlockedCompareExchange128((intptr_t*)&data, (intptr_t)value.method, (intptr_t)value.type, (intptr_t*)&cached);
+        }
+        #elif defined _WIN32
+        Data atomic_read()
+        {
+            auto ret = _InterlockedCompareExchange64((long long*)&data, 0, 0);
+            return *(Data*)&ret;
+        }
+        void atomic_write(const Data &value)
+        {
+            _InterlockedCompareExchange64((long long*)&data, *(const long long*)&value, *(long long*)&data);
+        }
+        #else
+            #if __x86_64__
+                typedef __int128_t AtomicValue;
+            #else
+                typedef long long AtomicValue;
+            #endif
+        Data atomic_read()
+        {
+            auto ret = __sync_val_compare_and_swap((AtomicValue*)&data, 0, 0);
+            return *(Data*)&ret;
+        }
+        void atomic_write(const Data &value)
+        {
+            __sync_val_compare_and_swap((AtomicValue*)&data, *(AtomicValue*)&data, *(const AtomicValue*)&value);
+        }
+        #endif
     };
 }
