@@ -13,17 +13,6 @@ namespace slim
 {
     namespace detail
     {
-        /**Used to determine some aspects of a member function pointer.*/
-        template<class T> struct MethodTraits;
-        template<class RetType, class SelfType, class... Args>
-        struct MethodTraits<RetType(SelfType::*)(Args...)>
-        {
-            typedef RetType result_type;
-            typedef SelfType self_type;
-            typedef std::is_void<result_type> is_void_result;
-            static constexpr size_t arg_count = sizeof...(Args);
-        };
-
         //Want to expand the functions arguments along with the dynamic FunctionArgs array while converting
         //each type.
         /**A varadic type that takes a pack of size_t indices as a parameter pack.*/
@@ -60,73 +49,32 @@ namespace slim
             return make_value(ret);
         }
 
-        /**Call and handle void returns. For std::true_type return NIL_VALUE.*/
-        template<class SelfType, class Func, class... Args>
-        static ObjectPtr do_call_void_ret(SelfType *self, Func func, std::true_type, Args &&... args)
-        {
-            (self->*func)(std::forward<Args>(args)...);
-            return NIL_VALUE;
-        }
-        template<class Func, class... Args>
-        static ObjectPtr do_call_void_ret(Func func, std::true_type, Args &&... args)
-        {
-            func(std::forward<Args>(args)...);
-            return NIL_VALUE;
-        }
-        /**Call and handle void returns. For std::false_type return result of func implicitly
-         * converted to ObjectPtr.
-         */
-        template<class SelfType, class Func, class... Args>
-        static ObjectPtr do_call_void_ret(SelfType *self, Func func, std::false_type, Args &&... args)
-        {
-            return convert_return_type((self->*func)(std::forward<Args>(args)...));
-        }
-        template<class Func, class... Args>
-        static ObjectPtr do_call_void_ret(Func func, std::false_type, Args &&... args)
-        {
-            return convert_return_type(func(std::forward<Args>(args)...));
-        }
-
-        /**Call a function with the correct self (C++ this) type given already correct arguments.*/
-        template<class Func, class... Args>
-        ObjectPtr do_call(Object *self, Func func, Args &&... args)
-        {
-            typedef MethodTraits<Func> Traits;
-            auto self_typed = static_cast<typename Traits::self_type*>(self);
-            assert(self_typed == dynamic_cast<typename Traits::self_type*>(self));
-            return do_call_void_ret(self_typed, func,
-                typename Traits::is_void_result(),
-                std::forward<Args>(args)...);
-        }
-
-        /**Call a static/global function with correct arguments, but unconverted return type.*/
-        template<class RetType, class... Args>
-        ObjectPtr do_static_call(RetType(*func)(Args...), Args &&... args)
-        {
-            return do_call_void_ret(func,
-                std::is_void<RetType>::type(),
-                std::forward<Args>(args)...);
-        }
-
         /**Implementation detail of call with fixed types.
          * Has a matching pack of argument types and indices for calling func.
          */
-        template<class... Args, class Func, size_t ...indices>
-        ObjectPtr do_call_typed(Object *self, Func func, const FunctionArgs &args, Indices<indices...>)
+        template<class... Args, class SelfType, size_t ...indices>
+        ObjectPtr call_unpacked(Object *self, void(SelfType::*func)(Args...), const FunctionArgs &args, Indices<indices...>)
         {
-            return do_call(self, func, slim::unpack_arg<Args>(args[indices])...);
+            (static_cast<SelfType*>(self)->*func)(slim::unpack_arg<Args>(args[indices])...);
+            return NIL_VALUE;
         }
-        template<class... Args, class Func, size_t ...indices>
-        ObjectPtr do_call_static_typed(Func func, const FunctionArgs &args, Indices<indices...>)
+        template<class... Args, class RetType, class SelfType, size_t ...indices>
+        ObjectPtr call_unpacked(Object *self, RetType(SelfType::*func)(Args...), const FunctionArgs &args, Indices<indices...>)
         {
-            return do_static_call(func, slim::unpack_arg<Args>(args[indices])...);
+            return convert_return_type((static_cast<SelfType*>(self)->*func)(slim::unpack_arg<Args>(args[indices])...));
         }
 
         /**Call a varargs member method.*/
+        template<class SelfType>
+        ObjectPtr call(Object *self, void(SelfType::*func)(const FunctionArgs &args), const FunctionArgs &args)
+        {
+            (static_cast<SelfType*>(self)->*func)(args);
+            return NIL_VALUE;
+        }
         template<class RetType, class SelfType>
         ObjectPtr call(Object *self, RetType(SelfType::*func)(const FunctionArgs &args), const FunctionArgs &args)
         {
-            return do_call(self, func, args);
+            return convert_return_type((static_cast<SelfType*>(self)->*func)(args));
         }
         /**Call func by converting each element of args to the appropriate type.*/
         template<class RetType, class SelfType, class... Args>
@@ -136,15 +84,31 @@ namespace slim
             {
                 throw ArgumentCountError(args.size(), sizeof...(Args), sizeof...(Args));
             }
-            return do_call_typed<Args...>(self, func, args, BuildIndices<sizeof...(Args)>{});
+            return call_unpacked<Args...>(self, func, args, BuildIndices<sizeof...(Args)>{});
         }
-        /**Call a static/global varargs function.*/
+
+        template<class... Args, size_t ...indices>
+        ObjectPtr call_static_unpacked(void(*func)(Args...), const FunctionArgs &args, Indices<indices...>)
+        {
+            func(slim::unpack_arg<Args>(args[indices])...);
+            return NIL_VALUE;
+        }
+        template<class... Args, class RetType, size_t ...indices>
+        ObjectPtr call_static_unpacked(RetType(*func)(Args...), const FunctionArgs &args, Indices<indices...>)
+        {
+            return convert_return_type(func(slim::unpack_arg<Args>(args[indices])...));
+        }
+        /**Call a static/global function.*/
+        inline ObjectPtr call_static(Object*, void(*func)(const FunctionArgs &args), const FunctionArgs &args)
+        {
+            func(args);
+            return NIL_VALUE;
+        }
         template<class RetType>
         ObjectPtr call_static(Object*, RetType(*func)(const FunctionArgs &args), const FunctionArgs &args)
         {
-            return do_static_call(func, args);
+            return convert_return_type(func(args));
         }
-        /**Call a static/global typed args function.*/
         template<class RetType, class... Args>
         ObjectPtr call_static(Object *, RetType(*func)(Args...), const FunctionArgs &args)
         {
@@ -152,7 +116,7 @@ namespace slim
             {
                 throw ArgumentCountError(args.size(), sizeof...(Args), sizeof...(Args));
             }
-            return do_call_static_typed<Args...>(func, args, BuildIndices<sizeof...(Args)>{});
+            return call_static_unpacked<Args...>(func, args, BuildIndices<sizeof...(Args)>{});
         }
 
 
