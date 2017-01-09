@@ -5,6 +5,7 @@
 #include "types/String.hpp"
 #include "Operators.hpp"
 #include "Function.hpp"
+#include "CachedMethod.hpp"
 #include <unordered_map>
 #include <mutex>
 
@@ -18,11 +19,13 @@ namespace slim
             virtual Ptr<Object> call(const FunctionArgs &args)override
             {
                 if (args.empty()) throw ArgumentError("no receiver given");
-                auto self = args[0];
+                auto self = args[0].get();
+                auto method = cache.get(self, name);
                 FunctionArgs args2(args.begin() + 1, args.end());
-                return self->call_method(name, args2);
+                return (*method)(self, args2);
             }
             Ptr<Symbol> name;
+            CachedMethod cache;
             SymbolProc(Ptr<Symbol> name) : name(name) {}
         };
         class UnaryProc : public Proc
