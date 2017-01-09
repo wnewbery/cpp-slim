@@ -100,20 +100,8 @@ namespace slim
     {
         return create_object<Number>(v);
     }
-    inline std::shared_ptr<Number> make_value(int v)
-    {
-        return create_object<Number>(v);
-    }
-    inline std::shared_ptr<Number> make_value(unsigned v)
-    {
-        return create_object<Number>(v);
-    }
-    inline std::shared_ptr<Number> make_value(long long v)
-    {
-        return create_object<Number>((double)v);
-    }
-    inline std::shared_ptr<Number> make_value(unsigned long long v)
-    {
-        return create_object<Number>((double)v);
-    }
+    std::shared_ptr<Number> make_value(int v);
+    std::shared_ptr<Number> make_value(unsigned v);
+    std::shared_ptr<Number> make_value(long long v);
+    std::shared_ptr<Number> make_value(unsigned long long v);
 }

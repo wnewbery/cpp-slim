@@ -168,5 +168,45 @@ namespace slim
     {
         return make_value(v == 0);
     }
+
+
+    namespace
+    {
+        static const unsigned char CACHE_MAX = 100;
+        struct CachedNumbers
+        {
+            std::shared_ptr<Number> numbers[CACHE_MAX + 1];
+            CachedNumbers()
+            {
+                for (int i = 0; i <= CACHE_MAX; ++i)
+                    numbers[i] = create_object<Number>(i);
+            }
+        };
+        std::shared_ptr<Number> *cached_numbers()
+        {
+            static CachedNumbers cache;
+            return cache.numbers;
+        }
+    }
+    std::shared_ptr<Number> make_value(int v)
+    {
+        if (v >= 0 && v <= CACHE_MAX) return cached_numbers()[v];
+        else return create_object<Number>(v);
+    }
+    std::shared_ptr<Number> make_value(unsigned v)
+    {
+        if (v >= 0 && v <= CACHE_MAX) return cached_numbers()[v];
+        else return create_object<Number>(v);
+    }
+    std::shared_ptr<Number> make_value(long long v)
+    {
+        if (v >= 0 && v <= CACHE_MAX) return cached_numbers()[v];
+        else return create_object<Number>((double)v);
+    }
+    std::shared_ptr<Number> make_value(unsigned long long v)
+    {
+        if (v >= 0 && v <= CACHE_MAX) return cached_numbers()[v];
+        else return create_object<Number>((double)v);
+    }
 }
 
