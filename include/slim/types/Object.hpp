@@ -113,6 +113,11 @@ namespace slim
     protected:
         /**Get a function table for the default implementation of call_method.*/
         virtual const MethodTable &method_table()const;
+
+        template<class T> Ptr<T> this_ptr()
+        {
+            return std::static_pointer_cast<T>(shared_from_this());
+        }
     };
 
     /**Create an instance of an object of type T.

@@ -7,6 +7,19 @@
 
 namespace slim
 {
+    namespace detail
+    {
+        template<class T> bool try_unpack_arg_number(const ObjectPtr &arg, T *out)
+        {
+            auto n = dynamic_cast<Number*>(arg.get());
+            if (n)
+            {
+                *out = (T)n->get_value();
+                return true;
+            }
+            else return false;
+        }
+    }
     /**Sets out if arg is a String instance.*/
     inline bool try_unpack_arg(const ObjectPtr &arg, std::string *out)
     {
@@ -21,24 +34,37 @@ namespace slim
     /**Sets out if arg is a Number instance.*/
     inline bool try_unpack_arg(const ObjectPtr &arg, double *out)
     {
-        auto n = dynamic_cast<Number*>(arg.get());
-        if (n)
-        {
-            *out = n->get_value();
-            return true;
-        }
-        else return false;
+        return detail::try_unpack_arg_number(arg, out);
     }
     /**Sets out if arg is a Number instance with a truncation conversion.*/
     inline bool try_unpack_arg(const ObjectPtr &arg, int *out)
     {
-        auto n = dynamic_cast<Number*>(arg.get());
-        if (n)
-        {
-            *out = (int)n->get_value();
-            return true;
-        }
-        else return false;
+        return detail::try_unpack_arg_number(arg, out);
+    }
+    /**Sets out if arg is a Number instance with a truncation conversion.*/
+    inline bool try_unpack_arg(const ObjectPtr &arg, unsigned *out)
+    {
+        return detail::try_unpack_arg_number(arg, out);
+    }
+    /**Sets out if arg is a Number instance with a truncation conversion.*/
+    inline bool try_unpack_arg(const ObjectPtr &arg, long *out)
+    {
+        return detail::try_unpack_arg_number(arg, out);
+    }
+    /**Sets out if arg is a Number instance with a truncation conversion.*/
+    inline bool try_unpack_arg(const ObjectPtr &arg, unsigned long *out)
+    {
+        return detail::try_unpack_arg_number(arg, out);
+    }
+    /**Sets out if arg is a Number instance with a truncation conversion.*/
+    inline bool try_unpack_arg(const ObjectPtr &arg, long long *out)
+    {
+        return detail::try_unpack_arg_number(arg, out);
+    }
+    /**Sets out if arg is a Number instance with a truncation conversion.*/
+    inline bool try_unpack_arg(const ObjectPtr &arg, unsigned long long *out)
+    {
+        return detail::try_unpack_arg_number(arg, out);
     }
     /**Sets out if arg is a Boolean instance.*/
     inline bool try_unpack_arg(const ObjectPtr &arg, bool *out)

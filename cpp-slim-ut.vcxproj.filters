@@ -96,6 +96,9 @@
     <ClCompile Include="tests\template\Partial.cpp">
       <Filter>tests\template</Filter>
     </ClCompile>
+    <ClCompile Include="tests\types\Time.cpp">
+      <Filter>tests\types</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tests\TestAccumulator.hpp">

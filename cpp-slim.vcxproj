@@ -58,6 +58,7 @@
     <ClInclude Include="include\slim\types\String.hpp" />
     <ClInclude Include="include\slim\types\Object.hpp" />
     <ClInclude Include="include\slim\types\Symbol.hpp" />
+    <ClInclude Include="include\slim\types\Time.hpp" />
     <ClInclude Include="include\slim\types\Type.hpp" />
     <ClInclude Include="include\slim\types\ViewModel.hpp" />
     <ClInclude Include="include\slim\Util.hpp" />
@@ -66,6 +67,7 @@
     <ClInclude Include="source\Unicode.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="include\slim\types\Time.cpp" />
     <ClCompile Include="source\Error.cpp" />
     <ClCompile Include="source\expression\ArithmeticOp.cpp" />
     <ClCompile Include="source\expression\AstOp.cpp" />

@@ -49,10 +49,6 @@ namespace slim
         : NameError(self->type_name() + " has no constant " + name->str())
     {
     }
-    ArgumentError::ArgumentError(const std::string &method_name)
-        : ScriptError("Invalid argument for " + method_name)
-    {
-    }
     ArgumentError::ArgumentError(const Object *obj, const std::string &method_name)
         : ScriptError("Invalid argument for " + obj->type_name() + "." + method_name)
     {

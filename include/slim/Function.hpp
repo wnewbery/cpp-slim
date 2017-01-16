@@ -61,7 +61,9 @@ namespace slim
         template<class... Args, class RetType, class SelfType, size_t ...indices>
         ObjectPtr call_unpacked(Object *self, RetType(SelfType::*func)(Args...), const FunctionArgs &args, Indices<indices...>)
         {
-            return convert_return_type((static_cast<SelfType*>(self)->*func)(slim::unpack_arg<Args>(args[indices])...));
+            return convert_return_type(
+                (static_cast<SelfType*>(self)->*func)
+                (slim::unpack_arg<std::remove_const<std::remove_reference<Args>::type>::type>(args[indices])...));
         }
 
         /**Call a varargs member method.*/
@@ -173,6 +175,12 @@ namespace slim
         Method(Ret(Self::*method)(Args...), const SymPtr &name)
             : raw((detail::RawMethod)method)
             , caller(&detail::wrapped_call<decltype(method)>)
+            , _name(name)
+        {}
+        template<class Ret, class Self, class...Args>
+        Method(Ret(Self::*method)(Args...)const, const SymPtr &name)
+            : raw((detail::RawMethod)method)
+            , caller(&detail::wrapped_call<Ret(Self::*)(Args...)>)
             , _name(name)
         {}
         template<class Ret, class...Args>

@@ -146,7 +146,7 @@ namespace slim
     {
     public:
         ArgumentError() : ScriptError("InvalidArgument") {}
-        ArgumentError(const std::string &method_name);
+        ArgumentError(const std::string &msg) : ScriptError("ArgumentError: " + msg) {}
         ArgumentError(const Object *obj, const std::string &method_name);
         ArgumentError(const Object *obj, const std::string &method_name, const std::string &msg);
     };
