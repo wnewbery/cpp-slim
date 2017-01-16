@@ -70,12 +70,10 @@ namespace slim
 
         /**Day of month, 1..n*/
         int day()const;
-        int mday()const { return day(); }
         int hour()const;
         int min()const;
         /**Month of the year, 1..12*/
         int month()const;
-        int mon()const { return month(); }
         int nsec()const { return 0; }
         int sec()const;
         float subsec()const { return 0; }

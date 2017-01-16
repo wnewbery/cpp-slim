@@ -152,8 +152,11 @@ BOOST_AUTO_TEST_CASE(accessors)
     BOOST_CHECK_EQUAL("12", eval("Time.utc(2017, 'jan', 15, 12, 44, 16).hour"));
     BOOST_CHECK_EQUAL("44", eval("Time.utc(2017, 'jan', 15, 12, 44, 16).min"));
     BOOST_CHECK_EQUAL("16", eval("Time.utc(2017, 'jan', 15, 12, 44, 16).sec"));
+    BOOST_CHECK_EQUAL("16", eval("Time.utc(2017, 'jan', 15, 12, 44, 16).tv_sec"));
     BOOST_CHECK_EQUAL("0", eval("Time.utc(2017, 'jan', 15, 12, 44, 16).nsec"));
+    BOOST_CHECK_EQUAL("0", eval("Time.utc(2017, 'jan', 15, 12, 44, 16).tv_nsec"));
     BOOST_CHECK_EQUAL("0", eval("Time.utc(2017, 'jan', 15, 12, 44, 16).usec"));
+    BOOST_CHECK_EQUAL("0", eval("Time.utc(2017, 'jan', 15, 12, 44, 16).tv_usec"));
     BOOST_CHECK_EQUAL("0", eval("Time.utc(2017, 'jan', 15, 12, 44, 16).subsec"));
 
 
