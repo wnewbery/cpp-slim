@@ -122,10 +122,14 @@ BOOST_AUTO_TEST_CASE(cmp)
     BOOST_CHECK_EQUAL("1", eval("Time.at(1000) <=> Time.at(900)"));
 }
 
-BOOST_AUTO_TEST_CASE(addition)
+BOOST_AUTO_TEST_CASE(arithmetic)
 {
     BOOST_CHECK_EQUAL(1500, eval_time("Time.at(1000) + 500"));
+
     BOOST_CHECK_EQUAL(500, eval_time("Time.at(1000) - 500"));
+    BOOST_CHECK_EQUAL("500", eval("Time.at(1000) - Time.at(500)"));
+    BOOST_CHECK_EQUAL("-500", eval("Time.at(500) - Time.at(1000)"));
+
 }
 
 BOOST_AUTO_TEST_CASE(no_timezones)

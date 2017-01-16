@@ -533,7 +533,15 @@ namespace slim
     }
     ObjectPtr Time::sub(Object *rhs)
     {
-        return create_object<Time>(v - (time_t)coerce<Number>(rhs)->get_value()*TICKS_SECOND);
+        if (auto num = dynamic_cast<Number*>(rhs))
+        {
+            return create_object<Time>(v - (time_t)num->get_value()*TICKS_SECOND);
+        }
+        else
+        {
+            auto t = coerce<Time>(rhs);
+            return make_value(v - t->v);
+        }
     }
 
     Ptr<Array> Time::to_a()const
