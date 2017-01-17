@@ -450,7 +450,23 @@ namespace slim
             }
         }
     }
-    
+
+
+    Ptr<Time> number_ago(const Number *self, const FunctionArgs &args)
+    {
+        const Time *ref = nullptr;
+        unpack<0>(args, &ref);
+        time_t t = ref ? ref->get_value() : time(nullptr);
+        return create_object<Time>(t - (time_t)self->get_value());
+    }
+    Ptr<Time> number_from_now(const Number *self, const FunctionArgs &args)
+    {
+        const Time *ref = nullptr;
+        unpack<0>(args, &ref);
+        time_t t = ref ? ref->get_value() : time(nullptr);
+        return create_object<Time>(t + (time_t)self->get_value());
+    }
+
     Ptr<Time> TimeType::local(const FunctionArgs &args)const
     {
         auto tm = slim::get_tm(args);

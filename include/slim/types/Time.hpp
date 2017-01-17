@@ -128,28 +128,30 @@ namespace slim
     };
 
     // Rails number extensions
-    inline Ptr<Time> number_ago(const Number *self)
+    Ptr<Time> number_ago(const Number *self, const FunctionArgs &args);
+    Ptr<Time> number_from_now(const Number *self, const FunctionArgs &args);
+    inline Ptr<Number> number_fortnights(const Number *self)
     {
-        return create_object<Time>((time_t)self->get_value());
+        return make_value(self->get_value() * 2 * Time::TICKS_WEEK);
     }
-    inline Ptr<Number> number_days(const Number *self, int n)
+    inline Ptr<Number> number_weeks(const Number *self)
     {
-        return make_value(self->get_value() + n * Time::TICKS_DAY);
+        return make_value(self->get_value() * Time::TICKS_WEEK);
     }
-    inline Ptr<Number> number_hours(const Number *self, int n)
+    inline Ptr<Number> number_days(const Number *self)
     {
-        return make_value(self->get_value() + n * Time::TICKS_HOUR);
+        return make_value(self->get_value() * Time::TICKS_DAY);
     }
-    inline Ptr<Number> number_minutes(const Number *self, int n)
+    inline Ptr<Number> number_hours(const Number *self)
     {
-        return make_value(self->get_value() + n * Time::TICKS_MIN);
+        return make_value(self->get_value() * Time::TICKS_HOUR);
     }
-    inline Ptr<Number> number_seconds(const Number *self, int n)
+    inline Ptr<Number> number_minutes(const Number *self)
     {
-        return make_value(self->get_value() + n * Time::TICKS_SECOND);
+        return make_value(self->get_value() * Time::TICKS_MIN);
     }
-    inline Ptr<Number> number_weeks(const Number *self, int n)
+    inline Ptr<Number> number_seconds(const Number *self)
     {
-        return make_value(self->get_value() + n * Time::TICKS_WEEK);
+        return make_value(self->get_value() * Time::TICKS_SECOND);
     }
 }

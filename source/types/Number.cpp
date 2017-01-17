@@ -1,4 +1,5 @@
 #include "types/Number.hpp"
+#include "types/Time.hpp"
 #include "Error.hpp"
 #include "Function.hpp"
 #include <sstream>
@@ -34,7 +35,17 @@ namespace slim
             //alias
             { &Number::to_i, "truncate" },
             { &Number::to_i, "to_int" },
-            { &Number::abs, "magnitude" }
+            { &Number::abs, "magnitude" },
+
+            // Time extensions
+            Method::free(&number_ago, "ago"), Method::free(&number_ago, "until"),
+            Method::free(&number_from_now, "from_now"), Method::free(&number_from_now, "since"),
+            Method::free(&number_fortnights, "fortnight"), Method::free(&number_fortnights, "fortnights"),
+            Method::free(&number_weeks, "week"), Method::free(&number_weeks, "weeks"),
+            Method::free(&number_days, "day"), Method::free(&number_days, "days"),
+            Method::free(&number_hours, "hour"), Method::free(&number_hours, "hours"),
+            Method::free(&number_minutes, "minute"), Method::free(&number_minutes, "minutes"),
+            Method::free(&number_seconds, "second"), Method::free(&number_seconds, "seconds"),
         });
         return table;
     }

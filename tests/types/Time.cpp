@@ -44,6 +44,10 @@ time_t eval_time(const std::string &str)
 {
     return coerce<Time>(eval_o(str))->get_value();
 }
+long long eval_i(const std::string &str)
+{
+    return (long long)coerce<Number>(eval_o(str))->get_value();
+}
 std::string time_str()
 {
     return std::to_string(time(nullptr));
@@ -290,6 +294,32 @@ BOOST_AUTO_TEST_CASE(format)
     BOOST_CHECK_EQUAL("\"12:44:16\"", eval("Time.utc(2017, 'jan', 15, 12, 44, 16).strftime '%T'"));
     BOOST_CHECK_EQUAL("\"12:44:16\"", eval("Time.utc(2017, 'jan', 15, 12, 44, 16).strftime '%X'"));
     BOOST_CHECK_EQUAL("\"      12:44:16\"", eval("Time.utc(2017, 'jan', 15, 12, 44, 16).strftime '%14T'"));
+}
+
+BOOST_AUTO_TEST_CASE(number_ext)
+{
+    BOOST_CHECK_EQUAL(      1, eval_i("1.second"));
+    BOOST_CHECK_EQUAL(      2, eval_i("2.seconds"));
+    BOOST_CHECK_EQUAL(     60, eval_i("1.minute"));
+    BOOST_CHECK_EQUAL(    120, eval_i("2.minutes"));
+    BOOST_CHECK_EQUAL(   3600, eval_i("1.hour"));
+    BOOST_CHECK_EQUAL(   7200, eval_i("2.hours"));
+    BOOST_CHECK_EQUAL(  86400, eval_i("1.day"));
+    BOOST_CHECK_EQUAL( 172800, eval_i("2.days"));
+    BOOST_CHECK_EQUAL( 604800, eval_i("1.week"));
+    BOOST_CHECK_EQUAL(1209600, eval_i("2.weeks"));
+    BOOST_CHECK_EQUAL(1209600, eval_i("1.fortnight"));
+    BOOST_CHECK_EQUAL(2419200, eval_i("2.fortnights"));
+
+    CHECK_TIME_EQUAL(time(nullptr), eval_time("0.ago"));
+    CHECK_TIME_EQUAL(time(nullptr) - 120, eval_time("120.ago"));
+    CHECK_TIME_EQUAL(time(nullptr) - 120, eval_time("120.until"));
+    CHECK_TIME_EQUAL(400, eval_time("100.until Time.at(500)"));
+
+    CHECK_TIME_EQUAL(time(nullptr), eval_time("0.from_now"));
+    CHECK_TIME_EQUAL(time(nullptr) + 120, eval_time("120.from_now"));
+    CHECK_TIME_EQUAL(time(nullptr) + 120, eval_time("120.since"));
+    CHECK_TIME_EQUAL(120, eval_time("120.since Time.at(0)"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

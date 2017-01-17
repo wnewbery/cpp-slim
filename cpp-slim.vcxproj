@@ -59,7 +59,6 @@
     <ClInclude Include="include\slim\types\Object.hpp" />
     <ClInclude Include="include\slim\types\Symbol.hpp" />
     <ClInclude Include="include\slim\types\Time.hpp" />
-    <ClInclude Include="include\slim\types\Type.hpp" />
     <ClInclude Include="include\slim\types\ViewModel.hpp" />
     <ClInclude Include="include\slim\Util.hpp" />
     <ClInclude Include="include\slim\Value.hpp" />

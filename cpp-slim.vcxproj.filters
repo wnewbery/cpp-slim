@@ -132,9 +132,6 @@
     <ClInclude Include="include\slim\types\Math.hpp">
       <Filter>include\types</Filter>
     </ClInclude>
-    <ClInclude Include="include\slim\types\Type.hpp">
-      <Filter>include\types</Filter>
-    </ClInclude>
     <ClInclude Include="source\template\TemplateBlock.hpp">
       <Filter>source\template</Filter>
     </ClInclude>

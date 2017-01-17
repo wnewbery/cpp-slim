@@ -65,7 +65,6 @@ namespace slim
                 (static_cast<SelfType*>(self)->*func)
                 (slim::unpack_arg<std::remove_const<std::remove_reference<Args>::type>::type>(args[indices])...));
         }
-
         /**Call a varargs member method.*/
         template<class SelfType>
         ObjectPtr call(Object *self, void(SelfType::*func)(const FunctionArgs &args), const FunctionArgs &args)
@@ -87,6 +86,41 @@ namespace slim
                 throw ArgumentCountError(args.size(), sizeof...(Args), sizeof...(Args));
             }
             return call_unpacked<Args...>(self, func, args, BuildIndices<sizeof...(Args)>{});
+        }
+
+        template<class... Args, class SelfType, size_t ...indices>
+        ObjectPtr free_call_unpacked(Object *self, void(*func)(SelfType *self, Args...), const FunctionArgs &args, Indices<indices...>)
+        {
+            func(static_cast<SelfType*>(self), slim::unpack_arg<Args>(args[indices])...);
+            return NIL_VALUE;
+        }
+        template<class... Args, class RetType, class SelfType, size_t ...indices>
+        ObjectPtr free_call_unpacked(Object *self, RetType(*func)(SelfType *self, Args...), const FunctionArgs &args, Indices<indices...>)
+        {
+            return convert_return_type(func(static_cast<SelfType*>(self),
+                    slim::unpack_arg<std::remove_const<std::remove_reference<Args>::type>::type>(args[indices])...));
+        }
+        /**Call a varargs member method.*/
+        template<class SelfType>
+        ObjectPtr free_call(Object *self, void(*func)(SelfType *self, const FunctionArgs &args), const FunctionArgs &args)
+        {
+            free_call(static_cast<SelfType*>(self), args);
+            return NIL_VALUE;
+        }
+        template<class RetType, class SelfType>
+        ObjectPtr free_call(Object *self, RetType(*func)(SelfType *self, const FunctionArgs &args), const FunctionArgs &args)
+        {
+            return convert_return_type(func(static_cast<SelfType*>(self), args));
+        }
+        /**Call func by converting each element of args to the appropriate type.*/
+        template<class RetType, class SelfType, class... Args>
+        ObjectPtr free_call(Object *self, RetType(*func)(SelfType *self, Args...), const FunctionArgs &args)
+        {
+            if (args.size() != sizeof...(Args))
+            {
+                throw ArgumentCountError(args.size(), sizeof...(Args), sizeof...(Args));
+            }
+            return free_call_unpacked<Args...>(self, func, args, BuildIndices<sizeof...(Args)>{});
         }
 
         template<class... Args, size_t ...indices>
@@ -152,9 +186,15 @@ namespace slim
             return call(self, (Func)func.method, args);
         }
         template<class Func>
+        ObjectPtr wrapped_free_call(Object *self, RawMember func, const FunctionArgs &args)
+        {
+            static_assert(sizeof(Func) == sizeof(RawFunc), "Cast assumes RawFunc was the correct storage size.");
+            return free_call(self, (Func)func.func, args);
+        }
+        template<class Func>
         ObjectPtr wrapped_static_call(Object *self, RawMember func, const FunctionArgs &args)
         {
-            static_assert(sizeof(Func) == sizeof(RawFunc), "Cast assumes RawMethod was the correct storage size.");
+            static_assert(sizeof(Func) == sizeof(RawFunc), "Cast assumes RawFunc was the correct storage size.");
             return call_static(self, (Func)func.func, args);
         }
     }
@@ -171,6 +211,7 @@ namespace slim
             : raw(raw), caller(caller), _name(name)
         {}
 
+        // Member
         template<class Ret, class Self, class...Args>
         Method(Ret(Self::*method)(Args...), const SymPtr &name)
             : raw((detail::RawMethod)method)
@@ -183,16 +224,38 @@ namespace slim
             , caller(&detail::wrapped_call<Ret(Self::*)(Args...)>)
             , _name(name)
         {}
+
+        // Static
         template<class Ret, class...Args>
         Method(Ret(*func)(Args...), const SymPtr &name)
             : raw((detail::RawFunc)func)
             , caller(&detail::wrapped_static_call<decltype(func)>)
             , _name(name)
         {}
+
         template<class Func>
         Method(Func func, const std::string &name)
             : Method(func, symbol(name))
         {}
+
+        // Free
+        //template<class Ret, class...Args>
+        //Method(Ret(*func)(Args...), const SymPtr &name)
+        //    : raw((detail::RawFunc)func)
+        //    , caller(&detail::wrapped_static_call<decltype(func)>)
+        //    , _name(name)
+        //{}
+        template<class Func>
+        static Method free(Func func, const SymPtr &name)
+        {
+            auto raw = (detail::RawFunc)func;
+            return Method(raw, detail::wrapped_free_call<Func>, name);
+        }
+        template<class Func>
+        static Method free(Func func, const std::string &name)
+        {
+            return free(func, symbol(name));
+        }
 
         template<class Self, class T>
         static Method getter(T Self::*prop, const SymPtr &name)
