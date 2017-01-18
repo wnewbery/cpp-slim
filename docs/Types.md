@@ -121,6 +121,8 @@ Returns `"nil"`.
 
 The `Number` class represents numeric values using a `double`. This is used for all numeric literals, and fulfills the role of the various numeric types (`Numeric`, `Integer`, `Bignum`, `Fixnum`, `Float`).
 
+Includes some Rails time helpers. The duration methods such as `hours` return another number object with seconds.
+
 Most methods are the same as the Ruby methods.
 
    * `to_f`, `to_d`: Returns the same number.
@@ -139,6 +141,14 @@ Most methods are the same as the Ruby methods.
    * `next_float`
    * `prev_float`
    * `zero?`
+   * `ago`, `util`
+   * `from_now`, `since`
+   * `fortnight`, `fortnights`
+   * `week`, `weeks`
+   * `day`, `days`
+   * `hour`, `hours`
+   * `minute`, `minutes`
+   * `second`, `seconds`
 
 #Regexp
 Regular expression object using `std::regex` with `std::regex::ECMAScript`.
@@ -192,4 +202,38 @@ C++ code can get instances using `slim::symbol(string)`, which is thread safe.
    * `<=>`: Uses the internal String object for comparison.
    * `to_s`: Returns the internal String object.
 
+# Time
+Time type providing a similar API to the Ruby Time object using a `time_t` with UTC conversions. As such it can only work with second precision and does not support other timezones.
 
+## Methods
+
+ * `::at`
+ * `::gm`
+ * `::local`
+ * `::mktime`
+ * `::new`
+ * `::now`
+ * `::utc`
+ * `==`, `!=`
+ * `<=>`
+ * `to_a`
+ * `to_f`
+ * `to_i`
+ * `asctime`, `ctime`
+ * `strftime`
+ * `dst?`, `isdst`
+ * `getgm`, `getutc`, `utc`, `gmtime`
+ * `gmt?`, `utc?`
+ * `gmt_offset`, `utc_offset`, `gmtoff`
+ * `zone`
+ * `day`, `mday`
+ * `hour`
+ * `min`
+ * `month`, `mon`
+ * `nsec`, `tv_nsec`
+ * `sec`, `tv_sec`
+ * `usec`, `tv_usec`
+ * `wday`
+ * `yday`
+ * `year`
+ * `sunday?`, `monday?`, `tuesday?`, `wednesday?`, `thursday?`, `friday?`, `saturday?`
