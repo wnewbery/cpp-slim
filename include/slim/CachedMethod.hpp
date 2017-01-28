@@ -52,7 +52,7 @@ namespace slim
         {
             // There is a chance the compare fails and the result is not written, just let the other thread win
             auto cached = data;
-            _InterlockedCompareExchange128((intptr_t*)&data, (intptr_t)value.method, (intptr_t)value.type, (intptr_t*)&cached);
+            _InterlockedCompareExchange128((intptr_t*)&data, (intptr_t)value.type, (intptr_t)value.method, (intptr_t*)&cached);
         }
         #elif defined _WIN32
         Data atomic_read()
